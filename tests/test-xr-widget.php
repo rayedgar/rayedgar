@@ -1,10 +1,17 @@
 <?php
 namespace {
     define('ABSPATH', true);
+    define('ELEMENTOR_VERSION', '3.5.0');
 
     function esc_html__( $text, $domain ) { return $text; }
     function esc_html( $text ) { return $text; }
-    function add_action( $hook, $callback ) {}
+    function add_action( $hook, $callback ) {
+        global $actions;
+        $actions[$hook][] = $callback;
+    }
+    function did_action($hook) { return $hook === 'elementor/loaded'; }
+
+    $actions = [];
 }
 
 namespace Elementor {
@@ -29,10 +36,39 @@ namespace Elementor {
             return 'typography';
         }
     }
+
+    class Widgets_Manager {
+        public function register($widget) {}
+    }
 }
 
 namespace {
-    require_once 'elementor-xr-widget/widgets/xr-widget.php';
+    require_once 'elementor-xr-widget/elementor-xr-widget.php';
+
+    echo "Testing Elementor_XR_Widget...\n";
+
+    global $actions;
+
+    // Simulate plugins_loaded
+    if (isset($actions['plugins_loaded'])) {
+        foreach ($actions['plugins_loaded'] as $callback) {
+            call_user_func($callback);
+        }
+    }
+
+    // Check if elementor/widgets/register action was added
+    if (isset($actions['elementor/widgets/register'])) {
+        echo "Register Widgets Action Hooked!\n";
+
+        // Trigger widget registration
+        $widgets_manager = new \Elementor\Widgets_Manager();
+        foreach ($actions['elementor/widgets/register'] as $callback) {
+            call_user_func($callback, $widgets_manager);
+        }
+    } else {
+        echo "Register Widgets Action NOT Hooked!\n";
+        exit(1);
+    }
 
     $widget = new \XR_Widget();
 
@@ -49,7 +85,6 @@ namespace {
 
     // Verify render method doesn't crash
     ob_start();
-    // We need to use reflection to call protected render()
     $reflection = new ReflectionClass($widget);
     $method = $reflection->getMethod('render');
     $method->setAccessible(true);
