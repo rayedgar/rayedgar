@@ -1,0 +1,69 @@
+.woo-product-slider-container {
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+}
+
+.woo-product-slider-container .swiper-slide {
+	height: auto;
+}
+
+.woo-product-slider-container .product-item {
+	padding: 15px;
+	border: 1px solid #eee;
+	transition: all 0.3s ease;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+}
+
+.woo-product-slider-container .product-item:hover {
+	box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.woo-product-slider-container .product-image img {
+	max-width: 100%;
+	height: auto;
+	margin-bottom: 15px;
+}
+
+.woo-product-slider-container .product-title {
+	font-size: 18px;
+	margin: 10px 0;
+	font-weight: 600;
+}
+
+.woo-product-slider-container .product-rating {
+	margin-bottom: 10px;
+	color: #ffb600;
+}
+
+.woo-product-slider-container .price {
+	font-size: 16px;
+	font-weight: bold;
+	margin-bottom: 15px;
+}
+
+.woo-product-slider-container .add-to-cart .button {
+	display: inline-block;
+	padding: 10px 20px;
+	background-color: #333;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 3px;
+	transition: background-color 0.3s ease;
+}
+
+.woo-product-slider-container .add-to-cart .button:hover {
+	background-color: #555;
+}
+
+.woo-product-slider-container .swiper-button-next,
+.woo-product-slider-container .swiper-button-prev {
+	color: #333;
+}
+
+.woo-product-slider-container .swiper-pagination-bullet-active {
+	background: #333;
+}
