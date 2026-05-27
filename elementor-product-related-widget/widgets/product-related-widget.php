@@ -59,6 +59,50 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'hover_animation',
+			[
+				'label' => esc_html__( 'Hover Animation', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'fade',
+				'options' => [
+					'fade' => esc_html__( 'Fade', 'elementor-product-related-widget' ),
+					'slide-up' => esc_html__( 'Slide Up', 'elementor-product-related-widget' ),
+					'slide-down' => esc_html__( 'Slide Down', 'elementor-product-related-widget' ),
+					'zoom-in' => esc_html__( 'Zoom In', 'elementor-product-related-widget' ),
+					'zoom-out' => esc_html__( 'Zoom Out', 'elementor-product-related-widget' ),
+				],
+				'condition' => [
+					'product_title_position' => 'overlay',
+				],
+			]
+		);
+
+		$this->add_control(
+			'hover_animation_speed',
+			[
+				'label' => esc_html__( 'Animation Speed (ms)', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::SLIDER,
+				'range' => [
+					'px' => [
+						'min' => 100,
+						'max' => 2000,
+						'step' => 50,
+					],
+				],
+				'default' => [
+					'size' => 300,
+				],
+				'selectors' => [
+					'{{WRAPPER}} .product-hover-overlay' => 'transition-duration: {{SIZE}}ms;',
+					'{{WRAPPER}} .product-hover-overlay .product-name' => 'transition-duration: {{SIZE}}ms;',
+				],
+				'condition' => [
+					'product_title_position' => 'overlay',
+				],
+			]
+		);
+
 		$this->add_responsive_control(
 			'image_align',
 			[
@@ -381,9 +425,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_responsive_control(
-			'product_grid_spacing',
+			'product_grid_columns_gap',
 			[
-				'label' => esc_html__( 'Grid Spacing (Gap)', 'elementor-product-related-widget' ),
+				'label' => esc_html__( 'Columns Gap', 'elementor-product-related-widget' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
 				'range' => [
 					'px' => [
@@ -392,7 +436,24 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .related-products-grid' => 'grid-gap: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .related-products-grid' => 'grid-column-gap: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_grid_rows_gap',
+			[
+				'label' => esc_html__( 'Rows Gap (Vertical Spacing)', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::SLIDER,
+				'range' => [
+					'px' => [
+						'min' => 0,
+						'max' => 100,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .related-products-grid' => 'grid-row-gap: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -549,7 +610,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		$this->add_render_attribute( 'wrapper', 'class', 'elementor-product-related-wrapper' );
 		$this->add_render_attribute( 'grid', 'class', 'related-products-grid' );
 		$this->add_render_attribute( 'grid', 'style', 'display: grid;' );
-
+		$this->add_render_attribute( 'wrapper', 'class', 'hover-animation-' . $settings['hover_animation'] );
 		?>
 		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
 			<?php if ( 'yes' === $settings['show_section_title'] && ! empty( $settings['section_title'] ) ) : ?>
@@ -601,11 +662,56 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				height: 100%;
 				display: flex;
 				align-items: center;
-				transition: opacity 0.3s;
+				transition-property: all;
+				transition-timing-function: ease;
 				pointer-events: none;
+			}
+			.elementor-element-<?php echo $widget_id; ?> .product-hover-overlay .product-name {
+				transition-property: all;
+				transition-timing-function: ease;
 			}
 			.elementor-element-<?php echo $widget_id; ?> .product-image-wrapper:hover .product-hover-overlay {
 				opacity: 1;
+			}
+
+			/* FADE */
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-fade .product-hover-overlay {
+				opacity: 0;
+			}
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-fade .product-image-wrapper:hover .product-hover-overlay {
+				opacity: 1;
+			}
+
+			/* SLIDE UP */
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-up .product-hover-overlay {
+				transform: translateY(20px);
+			}
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-up .product-image-wrapper:hover .product-hover-overlay {
+				transform: translateY(0);
+			}
+
+			/* SLIDE DOWN */
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-down .product-hover-overlay {
+				transform: translateY(-20px);
+			}
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-down .product-image-wrapper:hover .product-hover-overlay {
+				transform: translateY(0);
+			}
+
+			/* ZOOM IN */
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-in .product-hover-overlay {
+				transform: scale(0.8);
+			}
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-in .product-image-wrapper:hover .product-hover-overlay {
+				transform: scale(1);
+			}
+
+			/* ZOOM OUT */
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-out .product-hover-overlay {
+				transform: scale(1.2);
+			}
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-out .product-image-wrapper:hover .product-hover-overlay {
+				transform: scale(1);
 			}
 			.elementor-element-<?php echo $widget_id; ?> .product-name a {
 				color: inherit;
@@ -643,7 +749,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		var product_title_position = settings.product_title_position;
 		var columns = settings.columns;
 		#>
-		<div class="elementor-product-related-wrapper">
+		<div class="elementor-product-related-wrapper hover-animation-{{ settings.hover_animation }}">
 			<# if ( 'yes' === show_section_title && section_title ) { #>
 				<h2 class="related-title">{{{ section_title }}}</h2>
 			<# } #>
@@ -696,11 +802,57 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				height: 100%;
 				display: flex;
 				align-items: center;
-				transition: opacity 0.3s;
+				transition-property: all;
+				transition-timing-function: ease;
 				pointer-events: none;
+			}
+			.elementor-element-{{ id }} .product-hover-overlay .product-name {
+				transition-property: all;
+				transition-timing-function: ease;
 			}
 			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay {
 				opacity: 1;
+			}
+
+			/* FADE */
+			/* FADE */
+			.elementor-element-{{ id }} .hover-animation-fade .product-hover-overlay {
+				opacity: 0;
+			}
+			.elementor-element-{{ id }} .hover-animation-fade .product-image-wrapper:hover .product-hover-overlay {
+				opacity: 1;
+			}
+
+			/* SLIDE UP */
+			.elementor-element-{{ id }} .hover-animation-slide-up .product-hover-overlay {
+				transform: translateY(20px);
+			}
+			.elementor-element-{{ id }} .hover-animation-slide-up .product-image-wrapper:hover .product-hover-overlay {
+				transform: translateY(0);
+			}
+
+			/* SLIDE DOWN */
+			.elementor-element-{{ id }} .hover-animation-slide-down .product-hover-overlay {
+				transform: translateY(-20px);
+			}
+			.elementor-element-{{ id }} .hover-animation-slide-down .product-image-wrapper:hover .product-hover-overlay {
+				transform: translateY(0);
+			}
+
+			/* ZOOM IN */
+			.elementor-element-{{ id }} .hover-animation-zoom-in .product-hover-overlay {
+				transform: scale(0.8);
+			}
+			.elementor-element-{{ id }} .hover-animation-zoom-in .product-image-wrapper:hover .product-hover-overlay {
+				transform: scale(1);
+			}
+
+			/* ZOOM OUT */
+			.elementor-element-{{ id }} .hover-animation-zoom-out .product-hover-overlay {
+				transform: scale(1.2);
+			}
+			.elementor-element-{{ id }} .hover-animation-zoom-out .product-image-wrapper:hover .product-hover-overlay {
+				transform: scale(1);
 			}
 			.elementor-element-{{ id }} .product-name {
 				display: block;
