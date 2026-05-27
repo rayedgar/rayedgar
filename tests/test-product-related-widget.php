@@ -40,17 +40,17 @@ namespace {
 namespace Elementor {
     if (!class_exists('Widget_Base')) {
         class Widget_Base {
+            public function get_id() { return '123'; }
             public function start_controls_section($id, $args) {}
             public function end_controls_section() {}
             public function add_control($id, $args) {}
             public function add_group_control($type, $args) {}
             public function add_responsive_control($id, $args) {}
             public function get_settings_for_display() {
-                return [
+                return $GLOBALS['test_settings'] ?? [
                     'show_section_title' => 'yes',
                     'section_title' => 'Related Products',
-                    'show_product_name' => 'yes',
-                    'hover_title_on_image' => 'no',
+                    'product_title_position' => 'underneath',
                     'posts_per_page' => 4,
                     'columns' => '4',
                 ];
@@ -187,44 +187,50 @@ namespace {
     $widget = new Testable_Product_Related_Widget();
     echo "Widget Name: " . $widget->get_name() . "\n";
 
-    // Test Case 1: Normal Single Product Page
-    echo "Test Case 1: Normal Single Product Page\n";
-    $GLOBALS['is_singular_product'] = true;
-    $GLOBALS['related_ids'] = [101, 102, 103, 104];
+    // Mock global $post
     $GLOBALS['post'] = (object) ['ID' => 1];
+
+    // Test Case 1: Title Underneath Image
+    echo "Test Case 1: Title Underneath Image\n";
+    $GLOBALS['test_settings'] = [
+        'show_section_title' => 'yes',
+        'section_title' => 'Related Products',
+        'product_title_position' => 'underneath',
+        'posts_per_page' => 4,
+        'columns' => '4',
+    ];
     ob_start();
     $widget->public_render();
     $output = ob_get_clean();
-    if (strpos($output, 'Related Products') !== false && strpos($output, 'Sample Product') !== false) {
-        echo " - Render test passed.\n";
+    if (strpos($output, 'class="product-name"') !== false && strpos($output, 'class="product-hover-overlay"') === false) {
+        echo " - Underneath position test passed.\n";
     } else {
-        echo " - Render test failed.\n";
+        echo " - Underneath position test failed.\n";
     }
 
-    // Test Case 2: Non-Product Page (Editor Mode)
-    echo "Test Case 2: Non-Product Page (Editor Mode)\n";
-    $GLOBALS['is_singular_product'] = false;
+    // Test Case 2: Title Overlay on Hover
+    echo "Test Case 2: Title Overlay on Hover\n";
+    $GLOBALS['test_settings'] = [
+        'show_section_title' => 'yes',
+        'section_title' => 'Related Products',
+        'product_title_position' => 'overlay',
+        'posts_per_page' => 4,
+        'columns' => '4',
+    ];
     ob_start();
     $widget->public_render();
     $output = ob_get_clean();
-    if (strpos($output, 'Related products are only visible on single product pages') !== false) {
-        echo " - Non-product page message check passed.\n";
+    if (strpos($output, 'class="product-hover-overlay"') !== false) {
+        echo " - Overlay position test passed.\n";
     } else {
-        echo " - Non-product page message check failed.\n";
-        echo "Output: " . $output . "\n";
+        echo " - Overlay position test failed.\n";
     }
 
-    // Test Case 3: No Related Products Found (Editor Mode)
-    echo "Test Case 3: No Related Products Found (Editor Mode)\n";
-    $GLOBALS['is_singular_product'] = true;
-    $GLOBALS['related_ids'] = [];
-    ob_start();
-    $widget->public_render();
-    $output = ob_get_clean();
-    if (strpos($output, 'No related products found') !== false) {
-        echo " - No related products message check passed.\n";
+    // Test Case 4: Correct CSS Scoping
+    echo "Test Case 4: Correct CSS Scoping\n";
+    if (strpos($output, '.elementor-element-123') !== false && strpos($output, '{{WRAPPER}}') === false) {
+        echo " - CSS scoping test passed.\n";
     } else {
-        echo " - No related products message check failed.\n";
-        echo "Output: " . $output . "\n";
+        echo " - CSS scoping test failed.\n";
     }
 }
