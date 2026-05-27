@@ -102,8 +102,14 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					'overlay'    => esc_html__( 'Overlay on Hover', 'elementor-product-related-widget' ),
 				],
 				'selectors' => [
-					'{{WRAPPER}} .product-hover-overlay' => 'opacity: 0;',
+					'{{WRAPPER}} .product-hover-overlay' => 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: opacity 0.3s; pointer-events: none;',
 					'{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay' => 'opacity: 1;',
+					'{{WRAPPER}} .product-name a' => 'color: inherit; text-decoration: none;',
+					'{{WRAPPER}} .product-image-wrapper img' => 'width: 100%; height: auto; display: block;',
+					'{{WRAPPER}} .product-name' => 'display: block; width: 100%; margin: 0; padding: 0;',
+					'{{WRAPPER}} .product-item-content' => 'display: block;',
+					'{{WRAPPER}} .product-hover-overlay .product-name' => 'margin: 0; padding: 10px;',
+					'{{WRAPPER}} .dummy-image' => 'width: 100%;',
 				],
 			]
 		);
@@ -216,6 +222,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 						'icon' => 'eicon-text-align-right',
 					],
 				],
+				'default' => 'left',
 				'selectors' => [
 					'{{WRAPPER}} .related-title' => 'text-align: {{VALUE}};',
 				],
@@ -347,7 +354,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .product-name' => 'margin-top: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .product-name' => 'margin-top: {{SIZE}}{{UNIT}}; margin-bottom: 0;',
 				],
 				'condition' => [
 					'product_title_position' => 'underneath',
@@ -569,8 +576,8 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 									<?php echo $product->get_image(); ?>
 								</a>
 								<?php if ( 'overlay' === $settings['product_title_position'] ) : ?>
-									<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: opacity 0.3s; pointer-events: none;">
-										<h3 class="product-name hover-title" style="padding: 10px;">
+									<div class="product-hover-overlay">
+										<h3 class="product-name hover-title">
 											<?php the_title(); ?>
 										</h3>
 									</div>
@@ -589,24 +596,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				<?php endwhile; wp_reset_postdata(); ?>
 			</div>
 		</div>
-
-		<?php $widget_id = $this->get_id(); ?>
-		<style>
-			.elementor-element-<?php echo $widget_id; ?> .related-product-item .product-name a {
-				color: inherit;
-				text-decoration: none;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-hover-overlay .product-name {
-				margin: 0;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-image-wrapper img {
-				width: 100%;
-				height: auto;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-hover-overlay {
-				justify-content: center; /* Default */
-			}
-		</style>
 		<?php
 	}
 
@@ -630,12 +619,12 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				<div class="related-product-item">
 					<div class="product-item-content">
 						<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
-							<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;">
+							<div class="dummy-image">
 								<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
 							</div>
 							<# if ( 'overlay' === product_title_position ) { #>
-								<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: opacity 0.3s; pointer-events: none;">
-									<h3 class="product-name hover-title" style="padding: 10px;">
+								<div class="product-hover-overlay">
+									<h3 class="product-name hover-title">
 										Product Title {{ i + 1 }}
 									</h3>
 								</div>
@@ -655,17 +644,11 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		<style>
 			.elementor-element-{{ id }} .dummy-image {
-				width: 100%;
-			}
-			.elementor-element-{{ id }} .product-hover-overlay .product-name {
-				margin: 0;
-			}
-			.elementor-element-{{ id }} .product-image-wrapper img {
-				width: 100%;
-				height: auto;
-			}
-			.elementor-element-{{ id }} .product-hover-overlay {
-				justify-content: center; /* Default */
+				background: #eee;
+				aspect-ratio: 1/1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 		</style>
 		<?php
