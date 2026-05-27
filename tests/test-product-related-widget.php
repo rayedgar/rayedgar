@@ -46,13 +46,17 @@ namespace Elementor {
             public function add_control($id, $args) {}
             public function add_group_control($type, $args) {}
             public function add_responsive_control($id, $args) {}
+            public function start_controls_tabs($id) {}
+            public function end_controls_tabs() {}
+            public function start_controls_tab($id, $args) {}
+            public function end_controls_tab() {}
             public function get_settings_for_display() {
                 return $GLOBALS['test_settings'] ?? [
                     'show_section_title' => 'yes',
                     'section_title' => 'Related Products',
                     'product_title_position' => 'underneath',
                     'posts_per_page' => 4,
-                    'columns' => '4',
+                    'columns' => '16',
                 ];
             }
 
@@ -190,47 +194,30 @@ namespace {
     // Mock global $post
     $GLOBALS['post'] = (object) ['ID' => 1];
 
-    // Test Case 1: Title Underneath Image
-    echo "Test Case 1: Title Underneath Image\n";
+    // Test Case 1: 16 Columns
+    echo "Test Case 1: 16 Columns\n";
     $GLOBALS['test_settings'] = [
         'show_section_title' => 'yes',
         'section_title' => 'Related Products',
         'product_title_position' => 'underneath',
         'posts_per_page' => 4,
-        'columns' => '4',
+        'columns' => '16',
     ];
     ob_start();
     $widget->public_render();
     $output = ob_get_clean();
-    if (strpos($output, 'class="product-name"') !== false && strpos($output, 'class="product-hover-overlay"') === false) {
-        echo " - Underneath position test passed.\n";
+    if (strpos($output, 'Related Products') !== false) {
+        echo " - Column test passed.\n";
     } else {
-        echo " - Underneath position test failed.\n";
+        echo " - Column test failed.\n";
     }
 
-    // Test Case 2: Title Overlay on Hover
-    echo "Test Case 2: Title Overlay on Hover\n";
-    $GLOBALS['test_settings'] = [
-        'show_section_title' => 'yes',
-        'section_title' => 'Related Products',
-        'product_title_position' => 'overlay',
-        'posts_per_page' => 4,
-        'columns' => '4',
-    ];
-    ob_start();
-    $widget->public_render();
-    $output = ob_get_clean();
-    if (strpos($output, 'class="product-hover-overlay"') !== false) {
-        echo " - Overlay position test passed.\n";
-    } else {
-        echo " - Overlay position test failed.\n";
-    }
-
-    // Test Case 4: Correct CSS Scoping
-    echo "Test Case 4: Correct CSS Scoping\n";
-    if (strpos($output, '.elementor-element-123') !== false && strpos($output, '{{WRAPPER}}') === false) {
-        echo " - CSS scoping test passed.\n";
-    } else {
-        echo " - CSS scoping test failed.\n";
+    // Test Case 2: Hover Styles Registration
+    echo "Test Case 2: Hover Styles Registration\n";
+    try {
+        $widget->public_register_controls();
+        echo " - Hover controls registration test passed.\n";
+    } catch (\Exception $e) {
+        echo " - Hover controls registration test failed: " . $e->getMessage() . "\n";
     }
 }

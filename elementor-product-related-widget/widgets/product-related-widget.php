@@ -123,6 +123,16 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					'4' => '4',
 					'5' => '5',
 					'6' => '6',
+					'7' => '7',
+					'8' => '8',
+					'9' => '9',
+					'10' => '10',
+					'11' => '11',
+					'12' => '12',
+					'13' => '13',
+					'14' => '14',
+					'15' => '15',
+					'16' => '16',
 				],
 				'selectors' => [
 					'{{WRAPPER}} .related-products-grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
@@ -344,6 +354,18 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_responsive_control(
+			'product_image_spacing',
+			[
+				'label' => esc_html__( 'Image Spacing (Margin)', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', '%' ],
+				'selectors' => [
+					'{{WRAPPER}} .product-image-wrapper' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
 			'product_box_padding',
 			[
 				'label' => esc_html__( 'Box Padding', 'elementor-product-related-widget' ),
@@ -355,6 +377,15 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->start_controls_tabs( 'product_box_style_tabs' );
+
+		$this->start_controls_tab(
+			'product_box_style_normal',
+			[
+				'label' => esc_html__( 'Normal', 'elementor-product-related-widget' ),
+			]
+		);
+
 		$this->add_group_control(
 			\Elementor\Group_Control_Border::get_type(),
 			[
@@ -362,6 +393,54 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'selector' => '{{WRAPPER}} .related-product-item',
 			]
 		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Box_Shadow::get_type(),
+			[
+				'name' => 'product_box_shadow',
+				'selector' => '{{WRAPPER}} .related-product-item',
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'product_box_style_hover',
+			[
+				'label' => esc_html__( 'Hover', 'elementor-product-related-widget' ),
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Border::get_type(),
+			[
+				'name' => 'product_box_border_hover',
+				'selector' => '{{WRAPPER}} .related-product-item:hover',
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Box_Shadow::get_type(),
+			[
+				'name' => 'product_box_shadow_hover',
+				'selector' => '{{WRAPPER}} .related-product-item:hover',
+			]
+		);
+
+		$this->add_control(
+			'product_box_bg_hover',
+			[
+				'label' => esc_html__( 'Background Color', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .related-product-item:hover' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
 
 		$this->add_responsive_control(
 			'product_box_border_radius',
@@ -373,14 +452,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					'{{WRAPPER}} .related-product-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					'{{WRAPPER}} .product-image-wrapper' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
-			]
-		);
-
-		$this->add_group_control(
-			\Elementor\Group_Control_Box_Shadow::get_type(),
-			[
-				'name' => 'product_box_shadow',
-				'selector' => '{{WRAPPER}} .related-product-item',
 			]
 		);
 
