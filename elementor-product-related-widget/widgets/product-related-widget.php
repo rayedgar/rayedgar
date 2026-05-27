@@ -59,6 +59,37 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_responsive_control(
+			'image_align',
+			[
+				'label' => esc_html__( 'Image Alignment', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => esc_html__( 'Left', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => esc_html__( 'Center', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'left',
+				'selectors' => [
+					'{{WRAPPER}} .product-image-wrapper' => '{{VALUE}}',
+				],
+				'selectors_dictionary' => [
+					'left' => 'margin-right: auto; margin-left: 0;',
+					'center' => 'margin-left: auto; margin-right: auto;',
+					'right' => 'margin-left: auto; margin-right: 0;',
+				],
+			]
+		);
+
 		$this->add_control(
 			'product_title_position',
 			[
@@ -73,6 +104,18 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .product-hover-overlay' => 'opacity: 0;',
 					'{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay' => 'opacity: 1;',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_box_margin',
+			[
+				'label' => esc_html__( 'Box Margin', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', '%' ],
+				'selectors' => [
+					'{{WRAPPER}} .related-product-item' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);
@@ -276,6 +319,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 						'icon' => 'eicon-text-align-right',
 					],
 				],
+				'default' => 'left',
 				'selectors' => [
 					'{{WRAPPER}} .product-name' => 'text-align: {{VALUE}};',
 					'{{WRAPPER}} .product-hover-overlay' => 'justify-content: {{VALUE}};',
@@ -339,12 +383,12 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		$this->add_responsive_control(
 			'product_grid_spacing',
 			[
-				'label' => esc_html__( 'Grid Spacing', 'elementor-product-related-widget' ),
+				'label' => esc_html__( 'Grid Spacing (Gap)', 'elementor-product-related-widget' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
 				'range' => [
 					'px' => [
 						'min' => 0,
-						'max' => 50,
+						'max' => 100,
 					],
 				],
 				'selectors' => [
@@ -360,7 +404,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', 'em', '%' ],
 				'selectors' => [
-					'{{WRAPPER}} .product-image-wrapper' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .product-image-wrapper' => 'margin-top: {{TOP}}{{UNIT}} !important; margin-right: {{RIGHT}}{{UNIT}} !important; margin-bottom: {{BOTTOM}}{{UNIT}} !important; margin-left: {{LEFT}}{{UNIT}} !important;',
 				],
 			]
 		);
@@ -519,7 +563,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					$product = wc_get_product( get_the_ID() );
 					?>
 					<div class="related-product-item">
-						<div class="product-image-wrapper" style="position: relative; overflow: hidden; margin: 0 auto;">
+						<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
 							<a href="<?php the_permalink(); ?>">
 								<?php echo $product->get_image(); ?>
 							</a>
@@ -582,7 +626,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				for ( var i = 0; i < settings.posts_per_page; i++ ) {
 				#>
 				<div class="related-product-item">
-					<div class="product-image-wrapper" style="position: relative; overflow: hidden; margin: 0 auto;">
+					<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
 						<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;">
 							<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
 						</div>
