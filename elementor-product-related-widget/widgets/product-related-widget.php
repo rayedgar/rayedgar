@@ -80,7 +80,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				],
 				'default' => 'left',
 				'selectors' => [
-					'{{WRAPPER}} .product-image-wrapper' => '{{VALUE}}',
+					'{{WRAPPER}} .product-item-content' => '{{VALUE}}',
 				],
 				'selectors_dictionary' => [
 					'left' => 'margin-right: auto; margin-left: 0;',
@@ -146,7 +146,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .product-image-wrapper' => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .product-item-content' => 'width: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -563,26 +563,28 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					$product = wc_get_product( get_the_ID() );
 					?>
 					<div class="related-product-item">
-						<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
-							<a href="<?php the_permalink(); ?>">
-								<?php echo $product->get_image(); ?>
-							</a>
-							<?php if ( 'overlay' === $settings['product_title_position'] ) : ?>
-								<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: opacity 0.3s; pointer-events: none;">
-									<h3 class="product-name hover-title" style="padding: 10px;">
+						<div class="product-item-content">
+							<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
+								<a href="<?php the_permalink(); ?>">
+									<?php echo $product->get_image(); ?>
+								</a>
+								<?php if ( 'overlay' === $settings['product_title_position'] ) : ?>
+									<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: opacity 0.3s; pointer-events: none;">
+										<h3 class="product-name hover-title" style="padding: 10px;">
+											<?php the_title(); ?>
+										</h3>
+									</div>
+								<?php endif; ?>
+							</div>
+
+							<?php if ( 'underneath' === $settings['product_title_position'] ) : ?>
+								<h3 class="product-name">
+									<a href="<?php the_permalink(); ?>">
 										<?php the_title(); ?>
-									</h3>
-								</div>
+									</a>
+								</h3>
 							<?php endif; ?>
 						</div>
-
-						<?php if ( 'underneath' === $settings['product_title_position'] ) : ?>
-							<h3 class="product-name">
-								<a href="<?php the_permalink(); ?>">
-									<?php the_title(); ?>
-								</a>
-							</h3>
-						<?php endif; ?>
 					</div>
 				<?php endwhile; wp_reset_postdata(); ?>
 			</div>
@@ -626,24 +628,26 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				for ( var i = 0; i < settings.posts_per_page; i++ ) {
 				#>
 				<div class="related-product-item">
-					<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
-						<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;">
-							<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
-						</div>
-						<# if ( 'overlay' === product_title_position ) { #>
-							<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: opacity 0.3s; pointer-events: none;">
-								<h3 class="product-name hover-title" style="padding: 10px;">
-									Product Title {{ i + 1 }}
-								</h3>
+					<div class="product-item-content">
+						<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
+							<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;">
+								<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
 							</div>
+							<# if ( 'overlay' === product_title_position ) { #>
+								<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: opacity 0.3s; pointer-events: none;">
+									<h3 class="product-name hover-title" style="padding: 10px;">
+										Product Title {{ i + 1 }}
+									</h3>
+								</div>
+							<# } #>
+						</div>
+
+						<# if ( 'underneath' === product_title_position ) { #>
+							<h3 class="product-name">
+								Product Title {{ i + 1 }}
+							</h3>
 						<# } #>
 					</div>
-
-					<# if ( 'underneath' === product_title_position ) { #>
-						<h3 class="product-name">
-							Product Title {{ i + 1 }}
-						</h3>
-					<# } #>
 				</div>
 				<# } #>
 			</div>
