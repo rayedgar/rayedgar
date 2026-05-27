@@ -59,6 +59,89 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_responsive_control(
+			'product_align',
+			[
+				'label' => esc_html__( 'Product Alignment', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => esc_html__( 'Left', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => esc_html__( 'Center', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'left',
+				'selectors' => [
+					'{{WRAPPER}} .product-item-content' => 'text-align: {{VALUE}};',
+					'{{WRAPPER}} .product-name' => 'text-align: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_align_margin',
+			[
+				'type' => \Elementor\Controls_Manager::HIDDEN,
+				'default' => 'left',
+				'selectors' => [
+					'{{WRAPPER}} .product-item-content' => '{{VALUE}}',
+				],
+				'selectors_dictionary' => [
+					'left' => 'margin-right: auto; margin-left: 0;',
+					'center' => 'margin-left: auto; margin-right: auto;',
+					'right' => 'margin-left: auto; margin-right: 0;',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_align_flex',
+			[
+				'type' => \Elementor\Controls_Manager::HIDDEN,
+				'default' => 'left',
+				'selectors' => [
+					'{{WRAPPER}} .product-hover-overlay' => 'justify-content: {{VALUE}}; display: flex; align-items: center;',
+				],
+				'selectors_dictionary' => [
+					'left' => 'flex-start',
+					'center' => 'center',
+					'right' => 'flex-end',
+				],
+			]
+		);
+
+		$this->add_control(
+			'product_title_position',
+			[
+				'label' => esc_html__( 'Product Title Position', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'underneath',
+				'options' => [
+					'none'       => esc_html__( 'None', 'elementor-product-related-widget' ),
+					'underneath' => esc_html__( 'Underneath Image', 'elementor-product-related-widget' ),
+					'overlay'    => esc_html__( 'Overlay on Hover', 'elementor-product-related-widget' ),
+				],
+				'selectors' => [
+					'{{WRAPPER}} .product-hover-overlay' => 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition-property: all; transition-timing-function: ease; pointer-events: none; z-index: 10;',
+					'{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay' => 'opacity: 1;',
+					'{{WRAPPER}} .product-name a' => 'color: inherit; text-decoration: none;',
+					'{{WRAPPER}} .product-image-wrapper img' => 'width: 100%; height: auto; display: block;',
+					'{{WRAPPER}} .product-name' => 'display: block; width: 100%; margin: 0; padding: 0; position: relative; z-index: 5; transition-property: all; transition-timing-function: ease;',
+					'{{WRAPPER}} .product-item-content' => 'display: block; position: relative;',
+					'{{WRAPPER}} .product-hover-overlay .product-name' => 'margin: 0; padding: 10px;',
+					'{{WRAPPER}} .product-image-wrapper' => 'position: relative; overflow: hidden;',
+				],
+			]
+		);
+
 		$this->add_control(
 			'hover_animation',
 			[
@@ -103,63 +186,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-		$this->add_responsive_control(
-			'image_align',
-			[
-				'label' => esc_html__( 'Image Alignment', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::CHOOSE,
-				'options' => [
-					'left' => [
-						'title' => esc_html__( 'Left', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-left',
-					],
-					'center' => [
-						'title' => esc_html__( 'Center', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-center',
-					],
-					'right' => [
-						'title' => esc_html__( 'Right', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-right',
-					],
-				],
-				'default' => 'left',
-				'selectors' => [
-					'{{WRAPPER}} .product-item-content' => '{{VALUE}}',
-				],
-				'selectors_dictionary' => [
-					'left' => 'margin-right: auto; margin-left: 0;',
-					'center' => 'margin-left: auto; margin-right: auto;',
-					'right' => 'margin-left: auto; margin-right: 0;',
-				],
-			]
-		);
-
-		$this->add_control(
-			'product_title_position',
-			[
-				'label' => esc_html__( 'Product Title Position', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::SELECT,
-				'default' => 'underneath',
-				'options' => [
-					'none'       => esc_html__( 'None', 'elementor-product-related-widget' ),
-					'underneath' => esc_html__( 'Underneath Image', 'elementor-product-related-widget' ),
-					'overlay'    => esc_html__( 'Overlay on Hover', 'elementor-product-related-widget' ),
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'product_box_margin',
-			[
-				'label' => esc_html__( 'Box Margin', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::DIMENSIONS,
-				'size_units' => [ 'px', 'em', '%' ],
-				'selectors' => [
-					'{{WRAPPER}} .related-product-item' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				],
-			]
-		);
-
 		$this->add_control(
 			'posts_per_page',
 			[
@@ -200,22 +226,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'tablet_default' => '3',
 				'mobile_default' => '2',
 				'options' => [
-					'1' => '1',
-					'2' => '2',
-					'3' => '3',
-					'4' => '4',
-					'5' => '5',
-					'6' => '6',
-					'7' => '7',
-					'8' => '8',
-					'9' => '9',
-					'10' => '10',
-					'11' => '11',
-					'12' => '12',
-					'13' => '13',
-					'14' => '14',
-					'15' => '15',
-					'16' => '16',
+					'1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6',
+					'7' => '7', '8' => '8', '9' => '9', '10' => '10', '11' => '11', '12' => '12',
+					'13' => '13', '14' => '14', '15' => '15', '16' => '16',
 				],
 				'selectors' => [
 					'{{WRAPPER}} .related-products-grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
@@ -273,8 +286,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				],
 			]
 		);
-
-
 
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
@@ -342,44 +353,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_responsive_control(
-			'product_name_align',
-			[
-				'label' => esc_html__( 'Alignment', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::CHOOSE,
-				'options' => [
-					'left' => [
-						'title' => esc_html__( 'Left', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-left',
-					],
-					'center' => [
-						'title' => esc_html__( 'Center', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-center',
-					],
-					'right' => [
-						'title' => esc_html__( 'Right', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-right',
-					],
-				],
-				'default' => 'left',
-				'selectors' => [
-					'{{WRAPPER}} .product-name' => 'text-align: {{VALUE}};',
-					'{{WRAPPER}} .product-hover-overlay' => 'justify-content: {{overlay_VALUE}};',
-				],
-				'selectors_dictionary' => [
-					'left' => 'left',
-					'center' => 'center',
-					'right' => 'right',
-					'overlay_left' => 'flex-start',
-					'overlay_center' => 'center',
-					'overlay_right' => 'flex-end',
-				],
-				'condition' => [
-					'product_title_position!' => 'none',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
 			'product_name_spacing',
 			[
 				'label' => esc_html__( 'Spacing', 'elementor-product-related-widget' ),
@@ -429,15 +402,8 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => esc_html__( 'Columns Gap', 'elementor-product-related-widget' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
-				'range' => [
-					'px' => [
-						'min' => 0,
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .related-products-grid' => 'grid-column-gap: {{SIZE}}{{UNIT}};',
-				],
+				'range' => [ 'px' => [ 'min' => 0, 'max' => 100 ] ],
+				'selectors' => [ '{{WRAPPER}} .related-products-grid' => 'grid-column-gap: {{SIZE}}{{UNIT}};' ],
 			]
 		);
 
@@ -446,15 +412,8 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => esc_html__( 'Rows Gap (Vertical Spacing)', 'elementor-product-related-widget' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
-				'range' => [
-					'px' => [
-						'min' => 0,
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .related-products-grid' => 'grid-row-gap: {{SIZE}}{{UNIT}};',
-				],
+				'range' => [ 'px' => [ 'min' => 0, 'max' => 100 ] ],
+				'selectors' => [ '{{WRAPPER}} .related-products-grid' => 'grid-row-gap: {{SIZE}}{{UNIT}};' ],
 			]
 		);
 
@@ -465,7 +424,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', 'em', '%' ],
 				'selectors' => [
-					'{{WRAPPER}} .product-image-wrapper' => 'margin-top: {{TOP}}{{UNIT}} !important; margin-right: {{RIGHT}}{{UNIT}} !important; margin-bottom: {{BOTTOM}}{{UNIT}} !important; margin-left: {{LEFT}}{{UNIT}} !important;',
+					'{{WRAPPER}} .product-image-wrapper' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
 				],
 			]
 		);
@@ -482,67 +441,29 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-		$this->start_controls_tabs( 'product_box_style_tabs' );
-
-		$this->start_controls_tab(
-			'product_box_style_normal',
+		$this->add_responsive_control(
+			'product_box_margin',
 			[
-				'label' => esc_html__( 'Normal', 'elementor-product-related-widget' ),
-			]
-		);
-
-		$this->add_group_control(
-			\Elementor\Group_Control_Border::get_type(),
-			[
-				'name' => 'product_box_border',
-				'selector' => '{{WRAPPER}} .related-product-item',
-			]
-		);
-
-		$this->add_group_control(
-			\Elementor\Group_Control_Box_Shadow::get_type(),
-			[
-				'name' => 'product_box_shadow',
-				'selector' => '{{WRAPPER}} .related-product-item',
-			]
-		);
-
-		$this->end_controls_tab();
-
-		$this->start_controls_tab(
-			'product_box_style_hover',
-			[
-				'label' => esc_html__( 'Hover', 'elementor-product-related-widget' ),
-			]
-		);
-
-		$this->add_group_control(
-			\Elementor\Group_Control_Border::get_type(),
-			[
-				'name' => 'product_box_border_hover',
-				'selector' => '{{WRAPPER}} .related-product-item:hover',
-			]
-		);
-
-		$this->add_group_control(
-			\Elementor\Group_Control_Box_Shadow::get_type(),
-			[
-				'name' => 'product_box_shadow_hover',
-				'selector' => '{{WRAPPER}} .related-product-item:hover',
-			]
-		);
-
-		$this->add_control(
-			'product_box_bg_hover',
-			[
-				'label' => esc_html__( 'Background Color', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::COLOR,
+				'label' => esc_html__( 'Box Margin', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', '%' ],
 				'selectors' => [
-					'{{WRAPPER}} .related-product-item:hover' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .related-product-item' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);
 
+		$this->start_controls_tabs( 'product_box_style_tabs' );
+
+		$this->start_controls_tab( 'product_box_style_normal', [ 'label' => esc_html__( 'Normal', 'elementor-product-related-widget' ) ] );
+		$this->add_group_control( \Elementor\Group_Control_Border::get_type(), [ 'name' => 'product_box_border', 'selector' => '{{WRAPPER}} .related-product-item' ] );
+		$this->add_group_control( \Elementor\Group_Control_Box_Shadow::get_type(), [ 'name' => 'product_box_shadow', 'selector' => '{{WRAPPER}} .related-product-item' ] );
+		$this->end_controls_tab();
+
+		$this->start_controls_tab( 'product_box_style_hover', [ 'label' => esc_html__( 'Hover', 'elementor-product-related-widget' ) ] );
+		$this->add_group_control( \Elementor\Group_Control_Border::get_type(), [ 'name' => 'product_box_border_hover', 'selector' => '{{WRAPPER}} .related-product-item:hover' ] );
+		$this->add_group_control( \Elementor\Group_Control_Box_Shadow::get_type(), [ 'name' => 'product_box_shadow_hover', 'selector' => '{{WRAPPER}} .related-product-item:hover' ] );
+		$this->add_control( 'product_box_bg_hover', [ 'label' => esc_html__( 'Background Color', 'elementor-product-related-widget' ), 'type' => \Elementor\Controls_Manager::COLOR, 'selectors' => [ '{{WRAPPER}} .related-product-item:hover' => 'background-color: {{VALUE}};' ] ] );
 		$this->end_controls_tab();
 
 		$this->end_controls_tabs();
@@ -575,42 +496,27 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		}
 
 		global $post;
-
-		// Ensure we have a product object
 		$product = wc_get_product( $post->ID );
 		if ( ! $product ) {
-			if ( $is_editor ) {
-				echo '<div class="elementor-alert elementor-alert-warning">' . esc_html__( 'Product data not found.', 'elementor-product-related-widget' ) . '</div>';
-			}
+			if ( $is_editor ) echo '<div class="elementor-alert elementor-alert-warning">' . esc_html__( 'Product data not found.', 'elementor-product-related-widget' ) . '</div>';
 			return;
 		}
 
 		$related_ids = wc_get_related_products( $post->ID, $settings['posts_per_page'] );
-
 		if ( empty( $related_ids ) ) {
-			if ( $is_editor ) {
-				echo '<div class="elementor-alert elementor-alert-info">' . esc_html__( 'No related products found for this product.', 'elementor-product-related-widget' ) . '</div>';
-			}
+			if ( $is_editor ) echo '<div class="elementor-alert elementor-alert-info">' . esc_html__( 'No related products found for this product.', 'elementor-product-related-widget' ) . '</div>';
 			return;
 		}
 
-		$args = [
-			'post_type' => 'product',
-			'post__in'  => $related_ids,
-			'posts_per_page' => $settings['posts_per_page'],
-			'orderby' => 'post__in',
-		];
-
+		$args = [ 'post_type' => 'product', 'post__in' => $related_ids, 'posts_per_page' => $settings['posts_per_page'], 'orderby' => 'post__in' ];
 		$query = new \WP_Query( $args );
-
-		if ( ! $query->have_posts() ) {
-			return;
-		}
+		if ( ! $query->have_posts() ) return;
 
 		$this->add_render_attribute( 'wrapper', 'class', 'elementor-product-related-wrapper' );
+		$this->add_render_attribute( 'wrapper', 'class', 'hover-animation-' . $settings['hover_animation'] );
 		$this->add_render_attribute( 'grid', 'class', 'related-products-grid' );
 		$this->add_render_attribute( 'grid', 'style', 'display: grid;' );
-		$this->add_render_attribute( 'wrapper', 'class', 'hover-animation-' . $settings['hover_animation'] );
+
 		?>
 		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
 			<?php if ( 'yes' === $settings['show_section_title'] && ! empty( $settings['section_title'] ) ) : ?>
@@ -621,13 +527,13 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				<?php
 				while ( $query->have_posts() ) :
 					$query->the_post();
-					$product = wc_get_product( get_the_ID() );
+					$product_obj = wc_get_product( get_the_ID() );
 					?>
 					<div class="related-product-item">
 						<div class="product-item-content">
-							<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
+							<div class="product-image-wrapper">
 								<a href="<?php the_permalink(); ?>">
-									<?php echo $product->get_image(); ?>
+									<?php echo $product_obj->get_image(); ?>
 								</a>
 								<?php if ( 'overlay' === $settings['product_title_position'] ) : ?>
 									<div class="product-hover-overlay">
@@ -653,90 +559,12 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		<?php $widget_id = $this->get_id(); ?>
 		<style>
-			.elementor-element-<?php echo $widget_id; ?> .product-hover-overlay {
-				opacity: 0;
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				align-items: center;
-				transition-property: all;
-				transition-timing-function: ease;
-				pointer-events: none;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-hover-overlay .product-name {
-				transition-property: all;
-				transition-timing-function: ease;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-image-wrapper:hover .product-hover-overlay {
-				opacity: 1;
-			}
-
-			/* FADE */
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-fade .product-hover-overlay {
-				opacity: 0;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-fade .product-image-wrapper:hover .product-hover-overlay {
-				opacity: 1;
-			}
-
-			/* SLIDE UP */
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-up .product-hover-overlay {
-				transform: translateY(20px);
-			}
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-up .product-image-wrapper:hover .product-hover-overlay {
-				transform: translateY(0);
-			}
-
-			/* SLIDE DOWN */
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-down .product-hover-overlay {
-				transform: translateY(-20px);
-			}
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-down .product-image-wrapper:hover .product-hover-overlay {
-				transform: translateY(0);
-			}
-
-			/* ZOOM IN */
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-in .product-hover-overlay {
-				transform: scale(0.8);
-			}
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-in .product-image-wrapper:hover .product-hover-overlay {
-				transform: scale(1);
-			}
-
-			/* ZOOM OUT */
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-out .product-hover-overlay {
-				transform: scale(1.2);
-			}
-			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-out .product-image-wrapper:hover .product-hover-overlay {
-				transform: scale(1);
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-name a {
-				color: inherit;
-				text-decoration: none;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-image-wrapper img {
-				width: 100%;
-				height: auto;
-				display: block;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-name {
-				display: block;
-				width: 100%;
-				margin: 0;
-				padding: 0;
-				visibility: visible;
-				opacity: 1;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-item-content {
-				display: block;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-hover-overlay .product-name {
-				margin: 0;
-				padding: 10px;
-			}
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-up .product-hover-overlay { transform: translateY(20px); }
+			.elementor-element-<?php echo $widget_id; ?> .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-slide-down .product-hover-overlay { transform: translateY(-20px); }
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-in .product-hover-overlay { transform: scale(0.8); }
+			.elementor-element-<?php echo $widget_id; ?> .hover-animation-zoom-out .product-hover-overlay { transform: scale(1.2); }
+			.elementor-element-<?php echo $widget_id; ?> .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); opacity: 1; }
 		</style>
 		<?php
 	}
@@ -747,7 +575,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		var section_title = settings.section_title;
 		var show_section_title = settings.show_section_title;
 		var product_title_position = settings.product_title_position;
-		var columns = settings.columns;
 		#>
 		<div class="elementor-product-related-wrapper hover-animation-{{ settings.hover_animation }}">
 			<# if ( 'yes' === show_section_title && section_title ) { #>
@@ -755,13 +582,11 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			<# } #>
 
 			<div class="related-products-grid" style="display: grid;">
-				<# /* Dummy products for preview */
-				for ( var i = 0; i < settings.posts_per_page; i++ ) {
-				#>
+				<# for ( var i = 0; i < settings.posts_per_page; i++ ) { #>
 				<div class="related-product-item">
 					<div class="product-item-content">
-						<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
-							<div class="dummy-image">
+						<div class="product-image-wrapper">
+							<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; width: 100%;">
 								<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
 							</div>
 							<# if ( 'overlay' === product_title_position ) { #>
@@ -785,90 +610,12 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		</div>
 
 		<style>
-			.elementor-element-{{ id }} .dummy-image {
-				background: #eee;
-				aspect-ratio: 1/1;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				width: 100%;
-			}
-			.elementor-element-{{ id }} .product-hover-overlay {
-				opacity: 0;
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				align-items: center;
-				transition-property: all;
-				transition-timing-function: ease;
-				pointer-events: none;
-			}
-			.elementor-element-{{ id }} .product-hover-overlay .product-name {
-				transition-property: all;
-				transition-timing-function: ease;
-			}
-			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay {
-				opacity: 1;
-			}
-
-			/* FADE */
-			/* FADE */
-			.elementor-element-{{ id }} .hover-animation-fade .product-hover-overlay {
-				opacity: 0;
-			}
-			.elementor-element-{{ id }} .hover-animation-fade .product-image-wrapper:hover .product-hover-overlay {
-				opacity: 1;
-			}
-
-			/* SLIDE UP */
-			.elementor-element-{{ id }} .hover-animation-slide-up .product-hover-overlay {
-				transform: translateY(20px);
-			}
-			.elementor-element-{{ id }} .hover-animation-slide-up .product-image-wrapper:hover .product-hover-overlay {
-				transform: translateY(0);
-			}
-
-			/* SLIDE DOWN */
-			.elementor-element-{{ id }} .hover-animation-slide-down .product-hover-overlay {
-				transform: translateY(-20px);
-			}
-			.elementor-element-{{ id }} .hover-animation-slide-down .product-image-wrapper:hover .product-hover-overlay {
-				transform: translateY(0);
-			}
-
-			/* ZOOM IN */
-			.elementor-element-{{ id }} .hover-animation-zoom-in .product-hover-overlay {
-				transform: scale(0.8);
-			}
-			.elementor-element-{{ id }} .hover-animation-zoom-in .product-image-wrapper:hover .product-hover-overlay {
-				transform: scale(1);
-			}
-
-			/* ZOOM OUT */
-			.elementor-element-{{ id }} .hover-animation-zoom-out .product-hover-overlay {
-				transform: scale(1.2);
-			}
-			.elementor-element-{{ id }} .hover-animation-zoom-out .product-image-wrapper:hover .product-hover-overlay {
-				transform: scale(1);
-			}
-			.elementor-element-{{ id }} .product-name {
-				display: block;
-				width: 100%;
-				margin: 0;
-				padding: 0;
-				visibility: visible;
-				opacity: 1;
-			}
-			.elementor-element-{{ id }} .product-item-content {
-				display: block;
-			}
-			.elementor-element-{{ id }} .product-hover-overlay .product-name {
-				margin: 0;
-				padding: 10px;
-			}
+			.elementor-element-{{ id }} .hover-animation-slide-up .product-hover-overlay { transform: translateY(20px); }
+			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
+			.elementor-element-{{ id }} .hover-animation-slide-down .product-hover-overlay { transform: translateY(-20px); }
+			.elementor-element-{{ id }} .hover-animation-zoom-in .product-hover-overlay { transform: scale(0.8); }
+			.elementor-element-{{ id }} .hover-animation-zoom-out .product-hover-overlay { transform: scale(1.2); }
+			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); opacity: 1; }
 		</style>
 		<?php
 	}
