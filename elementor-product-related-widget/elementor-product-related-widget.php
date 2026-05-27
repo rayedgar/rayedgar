@@ -23,7 +23,7 @@ final class Elementor_Product_Related_Widget {
 	}
 
 	public function __construct() {
-		add_action( 'plugins_loaded', [ $this, 'init' ] );
+		add_action( 'plugins_loaded', [ $this, 'init' ], 20 );
 	}
 
 	public function init() {

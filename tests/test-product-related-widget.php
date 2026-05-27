@@ -31,9 +31,6 @@ namespace {
         }
     }
 
-    // WooCommerce and Elementor check will be handled by class_exists if we could,
-    // but it's a built-in function.
-    // We'll just define the classes instead.
     if (!class_exists('WooCommerce')) {
         class WooCommerce {}
     }
@@ -110,107 +107,124 @@ namespace Elementor {
         class Plugin {
             public static $instance;
             public $editor;
+            public function __construct() {
+                $this->editor = new class {
+                    public function is_edit_mode() {
+                        return true;
+                    }
+                };
+            }
         }
     }
 }
 
 // Mock WooCommerce and WP functions
 namespace {
-    if (!function_exists('is_singular')) {
-        function is_singular($type) {
-            return $type === 'product';
-        }
+    $GLOBALS['is_singular_product'] = true;
+    function is_singular($type) {
+        if ($type === 'product') return $GLOBALS['is_singular_product'];
+        return false;
     }
 
-    if (!function_exists('wc_get_related_products')) {
-        function wc_get_related_products($id, $limit) {
-            return [101, 102, 103, 104];
-        }
+    $GLOBALS['related_ids'] = [101, 102, 103, 104];
+    function wc_get_related_products($id, $limit) {
+        return $GLOBALS['related_ids'];
     }
 
-    if (!function_exists('wc_get_product')) {
-        function wc_get_product($id) {
-            return new class {
-                public function get_image() {
-                    return '<img src="dummy.jpg" />';
-                }
-            };
-        }
-    }
-
-    if (!function_exists('get_the_ID')) {
-        function get_the_ID() {
-            return 101;
-        }
-    }
-
-    if (!function_exists('the_permalink')) {
-        function the_permalink() {
-            echo 'http://example.com/product';
-        }
-    }
-
-    if (!function_exists('the_title')) {
-        function the_title() {
-            echo 'Sample Product';
-        }
-    }
-
-    if (!function_exists('wp_reset_postdata')) {
-        function wp_reset_postdata() {}
-    }
-
-    if (!class_exists('WP_Query')) {
-        class WP_Query {
-            public $posts;
-            private $index = 0;
-            public function __construct($args) {
-                $this->posts = [1, 2, 3, 4];
+    function wc_get_product($id) {
+        if ($id === 999) return false;
+        return new class {
+            public function get_image() {
+                return '<img src="dummy.jpg" />';
             }
-            public function have_posts() {
-                return $this->index < count($this->posts);
-            }
-            public function the_post() {
-                $this->index++;
-            }
+        };
+    }
+
+    function get_the_ID() {
+        return 101;
+    }
+
+    function the_permalink() {
+        echo 'http://example.com/product';
+    }
+
+    function the_title() {
+        echo 'Sample Product';
+    }
+
+    function wp_reset_postdata() {}
+
+    class WP_Query {
+        public $posts;
+        private $index = 0;
+        public function __construct($args) {
+            $this->posts = [1, 2, 3, 4];
+        }
+        public function have_posts() {
+            return $this->index < count($this->posts);
+        }
+        public function the_post() {
+            $this->index++;
         }
     }
+
+    // Initialize Elementor instance
+    \Elementor\Plugin::$instance = new \Elementor\Plugin();
 
     // Include the widget class
     require_once __DIR__ . '/../elementor-product-related-widget/widgets/product-related-widget.php';
 
-    if (!class_exists('Testable_Product_Related_Widget')) {
-        class Testable_Product_Related_Widget extends Product_Related_Widget {
-            public function public_register_controls() {
-                $this->register_controls();
-            }
-            public function public_render() {
-                $this->render();
-            }
+    class Testable_Product_Related_Widget extends Product_Related_Widget {
+        public function public_register_controls() {
+            $this->register_controls();
+        }
+        public function public_render() {
+            $this->render();
         }
     }
 
     // Test instantiation
     $widget = new Testable_Product_Related_Widget();
     echo "Widget Name: " . $widget->get_name() . "\n";
-    echo "Widget Title: " . $widget->get_title() . "\n";
 
-    // Mock global $post
+    // Test Case 1: Normal Single Product Page
+    echo "Test Case 1: Normal Single Product Page\n";
+    $GLOBALS['is_singular_product'] = true;
+    $GLOBALS['related_ids'] = [101, 102, 103, 104];
     $GLOBALS['post'] = (object) ['ID' => 1];
-
-    // Test register_controls
-    $widget->public_register_controls();
-    echo "Controls registered successfully.\n";
-
-    // Test render (output buffering to capture)
     ob_start();
     $widget->public_render();
     $output = ob_get_clean();
-
     if (strpos($output, 'Related Products') !== false && strpos($output, 'Sample Product') !== false) {
-        echo "Render test passed.\n";
+        echo " - Render test passed.\n";
     } else {
-        echo "Render test failed.\n";
+        echo " - Render test failed.\n";
+    }
+
+    // Test Case 2: Non-Product Page (Editor Mode)
+    echo "Test Case 2: Non-Product Page (Editor Mode)\n";
+    $GLOBALS['is_singular_product'] = false;
+    ob_start();
+    $widget->public_render();
+    $output = ob_get_clean();
+    if (strpos($output, 'Related products are only visible on single product pages') !== false) {
+        echo " - Non-product page message check passed.\n";
+    } else {
+        echo " - Non-product page message check failed.\n";
+        echo "Output: " . $output . "\n";
+    }
+
+    // Test Case 3: No Related Products Found (Editor Mode)
+    echo "Test Case 3: No Related Products Found (Editor Mode)\n";
+    $GLOBALS['is_singular_product'] = true;
+    $GLOBALS['related_ids'] = [];
+    ob_start();
+    $widget->public_render();
+    $output = ob_get_clean();
+    if (strpos($output, 'No related products found') !== false) {
+        echo " - No related products message check passed.\n";
+    } else {
+        echo " - No related products message check failed.\n";
         echo "Output: " . $output . "\n";
     }
 }

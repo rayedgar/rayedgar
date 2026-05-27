@@ -81,6 +81,10 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'label_off' => esc_html__( 'No', 'elementor-product-related-widget' ),
 				'return_value' => 'yes',
 				'default' => 'no',
+				'selectors' => [
+					'{{WRAPPER}} .product-hover-overlay' => 'opacity: 0;',
+					'{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay' => 'opacity: 1;',
+				],
 			]
 		);
 
@@ -165,30 +169,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-		$this->add_responsive_control(
-			'product_name_align',
-			[
-				'label' => esc_html__( 'Alignment', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::CHOOSE,
-				'options' => [
-					'left' => [
-						'title' => esc_html__( 'Left', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-left',
-					],
-					'center' => [
-						'title' => esc_html__( 'Center', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-center',
-					],
-					'right' => [
-						'title' => esc_html__( 'Right', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-right',
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .product-name' => 'text-align: {{VALUE}};',
-				],
-			]
-		);
+
 
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
@@ -246,6 +227,31 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'product_name_typography',
 				'selector' => '{{WRAPPER}} .product-name, {{WRAPPER}} .product-hover-overlay .product-name',
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_name_align',
+			[
+				'label' => esc_html__( 'Alignment', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => esc_html__( 'Left', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => esc_html__( 'Center', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .product-name' => 'text-align: {{VALUE}};',
+				],
 			]
 		);
 
@@ -354,19 +360,32 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 	protected function render() {
 		$settings = $this->get_settings_for_display();
+		$is_editor = \Elementor\Plugin::$instance->editor->is_edit_mode();
 
 		if ( ! is_singular( 'product' ) ) {
-			if ( \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
-				echo '<p>' . esc_html__( 'Related products are only visible on single product pages.', 'elementor-product-related-widget' ) . '</p>';
+			if ( $is_editor ) {
+				echo '<div class="elementor-alert elementor-alert-warning">' . esc_html__( 'Related products are only visible on single product pages.', 'elementor-product-related-widget' ) . '</div>';
 			}
 			return;
 		}
 
 		global $post;
 
+		// Ensure we have a product object
+		$product = wc_get_product( $post->ID );
+		if ( ! $product ) {
+			if ( $is_editor ) {
+				echo '<div class="elementor-alert elementor-alert-warning">' . esc_html__( 'Product data not found.', 'elementor-product-related-widget' ) . '</div>';
+			}
+			return;
+		}
+
 		$related_ids = wc_get_related_products( $post->ID, $settings['posts_per_page'] );
 
 		if ( empty( $related_ids ) ) {
+			if ( $is_editor ) {
+				echo '<div class="elementor-alert elementor-alert-info">' . esc_html__( 'No related products found for this product.', 'elementor-product-related-widget' ) . '</div>';
+			}
 			return;
 		}
 
@@ -404,9 +423,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 							<a href="<?php the_permalink(); ?>">
 								<?php echo $product->get_image(); ?>
 							</a>
-							<?php if ( 'yes' === $settings['hover_title_on_image'] ) : ?>
-								<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; pointer-events: none;">
-									<h3 class="product-name hover-title" style="padding: 10px; text-align: center;">
+							<?php if ( 'yes' === $settings['hover_title_on_image'] && 'yes' === $settings['show_product_name'] ) : ?>
+								<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s; pointer-events: none;">
+									<h3 class="product-name hover-title" style="padding: 10px;">
 										<?php the_title(); ?>
 									</h3>
 								</div>
@@ -426,14 +445,11 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		</div>
 
 		<style>
-			{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay {
-				opacity: 1;
-			}
-			{{WRAPPER}} .related-product-item .product-name a {
+			.related-product-item .product-name a {
 				color: inherit;
 				text-decoration: none;
 			}
-			{{WRAPPER}} .product-hover-overlay .product-name {
+			.product-hover-overlay .product-name {
 				margin: 0;
 			}
 		</style>
@@ -463,9 +479,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 						<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;">
 							<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
 						</div>
-						<# if ( 'yes' === hover_title_on_image ) { #>
-							<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; pointer-events: none;">
-								<h3 class="product-name hover-title" style="padding: 10px; text-align: center;">
+						<# if ( 'yes' === hover_title_on_image && 'yes' === show_product_name ) { #>
+							<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s; pointer-events: none;">
+								<h3 class="product-name hover-title" style="padding: 10px;">
 									Product Title {{ i + 1 }}
 								</h3>
 							</div>
@@ -483,13 +499,10 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		</div>
 
 		<style>
-			{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay {
-				opacity: 1;
-			}
 			.dummy-image {
 				width: 100%;
 			}
-			{{WRAPPER}} .product-hover-overlay .product-name {
+			.product-hover-overlay .product-name {
 				margin: 0;
 			}
 		</style>
