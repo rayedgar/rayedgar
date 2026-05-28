@@ -1,0 +1,113 @@
+<?php
+
+// Mocking WordPress and WooCommerce functions for testing.
+define('ABSPATH', true);
+
+$post_meta = [];
+$posts = [];
+$terms = [];
+
+function add_action($tag, $callback) {}
+function add_filter($tag, $callback) {}
+function _x($text, $context, $domain) { return $text; }
+function __($text, $domain) { return $text; }
+function register_post_type($post_type, $args) {}
+function wp_nonce_field($action, $name) {}
+function get_post_meta($id, $key, $single) {
+    global $post_meta;
+    return isset($post_meta[$id][$key]) ? $post_meta[$id][$key] : '';
+}
+function update_post_meta($id, $key, $value) {
+    global $post_meta;
+    $post_meta[$id][$key] = $value;
+}
+function apply_filters($tag, $value) { return $value; }
+function get_posts($args) {
+    global $posts;
+    return array_filter($posts, function($post) use ($args) {
+        return $post->post_type === $args['post_type'];
+    });
+}
+function has_term($term, $taxonomy, $post_id) {
+    global $terms;
+    if (!isset($terms[$post_id])) return false;
+    if (is_array($term)) {
+        return !empty(array_intersect($term, $terms[$post_id]));
+    }
+    return in_array($term, $terms[$post_id]);
+}
+
+class MockProduct {
+    public $id;
+    public function __construct($id) { $this->id = $id; }
+    public function get_id() { return $this->id; }
+}
+
+// Include the plugin file
+require_once 'woocommerce-custom-product-tabs/woocommerce-custom-product-tabs.php';
+
+// Setup Mock Data
+$posts = [
+    (object) [
+        'ID' => 101,
+        'post_title' => 'Global Tab',
+        'post_content' => 'Global Content',
+        'post_type' => 'wc_product_tab'
+    ],
+    (object) [
+        'ID' => 102,
+        'post_title' => 'Category Tab',
+        'post_content' => 'Category Content',
+        'post_type' => 'wc_product_tab'
+    ],
+    (object) [
+        'ID' => 103,
+        'post_title' => 'Product Tab',
+        'post_content' => 'Product Content',
+        'post_type' => 'wc_product_tab'
+    ],
+];
+
+update_post_meta(101, '_wcpt_display_rule', 'all');
+update_post_meta(101, '_wcpt_priority', 10);
+
+update_post_meta(102, '_wcpt_display_rule', 'categories');
+update_post_meta(102, '_wcpt_categories', [5]);
+update_post_meta(102, '_wcpt_priority', 20);
+
+update_post_meta(103, '_wcpt_display_rule', 'products');
+update_post_meta(103, '_wcpt_products', [1]);
+update_post_meta(103, '_wcpt_priority', 30);
+
+// Test Case 1: Product 1 (Category 5)
+echo "Testing Product 1 (Category 5)...\n";
+global $product, $terms;
+$product = new MockProduct(1);
+$terms[1] = [5];
+
+$tabs = wcpt_product_tabs([]);
+print_r(array_keys($tabs));
+
+if (isset($tabs['wcpt_tab_101']) && isset($tabs['wcpt_tab_102']) && isset($tabs['wcpt_tab_103'])) {
+    echo "Test Case 1 Passed!\n";
+} else {
+    echo "Test Case 1 Failed!\n";
+    exit(1);
+}
+
+// Test Case 2: Product 2 (Category 6)
+echo "Testing Product 2 (Category 6)...\n";
+$product = new MockProduct(2);
+$terms[2] = [6];
+
+$tabs = wcpt_product_tabs([]);
+print_r(array_keys($tabs));
+
+if (isset($tabs['wcpt_tab_101']) && !isset($tabs['wcpt_tab_102']) && !isset($tabs['wcpt_tab_103'])) {
+    echo "Test Case 2 Passed!\n";
+} else {
+    echo "Test Case 2 Failed!\n";
+    exit(1);
+}
+
+echo "All tests passed successfully!\n";
