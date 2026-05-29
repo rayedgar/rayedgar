@@ -87,6 +87,19 @@ update_post_meta(103, '_wcpt_display_rule', 'products');
 update_post_meta(103, '_wcpt_products', [1]);
 update_post_meta(103, '_wcpt_priority', 30);
 
+// New Stacked Field Tab
+$posts[] = (object) [
+    'ID' => 104,
+    'post_title' => 'Stacked Field Tab',
+    'post_content' => 'Stacked Content',
+    'post_type' => 'wc_product_tab'
+];
+update_post_meta(104, '_wcpt_display_as', 'field');
+update_post_meta(104, '_wcpt_display_rule', 'all');
+update_post_meta(104, '_wcpt_priority', 5);
+update_post_meta(104, '_wcpt_font_size', '20px');
+update_post_meta(104, '_wcpt_margin', 15);
+
 // Set styling for Global Tab
 update_post_meta(101, '_wcpt_line_height', '1.8');
 update_post_meta(101, '_wcpt_border_width', 2);
@@ -123,6 +136,15 @@ if (isset($tabs['wcpt_tab_101']) && !isset($tabs['wcpt_tab_102']) && !isset($tab
     exit(1);
 }
 
+// Test Case 2b: Verify Stacked Field excluded from Tabs
+echo "Testing Stacked Field exclusion from tabs...\n";
+if (!isset($tabs['wcpt_tab_104'])) {
+    echo "Exclusion Test Passed!\n";
+} else {
+    echo "Exclusion Test Failed!\n";
+    exit(1);
+}
+
 // Test Case 3: Verify Styles
 echo "Testing Styles on Global Tab...\n";
 $global_tab = $tabs['wcpt_tab_101'];
@@ -151,6 +173,22 @@ if ($stripped['color']['value'] === 'Red') {
     echo "Attribute Test Passed!\n";
 } else {
     echo "Attribute Test Failed!\n";
+    exit(1);
+}
+
+// Test Case 5: Verify Stacked Field Rendering
+echo "Testing Stacked Field Rendering...\n";
+ob_start();
+wcpt_render_stacked_fields();
+$stacked_output = ob_get_clean();
+echo "Stacked Output: $stacked_output\n";
+
+if (strpos($stacked_output, 'Stacked Content') !== false &&
+    strpos($stacked_output, 'font-size: 20px;') !== false &&
+    strpos($stacked_output, 'margin: 15px 0;') !== false) {
+    echo "Stacked Rendering Test Passed!\n";
+} else {
+    echo "Stacked Rendering Test Failed!\n";
     exit(1);
 }
 

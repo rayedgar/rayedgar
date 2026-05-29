@@ -80,6 +80,10 @@ function wcpt_render_meta_box( $post ) {
 	$border_width = get_post_meta( $post->ID, '_wcpt_border_width', true );
 	$padding      = get_post_meta( $post->ID, '_wcpt_padding', true );
 
+	$display_as   = get_post_meta( $post->ID, '_wcpt_display_as', true );
+	$font_size    = get_post_meta( $post->ID, '_wcpt_font_size', true );
+	$margin       = get_post_meta( $post->ID, '_wcpt_margin', true );
+
 	if ( '' === $priority ) {
 		$priority = 10;
 	}
@@ -138,6 +142,24 @@ function wcpt_render_meta_box( $post ) {
 	<p>
 		<label for="wcpt_padding"><?php _e( 'Padding (px)', 'wcpt' ); ?></label>
 		<input type="number" name="wcpt_padding" id="wcpt_padding" value="<?php echo esc_attr( $padding ); ?>" class="widefat">
+	</p>
+
+	<p>
+		<label for="wcpt_display_as"><?php _e( 'Display As', 'wcpt' ); ?></label>
+		<select name="wcpt_display_as" id="wcpt_display_as" class="widefat">
+			<option value="tab" <?php selected( $display_as, 'tab' ); ?>><?php _e( 'Standard WooCommerce Tab', 'wcpt' ); ?></option>
+			<option value="field" <?php selected( $display_as, 'field' ); ?>><?php _e( 'Stacked Field (Underneath)', 'wcpt' ); ?></option>
+		</select>
+	</p>
+
+	<p>
+		<label for="wcpt_font_size"><?php _e( 'Font Size (e.g. 16px or 1.2em)', 'wcpt' ); ?></label>
+		<input type="text" name="wcpt_font_size" id="wcpt_font_size" value="<?php echo esc_attr( $font_size ); ?>" class="widefat">
+	</p>
+
+	<p>
+		<label for="wcpt_margin"><?php _e( 'Margin (px)', 'wcpt' ); ?></label>
+		<input type="number" name="wcpt_margin" id="wcpt_margin" value="<?php echo esc_attr( $margin ); ?>" class="widefat">
 	</p>
 
 	<script type="text/javascript">
@@ -207,6 +229,18 @@ function wcpt_save_meta_box_data( $post_id ) {
 	if ( isset( $_POST['wcpt_padding'] ) ) {
 		update_post_meta( $post_id, '_wcpt_padding', intval( $_POST['wcpt_padding'] ) );
 	}
+
+	if ( isset( $_POST['wcpt_display_as'] ) ) {
+		update_post_meta( $post_id, '_wcpt_display_as', sanitize_text_field( $_POST['wcpt_display_as'] ) );
+	}
+
+	if ( isset( $_POST['wcpt_font_size'] ) ) {
+		update_post_meta( $post_id, '_wcpt_font_size', sanitize_text_field( $_POST['wcpt_font_size'] ) );
+	}
+
+	if ( isset( $_POST['wcpt_margin'] ) ) {
+		update_post_meta( $post_id, '_wcpt_margin', intval( $_POST['wcpt_margin'] ) );
+	}
 }
 add_action( 'save_post', 'wcpt_save_meta_box_data' );
 
@@ -230,6 +264,11 @@ function wcpt_product_tabs( $tabs ) {
 	$custom_tabs = get_posts( $args );
 
 	foreach ( $custom_tabs as $tab_post ) {
+		$display_as = get_post_meta( $tab_post->ID, '_wcpt_display_as', true );
+		if ( 'field' === $display_as ) {
+			continue;
+		}
+
 		$display_rule = get_post_meta( $tab_post->ID, '_wcpt_display_rule', true );
 		$priority     = get_post_meta( $tab_post->ID, '_wcpt_priority', true );
 		$should_show  = false;
@@ -259,6 +298,8 @@ function wcpt_product_tabs( $tabs ) {
 					'border_color' => get_post_meta( $tab_post->ID, '_wcpt_border_color', true ),
 					'border_width' => get_post_meta( $tab_post->ID, '_wcpt_border_width', true ),
 					'padding'      => get_post_meta( $tab_post->ID, '_wcpt_padding', true ),
+					'font_size'    => get_post_meta( $tab_post->ID, '_wcpt_font_size', true ),
+					'margin'       => get_post_meta( $tab_post->ID, '_wcpt_margin', true ),
 				),
 			);
 		}
@@ -292,6 +333,14 @@ function wcpt_render_tab_content( $key, $tab ) {
 			$css[] = 'padding: ' . intval( $styles['padding'] ) . 'px;';
 		}
 
+		if ( ! empty( $styles['font_size'] ) ) {
+			$css[] = 'font-size: ' . esc_attr( $styles['font_size'] ) . ';';
+		}
+
+		if ( ! empty( $styles['margin'] ) ) {
+			$css[] = 'margin: ' . intval( $styles['margin'] ) . 'px 0;';
+		}
+
 		if ( ! empty( $css ) ) {
 			$style_attr = ' style="' . implode( ' ', $css ) . '"';
 		}
@@ -314,3 +363,72 @@ function wcpt_remove_attribute_links( $product_attributes, $product ) {
 	return $product_attributes;
 }
 add_filter( 'woocommerce_display_product_attributes', 'wcpt_remove_attribute_links', 10, 2 );
+
+/**
+ * Render stacked fields underneath the product summary.
+ */
+function wcpt_render_stacked_fields() {
+	global $product;
+
+	if ( ! $product ) {
+		return;
+	}
+
+	$product_id = $product->get_id();
+	$args = array(
+		'post_type'      => 'wc_product_tab',
+		'post_status'    => 'publish',
+		'posts_per_page' => -1,
+		'meta_key'       => '_wcpt_priority',
+		'orderby'        => 'meta_value_num',
+		'order'          => 'ASC',
+	);
+
+	$custom_tabs = get_posts( $args );
+
+	foreach ( $custom_tabs as $tab_post ) {
+		$display_as = get_post_meta( $tab_post->ID, '_wcpt_display_as', true );
+		if ( 'field' !== $display_as ) {
+			continue;
+		}
+
+		$display_rule = get_post_meta( $tab_post->ID, '_wcpt_display_rule', true );
+		$should_show  = false;
+
+		if ( 'all' === $display_rule ) {
+			$should_show = true;
+		} elseif ( 'categories' === $display_rule ) {
+			$categories = get_post_meta( $tab_post->ID, '_wcpt_categories', true );
+			if ( is_array( $categories ) && has_term( $categories, 'product_cat', $product_id ) ) {
+				$should_show = true;
+			}
+		} elseif ( 'products' === $display_rule ) {
+			$products = get_post_meta( $tab_post->ID, '_wcpt_products', true );
+			if ( is_array( $products ) && in_array( $product_id, $products ) ) {
+				$should_show = true;
+			}
+		}
+
+		if ( $should_show ) {
+			$styles = array(
+				'line_height'  => get_post_meta( $tab_post->ID, '_wcpt_line_height', true ),
+				'border_color' => get_post_meta( $tab_post->ID, '_wcpt_border_color', true ),
+				'border_width' => get_post_meta( $tab_post->ID, '_wcpt_border_width', true ),
+				'padding'      => get_post_meta( $tab_post->ID, '_wcpt_padding', true ),
+				'font_size'    => get_post_meta( $tab_post->ID, '_wcpt_font_size', true ),
+				'margin'       => get_post_meta( $tab_post->ID, '_wcpt_margin', true ),
+			);
+
+			$tab_data = array(
+				'content' => $tab_post->post_content,
+				'styles'  => $styles,
+			);
+
+			echo '<div class="wcpt-stacked-field">';
+			echo '<h3>' . apply_filters( 'the_title', $tab_post->post_title ) . '</h3>';
+			wcpt_render_tab_content( 'wcpt_tab_' . $tab_post->ID, $tab_data );
+			echo '</div>';
+		}
+	}
+}
+add_action( 'woocommerce_after_single_product_summary', 'wcpt_render_stacked_fields', 15 );
