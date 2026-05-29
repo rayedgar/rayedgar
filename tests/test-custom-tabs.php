@@ -37,6 +37,14 @@ function has_term($term, $taxonomy, $post_id) {
     return in_array($term, $terms[$post_id]);
 }
 
+function wp_strip_all_tags($text) {
+    return strip_tags($text);
+}
+
+function esc_attr($text) {
+    return htmlspecialchars($text, ENT_QUOTES);
+}
+
 class MockProduct {
     public $id;
     public function __construct($id) { $this->id = $id; }
@@ -79,6 +87,11 @@ update_post_meta(103, '_wcpt_display_rule', 'products');
 update_post_meta(103, '_wcpt_products', [1]);
 update_post_meta(103, '_wcpt_priority', 30);
 
+// Set styling for Global Tab
+update_post_meta(101, '_wcpt_line_height', '1.8');
+update_post_meta(101, '_wcpt_border_width', 2);
+update_post_meta(101, '_wcpt_border_color', '#ff0000');
+
 // Test Case 1: Product 1 (Category 5)
 echo "Testing Product 1 (Category 5)...\n";
 global $product, $terms;
@@ -107,6 +120,37 @@ if (isset($tabs['wcpt_tab_101']) && !isset($tabs['wcpt_tab_102']) && !isset($tab
     echo "Test Case 2 Passed!\n";
 } else {
     echo "Test Case 2 Failed!\n";
+    exit(1);
+}
+
+// Test Case 3: Verify Styles
+echo "Testing Styles on Global Tab...\n";
+$global_tab = $tabs['wcpt_tab_101'];
+ob_start();
+wcpt_render_tab_content('wcpt_tab_101', $global_tab);
+$output = ob_get_clean();
+
+echo "Output: $output\n";
+if (strpos($output, 'line-height: 1.8;') !== false && strpos($output, 'border-left: 2px solid #ff0000;') !== false) {
+    echo "Style Test Passed!\n";
+} else {
+    echo "Style Test Failed!\n";
+    exit(1);
+}
+
+// Test Case 4: Verify Attribute Link Removal
+echo "Testing Attribute Link Removal...\n";
+$attributes = [
+    'color' => [
+        'value' => '<a href="http://example.com">Red</a>'
+    ]
+];
+$stripped = wcpt_remove_attribute_links($attributes, $product);
+echo "Stripped Value: " . $stripped['color']['value'] . "\n";
+if ($stripped['color']['value'] === 'Red') {
+    echo "Attribute Test Passed!\n";
+} else {
+    echo "Attribute Test Failed!\n";
     exit(1);
 }
 

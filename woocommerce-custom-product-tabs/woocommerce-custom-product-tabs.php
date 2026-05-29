@@ -75,6 +75,11 @@ function wcpt_render_meta_box( $post ) {
 	$products     = get_post_meta( $post->ID, '_wcpt_products', true );
 	$priority     = get_post_meta( $post->ID, '_wcpt_priority', true );
 
+	$line_height  = get_post_meta( $post->ID, '_wcpt_line_height', true );
+	$border_color = get_post_meta( $post->ID, '_wcpt_border_color', true );
+	$border_width = get_post_meta( $post->ID, '_wcpt_border_width', true );
+	$padding      = get_post_meta( $post->ID, '_wcpt_padding', true );
+
 	if ( '' === $priority ) {
 		$priority = 10;
 	}
@@ -110,6 +115,29 @@ function wcpt_render_meta_box( $post ) {
 	<p>
 		<label for="wcpt_priority"><?php _e( 'Priority', 'wcpt' ); ?></label>
 		<input type="number" name="wcpt_priority" id="wcpt_priority" value="<?php echo esc_attr( $priority ); ?>" class="widefat">
+	</p>
+
+	<hr>
+	<h3><?php _e( 'Appearance Settings', 'wcpt' ); ?></h3>
+
+	<p>
+		<label for="wcpt_line_height"><?php _e( 'Line Height (e.g. 1.6)', 'wcpt' ); ?></label>
+		<input type="text" name="wcpt_line_height" id="wcpt_line_height" value="<?php echo esc_attr( $line_height ); ?>" class="widefat">
+	</p>
+
+	<p>
+		<label for="wcpt_border_width"><?php _e( 'Side Border Thickness (px)', 'wcpt' ); ?></label>
+		<input type="number" name="wcpt_border_width" id="wcpt_border_width" value="<?php echo esc_attr( $border_width ); ?>" class="widefat">
+	</p>
+
+	<p>
+		<label for="wcpt_border_color"><?php _e( 'Side Border Color (hex)', 'wcpt' ); ?></label>
+		<input type="text" name="wcpt_border_color" id="wcpt_border_color" value="<?php echo esc_attr( $border_color ); ?>" class="widefat">
+	</p>
+
+	<p>
+		<label for="wcpt_padding"><?php _e( 'Padding (px)', 'wcpt' ); ?></label>
+		<input type="number" name="wcpt_padding" id="wcpt_padding" value="<?php echo esc_attr( $padding ); ?>" class="widefat">
 	</p>
 
 	<script type="text/javascript">
@@ -163,6 +191,22 @@ function wcpt_save_meta_box_data( $post_id ) {
 	if ( isset( $_POST['wcpt_priority'] ) ) {
 		update_post_meta( $post_id, '_wcpt_priority', intval( $_POST['wcpt_priority'] ) );
 	}
+
+	if ( isset( $_POST['wcpt_line_height'] ) ) {
+		update_post_meta( $post_id, '_wcpt_line_height', sanitize_text_field( $_POST['wcpt_line_height'] ) );
+	}
+
+	if ( isset( $_POST['wcpt_border_width'] ) ) {
+		update_post_meta( $post_id, '_wcpt_border_width', intval( $_POST['wcpt_border_width'] ) );
+	}
+
+	if ( isset( $_POST['wcpt_border_color'] ) ) {
+		update_post_meta( $post_id, '_wcpt_border_color', sanitize_text_field( $_POST['wcpt_border_color'] ) );
+	}
+
+	if ( isset( $_POST['wcpt_padding'] ) ) {
+		update_post_meta( $post_id, '_wcpt_padding', intval( $_POST['wcpt_padding'] ) );
+	}
 }
 add_action( 'save_post', 'wcpt_save_meta_box_data' );
 
@@ -210,6 +254,12 @@ function wcpt_product_tabs( $tabs ) {
 				'priority' => (int) $priority,
 				'callback' => 'wcpt_render_tab_content',
 				'content'  => $tab_post->post_content, // Pass content for callback
+				'styles'   => array(
+					'line_height'  => get_post_meta( $tab_post->ID, '_wcpt_line_height', true ),
+					'border_color' => get_post_meta( $tab_post->ID, '_wcpt_border_color', true ),
+					'border_width' => get_post_meta( $tab_post->ID, '_wcpt_border_width', true ),
+					'padding'      => get_post_meta( $tab_post->ID, '_wcpt_padding', true ),
+				),
 			);
 		}
 	}
@@ -222,5 +272,45 @@ add_filter( 'woocommerce_product_tabs', 'wcpt_product_tabs' );
  * Render Tab Content.
  */
 function wcpt_render_tab_content( $key, $tab ) {
+	$style_attr = '';
+	if ( ! empty( $tab['styles'] ) ) {
+		$styles = $tab['styles'];
+		$css    = array();
+
+		if ( ! empty( $styles['line_height'] ) ) {
+			$css[] = 'line-height: ' . esc_attr( $styles['line_height'] ) . ';';
+		}
+
+		if ( ! empty( $styles['border_width'] ) ) {
+			$width = intval( $styles['border_width'] ) . 'px';
+			$color = ! empty( $styles['border_color'] ) ? esc_attr( $styles['border_color'] ) : '#ccc';
+			$css[] = "border-left: $width solid $color;";
+			$css[] = "border-right: $width solid $color;";
+		}
+
+		if ( ! empty( $styles['padding'] ) ) {
+			$css[] = 'padding: ' . intval( $styles['padding'] ) . 'px;';
+		}
+
+		if ( ! empty( $css ) ) {
+			$style_attr = ' style="' . implode( ' ', $css ) . '"';
+		}
+	}
+
+	echo '<div class="wcpt-tab-content-wrapper"' . $style_attr . '>';
 	echo apply_filters( 'the_content', $tab['content'] );
+	echo '</div>';
 }
+
+/**
+ * Remove links from product attributes in the "Additional Information" tab.
+ */
+function wcpt_remove_attribute_links( $product_attributes, $product ) {
+	foreach ( $product_attributes as &$attribute ) {
+		if ( isset( $attribute['value'] ) ) {
+			$attribute['value'] = wp_strip_all_tags( $attribute['value'] );
+		}
+	}
+	return $product_attributes;
+}
+add_filter( 'woocommerce_display_product_attributes', 'wcpt_remove_attribute_links', 10, 2 );
