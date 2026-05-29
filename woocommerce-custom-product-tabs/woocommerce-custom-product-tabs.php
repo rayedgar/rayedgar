@@ -35,7 +35,7 @@ function wcpt_register_post_type() {
 		'public'             => false,
 		'publicly_queryable' => false,
 		'show_ui'            => true,
-		'show_in_menu'       => 'edit.php?post_type=product',
+		'show_in_menu'       => 'woocommerce',
 		'query_var'          => true,
 		'rewrite'            => array( 'slug' => 'wc-product-tab' ),
 		'capability_type'    => 'post',
@@ -97,6 +97,15 @@ function wcpt_render_meta_box( $post ) {
 	}
 
 	?>
+	<div style="background: #f0f0f1; padding: 12px; border-left: 4px solid #2271b1; margin-bottom: 20px;">
+		<label for="wcpt_display_as" style="font-weight: bold; display: block; margin-bottom: 5px;"><?php _e( 'DISPLAY LAYOUT', 'wcpt' ); ?></label>
+		<select name="wcpt_display_as" id="wcpt_display_as" class="widefat" style="border-color: #2271b1; font-weight: bold;">
+			<option value="tab" <?php selected( $display_as, 'tab' ); ?>><?php _e( 'Standard WooCommerce Tab', 'wcpt' ); ?></option>
+			<option value="field" <?php selected( $display_as, 'field' ); ?>><?php _e( 'Stacked Field (Underneath Tabs)', 'wcpt' ); ?></option>
+		</select>
+		<p class="description"><?php _e( 'Choose how this content should be displayed on the product page.', 'wcpt' ); ?></p>
+	</div>
+
 	<p>
 		<label for="wcpt_display_rule"><?php _e( 'Display Rule', 'wcpt' ); ?></label>
 		<select name="wcpt_display_rule" id="wcpt_display_rule" class="widefat">
@@ -144,13 +153,6 @@ function wcpt_render_meta_box( $post ) {
 		<input type="number" name="wcpt_padding" id="wcpt_padding" value="<?php echo esc_attr( $padding ); ?>" class="widefat">
 	</p>
 
-	<p>
-		<label for="wcpt_display_as"><?php _e( 'Display As', 'wcpt' ); ?></label>
-		<select name="wcpt_display_as" id="wcpt_display_as" class="widefat">
-			<option value="tab" <?php selected( $display_as, 'tab' ); ?>><?php _e( 'Standard WooCommerce Tab', 'wcpt' ); ?></option>
-			<option value="field" <?php selected( $display_as, 'field' ); ?>><?php _e( 'Stacked Field (Underneath)', 'wcpt' ); ?></option>
-		</select>
-	</p>
 
 	<p>
 		<label for="wcpt_font_size"><?php _e( 'Font Size (e.g. 16px or 1.2em)', 'wcpt' ); ?></label>
