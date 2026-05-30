@@ -434,3 +434,12 @@ function wcpt_render_stacked_fields() {
 	}
 }
 add_action( 'woocommerce_after_single_product_summary', 'wcpt_render_stacked_fields', 15 );
+
+/**
+ * Register Elementor Widget.
+ */
+function wcpt_register_elementor_widget( $widgets_manager ) {
+	require_once __DIR__ . '/elementor-widget.php';
+	$widgets_manager->register( new \WCPT_Elementor_Widget() );
+}
+add_action( 'elementor/widgets/register', 'wcpt_register_elementor_widget' );
