@@ -2,13 +2,15 @@
 /**
  * Plugin Name: WooCommerce Custom Product Tabs
  * Description: Add custom tabs to your WooCommerce product pages based on display rules.
- * Version: 1.0
+ * Version: 1.2.2
  * Author: Jules
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
+
+define( 'WCPT_VERSION', '1.2.2' );
 
 /**
  * Register Custom Post Type for Product Tabs.
@@ -55,6 +57,7 @@ add_action( 'init', 'wcpt_register_post_type' );
 function wcpt_enqueue_styles() {
 	?>
 	<style type="text/css">
+		/* WCPT Version: <?php echo WCPT_VERSION; ?> */
 		.wcpt-tab-content-wrapper {
 			box-sizing: border-box;
 			max-width: 100%;
@@ -72,6 +75,37 @@ function wcpt_enqueue_styles() {
 			}
 			.wcpt-stacked-field {
 				margin-bottom: 20px;
+			}
+			.woocommerce-product-attributes-item {
+				display: flex !important;
+				flex-wrap: nowrap !important;
+				justify-content: space-between !important;
+				align-items: center !important;
+				border-bottom: 1px solid #eee !important;
+				margin-bottom: 0 !important;
+				width: 100% !important;
+			}
+			.woocommerce-product-attributes-item__label,
+			.woocommerce-product-attributes-item__value {
+				display: block !important;
+				padding: 10px 5px !important;
+				background: none !important;
+				border: none !important;
+				white-space: nowrap !important;
+				margin: 0 !important;
+				box-sizing: border-box !important;
+			}
+			.woocommerce-product-attributes-item__label {
+				font-weight: bold !important;
+				flex-shrink: 0 !important;
+				max-width: 50% !important;
+			}
+			.woocommerce-product-attributes-item__value {
+				text-align: right !important;
+				flex-grow: 1 !important;
+				overflow: hidden !important;
+				text-overflow: ellipsis !important;
+				min-width: 0 !important;
 			}
 		}
 	</style>
