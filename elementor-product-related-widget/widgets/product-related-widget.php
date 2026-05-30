@@ -121,7 +121,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				],
 				'default' => 'left',
 				'selectors' => [
-					'{{WRAPPER}} .related-product-item' => 'text-align: {{VALUE}};',
+					'{{WRAPPER}} .related-product-item' => '{{VALUE}}',
 					'{{WRAPPER}} .product-image-wrapper' => '{{VALUE}}',
 					'{{WRAPPER}} .product-hover-overlay' => '{{VALUE}}',
 				],
@@ -152,18 +152,15 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_responsive_control(
-			'posts_per_page',
+			'rows',
 			[
-				'label' => esc_html__( 'Products Count', 'elementor-product-related-widget' ),
+				'label' => esc_html__( 'Rows', 'elementor-product-related-widget' ),
 				'type' => \Elementor\Controls_Manager::NUMBER,
 				'min' => 1,
-				'max' => 50,
-				'default' => 4,
-				'tablet_default' => 3,
+				'max' => 20,
+				'default' => 1,
+				'tablet_default' => 1,
 				'mobile_default' => 2,
-				'selectors' => [
-					'{{WRAPPER}} .related-product-item' => '--posts-count: {{VALUE}};',
-				],
 			]
 		);
 
@@ -458,11 +455,19 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
-		$max_posts = max(
-			(int) $settings['posts_per_page'],
-			(int) ($settings['posts_per_page_tablet'] ?? 0),
-			(int) ($settings['posts_per_page_mobile'] ?? 0)
-		);
+		$cols_desktop = (int) $settings['columns'];
+		$cols_tablet  = (int) ($settings['columns_tablet'] ?: $cols_desktop);
+		$cols_mobile  = (int) ($settings['columns_mobile'] ?: $cols_tablet);
+
+		$rows_desktop = (int) $settings['rows'];
+		$rows_tablet  = (int) ($settings['rows_tablet'] ?: $rows_desktop);
+		$rows_mobile  = (int) ($settings['rows_mobile'] ?: $rows_tablet);
+
+		$total_desktop = $cols_desktop * $rows_desktop;
+		$total_tablet  = $cols_tablet * $rows_tablet;
+		$total_mobile  = $cols_mobile * $rows_mobile;
+
+		$max_posts = max( $total_desktop, $total_tablet, $total_mobile );
 
 		$related_ids = wc_get_related_products( $post->ID, $max_posts );
 		if ( empty( $related_ids ) ) {
@@ -481,21 +486,21 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		?>
 		<style>
-			.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+1) {
+			.elementor-element-<?php echo $this->get_id(); ?> .related-product-item {
 				display: block;
 			}
 			@media (min-width: 1025px) {
-				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo (int) $settings['posts_per_page'] + 1; ?>) {
+				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_desktop + 1; ?>) {
 					display: none;
 				}
 			}
 			@media (max-width: 1024px) and (min-width: 768px) {
-				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo (int) ($settings['posts_per_page_tablet'] ?: $settings['posts_per_page']) + 1; ?>) {
+				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_tablet + 1; ?>) {
 					display: none;
 				}
 			}
 			@media (max-width: 767px) {
-				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo (int) ($settings['posts_per_page_mobile'] ?: ($settings['posts_per_page_tablet'] ?: $settings['posts_per_page'])) + 1; ?>) {
+				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_mobile + 1; ?>) {
 					display: none;
 				}
 			}
@@ -517,7 +522,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 								<?php echo $product_obj->get_image(); ?>
 							</a>
 							<?php if ( 'overlay' === $settings['product_title_position'] ) : ?>
-								<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s; pointer-events: none;">
+									<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none;">
 									<h3 class="product-name hover-title" style="padding: 10px; margin: 0;">
 										<?php the_title(); ?>
 									</h3>
@@ -581,11 +586,20 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 			<div class="related-products-grid" style="display: grid;">
 				<#
-				var max_posts = Math.max(
-					parseInt(settings.posts_per_page) || 0,
-					parseInt(settings.posts_per_page_tablet) || 0,
-					parseInt(settings.posts_per_page_mobile) || 0
-				);
+				var cols_desktop = parseInt(settings.columns) || 4;
+				var cols_tablet  = parseInt(settings.columns_tablet) || cols_desktop;
+				var cols_mobile  = parseInt(settings.columns_mobile) || cols_tablet;
+
+				var rows_desktop = parseInt(settings.rows) || 1;
+				var rows_tablet  = parseInt(settings.rows_tablet) || rows_desktop;
+				var rows_mobile  = parseInt(settings.rows_mobile) || rows_tablet;
+
+				var total_desktop = cols_desktop * rows_desktop;
+				var total_tablet  = cols_tablet * rows_tablet;
+				var total_mobile  = cols_mobile * rows_mobile;
+
+				var max_posts = Math.max( total_desktop, total_tablet, total_mobile );
+
 				for ( var i = 0; i < max_posts; i++ ) {
 				#>
 				<div class="related-product-item">
@@ -594,7 +608,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 							<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
 						</div>
 						<# if ( 'overlay' === product_title_position ) { #>
-							<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s; pointer-events: none;">
+							<div class="product-hover-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none;">
 								<h3 class="product-name hover-title" style="padding: 10px; margin: 0;">
 									Product Title {{ i + 1 }}
 								</h3>
@@ -613,21 +627,21 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		</div>
 
 		<style>
-			.elementor-element-{{ id }} .related-product-item:nth-child(n+1) {
+			.elementor-element-{{ id }} .related-product-item {
 				display: block;
 			}
 			@media (min-width: 1025px) {
-				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.posts_per_page) + 1 }}) {
+				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ total_desktop + 1 }}) {
 					display: none;
 				}
 			}
 			@media (max-width: 1024px) and (min-width: 768px) {
-				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.posts_per_page_tablet || settings.posts_per_page) + 1 }}) {
+				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ total_tablet + 1 }}) {
 					display: none;
 				}
 			}
 			@media (max-width: 767px) {
-				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.posts_per_page_mobile || (settings.posts_per_page_tablet || settings.posts_per_page)) + 1 }}) {
+				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ total_mobile + 1 }}) {
 					display: none;
 				}
 			}
