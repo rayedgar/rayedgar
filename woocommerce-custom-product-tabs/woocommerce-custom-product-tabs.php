@@ -35,7 +35,7 @@ function wcpt_register_post_type() {
 		'public'             => false,
 		'publicly_queryable' => false,
 		'show_ui'            => true,
-		'show_in_menu'       => 'woocommerce',
+		'show_in_menu'       => 'edit.php?post_type=product',
 		'query_var'          => true,
 		'rewrite'            => array( 'slug' => 'wc-product-tab' ),
 		'capability_type'    => 'post',
@@ -97,18 +97,6 @@ function wcpt_render_meta_box( $post ) {
 	}
 
 	?>
-	<div style="background: #f0f0f1; padding: 15px; border: 1px solid #2271b1; border-left-width: 5px; margin-bottom: 25px; border-radius: 4px;">
-		<h3 style="margin: 0 0 10px; color: #2271b1;"><?php _e( 'Display Layout Setting', 'wcpt' ); ?></h3>
-		<label for="wcpt_display_as" style="font-weight: bold; display: block; margin-bottom: 8px;"><?php _e( 'How should this item appear?', 'wcpt' ); ?></label>
-		<select name="wcpt_display_as" id="wcpt_display_as" class="widefat" style="border-color: #2271b1; font-weight: bold; height: 40px; font-size: 14px;">
-			<option value="tab" <?php selected( $display_as, 'tab' ); ?>><?php _e( 'Standard WooCommerce Tab (Horizontal Bar)', 'wcpt' ); ?></option>
-			<option value="field" <?php selected( $display_as, 'field' ); ?>><?php _e( 'Stacked Field (Vertical List Underneath)', 'wcpt' ); ?></option>
-		</select>
-		<p class="description" style="margin-top: 10px; font-style: italic;">
-			<?php _e( '<strong>Note:</strong> Standard tabs appear in the WooCommerce tab bar. Stacked fields appear one after another below the main product summary.', 'wcpt' ); ?>
-		</p>
-	</div>
-
 	<p>
 		<label for="wcpt_display_rule"><?php _e( 'Display Rule', 'wcpt' ); ?></label>
 		<select name="wcpt_display_rule" id="wcpt_display_rule" class="widefat">
@@ -156,6 +144,13 @@ function wcpt_render_meta_box( $post ) {
 		<input type="number" name="wcpt_padding" id="wcpt_padding" value="<?php echo esc_attr( $padding ); ?>" class="widefat">
 	</p>
 
+	<p>
+		<label for="wcpt_display_as"><?php _e( 'Display As', 'wcpt' ); ?></label>
+		<select name="wcpt_display_as" id="wcpt_display_as" class="widefat">
+			<option value="tab" <?php selected( $display_as, 'tab' ); ?>><?php _e( 'Standard WooCommerce Tab', 'wcpt' ); ?></option>
+			<option value="field" <?php selected( $display_as, 'field' ); ?>><?php _e( 'Stacked Field (Underneath)', 'wcpt' ); ?></option>
+		</select>
+	</p>
 
 	<p>
 		<label for="wcpt_font_size"><?php _e( 'Font Size (e.g. 16px or 1.2em)', 'wcpt' ); ?></label>
@@ -437,12 +432,3 @@ function wcpt_render_stacked_fields() {
 	}
 }
 add_action( 'woocommerce_after_single_product_summary', 'wcpt_render_stacked_fields', 15 );
-
-/**
- * Register Elementor Widget.
- */
-function wcpt_register_elementor_widget( $widgets_manager ) {
-	require_once __DIR__ . '/elementor-widget.php';
-	$widgets_manager->register( new \WCPT_Elementor_Widget() );
-}
-add_action( 'elementor/widgets/register', 'wcpt_register_elementor_widget' );
