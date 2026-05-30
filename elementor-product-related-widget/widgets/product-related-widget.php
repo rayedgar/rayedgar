@@ -162,7 +162,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'tablet_default' => 3,
 				'mobile_default' => 2,
 				'selectors' => [
-					'{{WRAPPER}} .related-product-item:nth-child(n+{{VALUE}}+1)' => 'display: none;',
+					'{{WRAPPER}} .related-product-item' => '--posts-count: {{VALUE}};',
 				],
 			]
 		);
@@ -480,6 +480,26 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		$this->add_render_attribute( 'wrapper', 'class', 'hover-reveal-' . $settings['hover_reveal_effect'] );
 
 		?>
+		<style>
+			.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+1) {
+				display: block;
+			}
+			@media (min-width: 1025px) {
+				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo (int) $settings['posts_per_page'] + 1; ?>) {
+					display: none;
+				}
+			}
+			@media (max-width: 1024px) and (min-width: 768px) {
+				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo (int) ($settings['posts_per_page_tablet'] ?: $settings['posts_per_page']) + 1; ?>) {
+					display: none;
+				}
+			}
+			@media (max-width: 767px) {
+				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo (int) ($settings['posts_per_page_mobile'] ?: ($settings['posts_per_page_tablet'] ?: $settings['posts_per_page'])) + 1; ?>) {
+					display: none;
+				}
+			}
+		</style>
 		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
 			<?php if ( 'yes' === $settings['show_section_title'] && ! empty( $settings['section_title'] ) ) : ?>
 				<h2 class="related-title"><?php echo esc_html( $settings['section_title'] ); ?></h2>
@@ -593,6 +613,24 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		</div>
 
 		<style>
+			.elementor-element-{{ id }} .related-product-item:nth-child(n+1) {
+				display: block;
+			}
+			@media (min-width: 1025px) {
+				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.posts_per_page) + 1 }}) {
+					display: none;
+				}
+			}
+			@media (max-width: 1024px) and (min-width: 768px) {
+				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.posts_per_page_tablet || settings.posts_per_page) + 1 }}) {
+					display: none;
+				}
+			}
+			@media (max-width: 767px) {
+				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.posts_per_page_mobile || (settings.posts_per_page_tablet || settings.posts_per_page)) + 1 }}) {
+					display: none;
+				}
+			}
 			.elementor-element-{{ id }} .product-image-wrapper img { width: 100%; height: auto; }
 
 			.elementor-element-{{ id }} .product-hover-overlay {
