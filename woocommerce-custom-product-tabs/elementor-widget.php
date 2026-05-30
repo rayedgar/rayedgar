@@ -36,12 +36,33 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 			'display_layout',
 			[
 				'label' => __( 'Display Layout', 'wcpt' ),
-				'type' => \Elementor\Controls_Manager::SELECT,
+				'type' => \Elementor\Controls_Manager::CHOOSE,
 				'default' => 'tabs',
 				'options' => [
-					'tabs'   => __( 'Standard Tabs', 'wcpt' ),
-					'fields' => __( 'Separate Stacked Fields', 'wcpt' ),
+					'tabs' => [
+						'title' => __( 'Standard Tabs', 'wcpt' ),
+						'icon' => 'eicon-tabs',
+					],
+					'fields' => [
+						'title' => __( 'Separate Stacked Fields', 'wcpt' ),
+						'icon' => 'eicon-editor-list-ol',
+					],
 				],
+				'toggle' => false,
+			]
+		);
+
+		$this->add_control(
+			'style_notice',
+			[
+				'type' => \Elementor\Controls_Manager::RAW_HTML,
+				'raw' => sprintf(
+					'<div class="elementor-control-field-description">%s <a href="%s" target="_blank">%s</a></div>',
+					__( 'Individual field styling (spacing, size, borders) is managed within each', 'wcpt' ),
+					admin_url( 'edit.php?post_type=wc_product_tab' ),
+					__( 'Product Tab item.', 'wcpt' )
+				),
+				'content_classes' => 'elementor-descriptor',
 			]
 		);
 

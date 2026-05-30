@@ -97,13 +97,16 @@ function wcpt_render_meta_box( $post ) {
 	}
 
 	?>
-	<div style="background: #f0f0f1; padding: 12px; border-left: 4px solid #2271b1; margin-bottom: 20px;">
-		<label for="wcpt_display_as" style="font-weight: bold; display: block; margin-bottom: 5px;"><?php _e( 'DISPLAY LAYOUT', 'wcpt' ); ?></label>
-		<select name="wcpt_display_as" id="wcpt_display_as" class="widefat" style="border-color: #2271b1; font-weight: bold;">
-			<option value="tab" <?php selected( $display_as, 'tab' ); ?>><?php _e( 'Standard WooCommerce Tab', 'wcpt' ); ?></option>
-			<option value="field" <?php selected( $display_as, 'field' ); ?>><?php _e( 'Stacked Field (Underneath Tabs)', 'wcpt' ); ?></option>
+	<div style="background: #f0f0f1; padding: 15px; border: 1px solid #2271b1; border-left-width: 5px; margin-bottom: 25px; border-radius: 4px;">
+		<h3 style="margin: 0 0 10px; color: #2271b1;"><?php _e( 'Display Layout Setting', 'wcpt' ); ?></h3>
+		<label for="wcpt_display_as" style="font-weight: bold; display: block; margin-bottom: 8px;"><?php _e( 'How should this item appear?', 'wcpt' ); ?></label>
+		<select name="wcpt_display_as" id="wcpt_display_as" class="widefat" style="border-color: #2271b1; font-weight: bold; height: 40px; font-size: 14px;">
+			<option value="tab" <?php selected( $display_as, 'tab' ); ?>><?php _e( 'Standard WooCommerce Tab (Horizontal Bar)', 'wcpt' ); ?></option>
+			<option value="field" <?php selected( $display_as, 'field' ); ?>><?php _e( 'Stacked Field (Vertical List Underneath)', 'wcpt' ); ?></option>
 		</select>
-		<p class="description"><?php _e( 'Choose how this content should be displayed on the product page.', 'wcpt' ); ?></p>
+		<p class="description" style="margin-top: 10px; font-style: italic;">
+			<?php _e( '<strong>Note:</strong> Standard tabs appear in the WooCommerce tab bar. Stacked fields appear one after another below the main product summary.', 'wcpt' ); ?>
+		</p>
 	</div>
 
 	<p>
