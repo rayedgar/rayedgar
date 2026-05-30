@@ -152,14 +152,14 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_responsive_control(
-			'rows',
+			'products_count',
 			[
-				'label' => esc_html__( 'Rows', 'elementor-product-related-widget' ),
+				'label' => esc_html__( 'Amount of Products to show', 'elementor-product-related-widget' ),
 				'type' => \Elementor\Controls_Manager::NUMBER,
 				'min' => 1,
-				'max' => 20,
-				'default' => 1,
-				'tablet_default' => 1,
+				'max' => 50,
+				'default' => 4,
+				'tablet_default' => 3,
 				'mobile_default' => 2,
 			]
 		);
@@ -455,17 +455,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
-		$cols_desktop = (int) $settings['columns'];
-		$cols_tablet  = (int) ($settings['columns_tablet'] ?: $cols_desktop);
-		$cols_mobile  = (int) ($settings['columns_mobile'] ?: $cols_tablet);
-
-		$rows_desktop = (int) $settings['rows'];
-		$rows_tablet  = (int) ($settings['rows_tablet'] ?: $rows_desktop);
-		$rows_mobile  = (int) ($settings['rows_mobile'] ?: $rows_tablet);
-
-		$total_desktop = $cols_desktop * $rows_desktop;
-		$total_tablet  = $cols_tablet * $rows_tablet;
-		$total_mobile  = $cols_mobile * $rows_mobile;
+		$total_desktop = (int) $settings['products_count'];
+		$total_tablet  = (int) ($settings['products_count_tablet'] ?: $total_desktop);
+		$total_mobile  = (int) ($settings['products_count_mobile'] ?: $total_tablet);
 
 		$max_posts = max( $total_desktop, $total_tablet, $total_mobile );
 
@@ -586,17 +578,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 			<div class="related-products-grid" style="display: grid;">
 				<#
-				var cols_desktop = parseInt(settings.columns) || 4;
-				var cols_tablet  = parseInt(settings.columns_tablet) || cols_desktop;
-				var cols_mobile  = parseInt(settings.columns_mobile) || cols_tablet;
-
-				var rows_desktop = parseInt(settings.rows) || 1;
-				var rows_tablet  = parseInt(settings.rows_tablet) || rows_desktop;
-				var rows_mobile  = parseInt(settings.rows_mobile) || rows_tablet;
-
-				var total_desktop = cols_desktop * rows_desktop;
-				var total_tablet  = cols_tablet * rows_tablet;
-				var total_mobile  = cols_mobile * rows_mobile;
+				var total_desktop = parseInt(settings.products_count) || 0;
+				var total_tablet  = parseInt(settings.products_count_tablet) || total_desktop;
+				var total_mobile  = parseInt(settings.products_count_mobile) || total_tablet;
 
 				var max_posts = Math.max( total_desktop, total_tablet, total_mobile );
 

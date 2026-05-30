@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Elementor Product Related Widget
  * Description: Custom Elementor widget to display related products.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Jules
  * Text Domain: elementor-product-related-widget
  */
