@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Custom Product Tabs
  * Description: Add custom tabs to your WooCommerce product pages based on display rules.
- * Version: 1.2.3
+ * Version: 1.3.0
  * Author: Jules
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'WCPT_VERSION', '1.2.3' );
+define( 'WCPT_VERSION', '1.3.0' );
 
 /**
  * Register Custom Post Type for Product Tabs.
@@ -55,6 +55,7 @@ add_action( 'init', 'wcpt_register_post_type' );
  * Enqueue Responsive Styles.
  */
 function wcpt_enqueue_styles() {
+	$global_align = get_option( 'wcpt_attribute_alignment', 'left' );
 	?>
 	<style type="text/css">
 		/* WCPT Version: <?php echo WCPT_VERSION; ?> */
@@ -109,6 +110,13 @@ function wcpt_enqueue_styles() {
 				min-width: 0 !important;
 			}
 		}
+		/* Global Attribute Alignment */
+		.woocommerce-product-attributes.shop_attributes {
+			text-align: <?php echo esc_attr( $global_align ); ?>;
+		}
+		.woocommerce-product-attributes.shop_attributes .woocommerce-product-attributes-item__value {
+			text-align: <?php echo esc_attr( $global_align ); ?>;
+		}
 	</style>
 	<?php
 }
@@ -148,6 +156,9 @@ function wcpt_render_meta_box( $post ) {
 	$display_as   = get_post_meta( $post->ID, '_wcpt_display_as', true );
 	$font_size    = get_post_meta( $post->ID, '_wcpt_font_size', true );
 	$margin       = get_post_meta( $post->ID, '_wcpt_margin', true );
+	$text_align   = get_post_meta( $post->ID, '_wcpt_text_align', true );
+
+	$global_attr_align = get_option( 'wcpt_attribute_alignment', 'left' );
 
 	if ( '' === $priority ) {
 		$priority = 10;
@@ -232,6 +243,25 @@ function wcpt_render_meta_box( $post ) {
 		<input type="number" name="wcpt_margin" id="wcpt_margin" value="<?php echo esc_attr( $margin ); ?>" class="widefat">
 	</p>
 
+	<p>
+		<label for="wcpt_text_align"><?php _e( 'Text Alignment', 'wcpt' ); ?></label>
+		<select name="wcpt_text_align" id="wcpt_text_align" class="widefat">
+			<option value="left" <?php selected( $text_align, 'left' ); ?>><?php _e( 'Left', 'wcpt' ); ?></option>
+			<option value="center" <?php selected( $text_align, 'center' ); ?>><?php _e( 'Center', 'wcpt' ); ?></option>
+			<option value="right" <?php selected( $text_align, 'right' ); ?>><?php _e( 'Right', 'wcpt' ); ?></option>
+		</select>
+	</p>
+
+	<div style="margin-top: 20px; padding: 10px; border: 1px dashed #ccc;">
+		<label for="wcpt_global_attr_align"><?php _e( 'Global Product Info Alignment (Applies to Info Tab)', 'wcpt' ); ?></label>
+		<select name="wcpt_global_attr_align" id="wcpt_global_attr_align" class="widefat">
+			<option value="left" <?php selected( $global_attr_align, 'left' ); ?>><?php _e( 'Left', 'wcpt' ); ?></option>
+			<option value="center" <?php selected( $global_attr_align, 'center' ); ?>><?php _e( 'Center', 'wcpt' ); ?></option>
+			<option value="right" <?php selected( $global_attr_align, 'right' ); ?>><?php _e( 'Right', 'wcpt' ); ?></option>
+		</select>
+		<p class="description"><?php _e( 'This setting applies to the standard WooCommerce Additional Information tab.', 'wcpt' ); ?></p>
+	</div>
+
 	<script type="text/javascript">
 		(function($) {
 			function toggleFields() {
@@ -311,6 +341,14 @@ function wcpt_save_meta_box_data( $post_id ) {
 	if ( isset( $_POST['wcpt_margin'] ) ) {
 		update_post_meta( $post_id, '_wcpt_margin', intval( $_POST['wcpt_margin'] ) );
 	}
+
+	if ( isset( $_POST['wcpt_text_align'] ) ) {
+		update_post_meta( $post_id, '_wcpt_text_align', sanitize_text_field( $_POST['wcpt_text_align'] ) );
+	}
+
+	if ( isset( $_POST['wcpt_global_attr_align'] ) ) {
+		update_option( 'wcpt_attribute_alignment', sanitize_text_field( $_POST['wcpt_global_attr_align'] ) );
+	}
 }
 add_action( 'save_post', 'wcpt_save_meta_box_data' );
 
@@ -370,6 +408,7 @@ function wcpt_product_tabs( $tabs ) {
 					'padding'      => get_post_meta( $tab_post->ID, '_wcpt_padding', true ),
 					'font_size'    => get_post_meta( $tab_post->ID, '_wcpt_font_size', true ),
 					'margin'       => get_post_meta( $tab_post->ID, '_wcpt_margin', true ),
+					'text_align'   => get_post_meta( $tab_post->ID, '_wcpt_text_align', true ),
 				),
 			);
 		}
@@ -409,6 +448,10 @@ function wcpt_render_tab_content( $key, $tab ) {
 
 		if ( ! empty( $styles['margin'] ) ) {
 			$css[] = 'margin: ' . intval( $styles['margin'] ) . 'px 0;';
+		}
+
+		if ( ! empty( $styles['text_align'] ) ) {
+			$css[] = 'text-align: ' . esc_attr( $styles['text_align'] ) . ';';
 		}
 
 		if ( ! empty( $css ) ) {
@@ -487,6 +530,7 @@ function wcpt_render_stacked_fields() {
 				'padding'      => get_post_meta( $tab_post->ID, '_wcpt_padding', true ),
 				'font_size'    => get_post_meta( $tab_post->ID, '_wcpt_font_size', true ),
 				'margin'       => get_post_meta( $tab_post->ID, '_wcpt_margin', true ),
+				'text_align'   => get_post_meta( $tab_post->ID, '_wcpt_text_align', true ),
 			);
 
 			$tab_data = array(
