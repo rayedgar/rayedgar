@@ -216,21 +216,27 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 						'max' => 100,
 					],
 				],
-				'default' => [
-					'size' => 25,
-					'unit' => '%',
+				'selectors' => [
+					'{{WRAPPER}} .product-image-wrapper' => 'width: {{SIZE}}{{UNIT}};',
 				],
-				'tablet_default' => [
-					'size' => 33.33,
-					'unit' => '%',
-				],
-				'mobile_default' => [
-					'size' => 50,
-					'unit' => '%',
+			]
+		);
+
+		$this->add_responsive_control(
+			'columns',
+			[
+				'label' => esc_html__( 'Columns', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => '4',
+				'tablet_default' => '3',
+				'mobile_default' => '2',
+				'options' => [
+					'1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6',
+					'7' => '7', '8' => '8', '9' => '9', '10' => '10', '11' => '11', '12' => '12',
+					'13' => '13', '14' => '14', '15' => '15', '16' => '16',
 				],
 				'selectors' => [
-					'{{WRAPPER}} .related-product-item' => 'width: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .related-product-item' => 'flex: 0 0 {{SIZE}}{{UNIT}}; max-width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .related-products-grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
 				],
 			]
 		);
@@ -402,8 +408,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .related-products-grid' => 'margin-left: calc(-{{SIZE}}{{UNIT}} / 2); margin-right: calc(-{{SIZE}}{{UNIT}} / 2);',
-					'{{WRAPPER}} .related-product-item' => 'padding-left: calc({{SIZE}}{{UNIT}} / 2); padding-right: calc({{SIZE}}{{UNIT}} / 2);',
+					'{{WRAPPER}} .related-products-grid' => 'grid-column-gap: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -420,7 +425,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .related-product-item' => 'margin-bottom: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .related-products-grid' => 'grid-row-gap: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -504,7 +509,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		$this->add_render_attribute( 'wrapper', 'class', 'elementor-product-related-wrapper' );
 		$this->add_render_attribute( 'grid', 'class', 'related-products-grid' );
-		$this->add_render_attribute( 'grid', 'style', 'display: flex; flex-wrap: wrap;' );
+		$this->add_render_attribute( 'grid', 'style', 'display: grid;' );
 		$this->add_render_attribute( 'wrapper', 'class', 'hover-reveal-' . $settings['hover_reveal_effect'] );
 
 		?>
@@ -609,7 +614,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				<h2 class="related-title">{{{ section_title }}}</h2>
 			<# } #>
 
-			<div class="related-products-grid" style="display: flex; flex-wrap: wrap;">
+			<div class="related-products-grid" style="display: grid;">
 				<#
 				var total_desktop = parseInt(settings.products_count) || 4;
 				var total_tablet  = parseInt(settings.products_count_tablet) || total_desktop;
