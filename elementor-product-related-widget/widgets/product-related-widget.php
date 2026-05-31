@@ -180,27 +180,20 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 						'max' => 100,
 					],
 				],
-				'selectors' => [
-					'{{WRAPPER}} .product-image-wrapper' => 'width: {{SIZE}}{{UNIT}};',
+				'default' => [
+					'size' => 25,
+					'unit' => '%',
 				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'columns',
-			[
-				'label' => esc_html__( 'Columns', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::SELECT,
-				'default' => '4',
-				'tablet_default' => '3',
-				'mobile_default' => '2',
-				'options' => [
-					'1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6',
-					'7' => '7', '8' => '8', '9' => '9', '10' => '10', '11' => '11', '12' => '12',
-					'13' => '13', '14' => '14', '15' => '15', '16' => '16',
+				'tablet_default' => [
+					'size' => 33.33,
+					'unit' => '%',
+				],
+				'mobile_default' => [
+					'size' => 50,
+					'unit' => '%',
 				],
 				'selectors' => [
-					'{{WRAPPER}} .related-products-grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
+					'{{WRAPPER}} .related-product-item' => 'width: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -473,7 +466,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		$this->add_render_attribute( 'wrapper', 'class', 'elementor-product-related-wrapper' );
 		$this->add_render_attribute( 'grid', 'class', 'related-products-grid' );
-		$this->add_render_attribute( 'grid', 'style', 'display: grid;' );
+		$this->add_render_attribute( 'grid', 'style', 'display: flex; flex-wrap: wrap;' );
 		$this->add_render_attribute( 'wrapper', 'class', 'hover-reveal-' . $settings['hover_reveal_effect'] );
 
 		?>
@@ -576,19 +569,20 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				<h2 class="related-title">{{{ section_title }}}</h2>
 			<# } #>
 
-			<div class="related-products-grid" style="display: grid;">
+			<div class="related-products-grid" style="display: flex; flex-wrap: wrap;">
 				<#
-				var total_desktop = parseInt(settings.products_count) || 0;
+				var total_desktop = parseInt(settings.products_count) || 4;
 				var total_tablet  = parseInt(settings.products_count_tablet) || total_desktop;
 				var total_mobile  = parseInt(settings.products_count_mobile) || total_tablet;
 
 				var max_posts = Math.max( total_desktop, total_tablet, total_mobile );
+				if ( max_posts === 0 ) max_posts = 4;
 
 				for ( var i = 0; i < max_posts; i++ ) {
 				#>
 				<div class="related-product-item">
 					<div class="product-image-wrapper" style="position: relative; overflow: hidden;">
-						<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; width: 100%;">
+						<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 100px;">
 							<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
 						</div>
 						<# if ( 'overlay' === product_title_position ) { #>
