@@ -67,6 +67,10 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'min' => 1,
 				'max' => 50,
 				'default' => 4,
+				'selectors' => [
+					'{{WRAPPER}} .related-product-item' => 'display: none;',
+					'{{WRAPPER}} .related-product-item:nth-child(-n+{{VALUE}})' => 'display: block;',
+				],
 			]
 		);
 
@@ -452,11 +456,12 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
-		$total_desktop = (int) $settings['products_count'];
-		$total_tablet  = (int) ($settings['products_count_tablet'] ?: $total_desktop);
-		$total_mobile  = (int) ($settings['products_count_mobile'] ?: $total_tablet);
-
-		$max_posts = max( $total_desktop, $total_tablet, $total_mobile );
+		$max_posts = (int) $settings['products_count'];
+		foreach ( $settings as $key => $value ) {
+			if ( strpos( $key, 'products_count_' ) === 0 && ! empty( $value ) ) {
+				$max_posts = max( $max_posts, (int) $value );
+			}
+		}
 
 		$related_ids = wc_get_related_products( $post->ID, $max_posts );
 		if ( empty( $related_ids ) ) {
@@ -475,11 +480,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		?>
 		<style>
-			.elementor-element-<?php echo $this->get_id(); ?> .related-product-item { display: block; }
-			@media (min-width: 1025px) { .elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_desktop + 1; ?>) { display: none; } }
-			@media (max-width: 1024px) and (min-width: 768px) { .elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_tablet + 1; ?>) { display: none; } }
-			@media (max-width: 767px) { .elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_mobile + 1; ?>) { display: none; } }
-
 			.elementor-element-<?php echo $this->get_id(); ?> .hover-reveal-slide-up .product-hover-overlay { transform: translateY(20px); }
 			.elementor-element-<?php echo $this->get_id(); ?> .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
 			.elementor-element-<?php echo $this->get_id(); ?> .hover-reveal-zoom-in .product-hover-overlay { transform: scale(0.8); }
@@ -540,11 +540,12 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 			<div class="related-products-grid" style="display: grid;">
 				<#
-				var total_desktop = parseInt(settings.products_count) || 4;
-				var total_tablet  = parseInt(settings.products_count_tablet) || total_desktop;
-				var total_mobile  = parseInt(settings.products_count_mobile) || total_tablet;
-				var max_posts = Math.max( total_desktop, total_tablet, total_mobile );
-				if ( max_posts === 0 ) max_posts = 4;
+				var max_posts = parseInt(settings.products_count) || 4;
+				for ( var key in settings ) {
+					if ( key.indexOf('products_count_') === 0 && settings[key] ) {
+						max_posts = Math.max( max_posts, parseInt(settings[key]) );
+					}
+				}
 				for ( var i = 0; i < max_posts; i++ ) {
 				#>
 				<div class="related-product-item">
@@ -574,11 +575,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		</div>
 
 		<style>
-			.elementor-element-{{ id }} .related-product-item { display: block; }
-			@media (min-width: 1025px) { .elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.products_count) + 1 }}) { display: none; } }
-			@media (max-width: 1024px) and (min-width: 768px) { .elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.products_count_tablet || settings.products_count) + 1 }}) { display: none; } }
-			@media (max-width: 767px) { .elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.products_count_mobile || (settings.products_count_tablet || settings.products_count)) + 1 }}) { display: none; } }
-
 			.elementor-element-{{ id }} .hover-reveal-slide-up .product-hover-overlay { transform: translateY(20px); }
 			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
 			.elementor-element-{{ id }} .hover-reveal-zoom-in .product-hover-overlay { transform: scale(0.8); }
