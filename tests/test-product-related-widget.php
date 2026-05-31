@@ -55,8 +55,8 @@ namespace Elementor {
                     'show_section_title' => 'yes',
                     'section_title' => 'Related Products',
                     'product_title_position' => 'underneath',
-                    'posts_per_page' => 4,
-                    'columns' => '16',
+                    'products_count' => 4,
+                    'hover_reveal_effect' => 'fade',
                 ];
             }
 
@@ -80,6 +80,7 @@ namespace Elementor {
             const SLIDER = 'slider';
             const DIMENSIONS = 'dimensions';
             const CHOOSE = 'choose';
+            const HIDDEN = 'hidden';
         }
     }
 
@@ -178,12 +179,14 @@ namespace {
     // Include the widget class
     require_once __DIR__ . '/../elementor-product-related-widget/widgets/product-related-widget.php';
 
-    class Testable_Product_Related_Widget extends Product_Related_Widget {
-        public function public_register_controls() {
-            $this->register_controls();
-        }
-        public function public_render() {
-            $this->render();
+    if (!class_exists('Testable_Product_Related_Widget')) {
+        class Testable_Product_Related_Widget extends Product_Related_Widget {
+            public function public_register_controls() {
+                $this->register_controls();
+            }
+            public function public_render() {
+                $this->render();
+            }
         }
     }
 
@@ -194,30 +197,30 @@ namespace {
     // Mock global $post
     $GLOBALS['post'] = (object) ['ID' => 1];
 
-    // Test Case 1: 16 Columns
-    echo "Test Case 1: 16 Columns\n";
+    // Test Case: Underneath Position Visibility
+    echo "Test Case: Underneath Position Visibility\n";
     $GLOBALS['test_settings'] = [
         'show_section_title' => 'yes',
         'section_title' => 'Related Products',
         'product_title_position' => 'underneath',
-        'posts_per_page' => 4,
-        'columns' => '16',
+        'products_count' => 4,
+        'hover_reveal_effect' => 'fade',
     ];
     ob_start();
     $widget->public_render();
     $output = ob_get_clean();
-    if (strpos($output, 'Related Products') !== false) {
-        echo " - Column test passed.\n";
+    if (strpos($output, 'class="product-item-content"') !== false && strpos($output, 'class="product-name"') !== false) {
+        echo " - Visibility test passed.\n";
     } else {
-        echo " - Column test failed.\n";
+        echo " - Visibility test failed.\n";
     }
 
-    // Test Case 2: Hover Styles Registration
-    echo "Test Case 2: Hover Styles Registration\n";
+    // Test Case: Controls Registration
+    echo "Test Case: Controls Registration\n";
     try {
         $widget->public_register_controls();
-        echo " - Hover controls registration test passed.\n";
+        echo " - Controls registration test passed.\n";
     } catch (\Exception $e) {
-        echo " - Hover controls registration test failed: " . $e->getMessage() . "\n";
+        echo " - Controls registration test failed: " . $e->getMessage() . "\n";
     }
 }
