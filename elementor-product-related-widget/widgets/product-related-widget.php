@@ -60,6 +60,101 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_responsive_control(
+			'products_count',
+			[
+				'label' => esc_html__( 'Amount of Products to show', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::NUMBER,
+				'min' => 1,
+				'max' => 50,
+				'default' => 4,
+			]
+		);
+
+		$this->add_responsive_control(
+			'columns',
+			[
+				'label' => esc_html__( 'Columns', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => '4',
+				'options' => [
+					'1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6',
+					'7' => '7', '8' => '8', '9' => '9', '10' => '10', '11' => '11', '12' => '12',
+					'13' => '13', '14' => '14', '15' => '15', '16' => '16',
+				],
+				'selectors' => [
+					'{{WRAPPER}} .related-products-grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_alignment',
+			[
+				'label' => esc_html__( 'Product Alignment', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => esc_html__( 'Left', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => esc_html__( 'Center', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => esc_html__( 'Right', 'elementor-product-related-widget' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'left',
+				'selectors' => [
+					'{{WRAPPER}} .product-item-content' => 'text-align: {{VALUE}};',
+					'{{WRAPPER}} .product-name' => 'text-align: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_alignment_flex',
+			[
+				'type' => \Elementor\Controls_Manager::HIDDEN,
+				'default' => 'left',
+				'selectors' => [
+					'{{WRAPPER}} .product-hover-overlay' => 'justify-content: {{VALUE}}; display: flex; align-items: center;',
+				],
+				'selectors_dictionary' => [
+					'left'   => 'flex-start',
+					'center' => 'center',
+					'right'  => 'flex-end',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_title_position',
+			[
+				'label' => esc_html__( 'Product Title Position', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'underneath',
+				'options' => [
+					'none'       => esc_html__( 'None', 'elementor-product-related-widget' ),
+					'underneath' => esc_html__( 'Underneath Image', 'elementor-product-related-widget' ),
+					'overlay'    => esc_html__( 'Overlay on Hover', 'elementor-product-related-widget' ),
+				],
+				'selectors' => [
+					'{{WRAPPER}} .product-hover-overlay' => 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: all 0.3s ease; pointer-events: none; z-index: 10;',
+					'{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay' => 'opacity: 1;',
+					'{{WRAPPER}} .product-name a' => 'color: inherit; text-decoration: none;',
+					'{{WRAPPER}} .product-image-wrapper img' => 'width: 100%; height: auto; display: block;',
+					'{{WRAPPER}} .product-name' => 'display: block; width: 100%; margin: 0; padding: 0; opacity: 1; visibility: visible;',
+					'{{WRAPPER}} .product-item-content' => 'display: block; width: 100%;',
+					'{{WRAPPER}} .product-hover-overlay .product-name' => 'margin: 0; padding: 10px;',
+					'{{WRAPPER}} .product-image-wrapper' => 'position: relative; overflow: hidden;',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
 			'hover_reveal_effect',
 			[
 				'label' => esc_html__( 'Hover Reveal Effect', 'elementor-product-related-widget' ),
@@ -101,106 +196,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_responsive_control(
-			'product_alignment',
-			[
-				'label' => esc_html__( 'Product Alignment', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::CHOOSE,
-				'options' => [
-					'left' => [
-						'title' => esc_html__( 'Left', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-left',
-					],
-					'center' => [
-						'title' => esc_html__( 'Center', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-center',
-					],
-					'right' => [
-						'title' => esc_html__( 'Right', 'elementor-product-related-widget' ),
-						'icon' => 'eicon-text-align-right',
-					],
-				],
-				'default' => 'left',
-				'selectors' => [
-					'{{WRAPPER}} .product-item-content' => '{{VALUE}}',
-					'{{WRAPPER}} .product-name' => 'text-align: {{VALUE}};',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'product_alignment_margin',
-			[
-				'type' => \Elementor\Controls_Manager::HIDDEN,
-				'default' => 'left',
-				'selectors' => [
-					'{{WRAPPER}} .product-item-content' => '{{VALUE}}',
-				],
-				'selectors_dictionary' => [
-					'left'   => 'margin-left: 0; margin-right: auto;',
-					'center' => 'margin-left: auto; margin-right: auto;',
-					'right'  => 'margin-left: auto; margin-right: 0;',
-				],
-				'condition' => [
-					'product_alignment' => [ 'left', 'center', 'right' ],
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'product_alignment_flex',
-			[
-				'type' => \Elementor\Controls_Manager::HIDDEN,
-				'default' => 'left',
-				'selectors' => [
-					'{{WRAPPER}} .product-hover-overlay' => 'justify-content: {{VALUE}}; display: flex; align-items: center;',
-				],
-				'selectors_dictionary' => [
-					'left'   => 'flex-start',
-					'center' => 'center',
-					'right'  => 'flex-end',
-				],
-				'condition' => [
-					'product_alignment' => [ 'left', 'center', 'right' ],
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'product_title_position',
-			[
-				'label' => esc_html__( 'Product Title Position', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::SELECT,
-				'default' => 'underneath',
-				'options' => [
-					'none'       => esc_html__( 'None', 'elementor-product-related-widget' ),
-					'underneath' => esc_html__( 'Underneath Image', 'elementor-product-related-widget' ),
-					'overlay'    => esc_html__( 'Overlay on Hover', 'elementor-product-related-widget' ),
-				],
-				'selectors' => [
-					'{{WRAPPER}} .product-hover-overlay' => 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: all 0.3s ease; pointer-events: none; z-index: 10;',
-					'{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay' => 'opacity: 1;',
-					'{{WRAPPER}} .product-name a' => 'color: inherit; text-decoration: none;',
-					'{{WRAPPER}} .product-image-wrapper img' => 'width: 100%; height: auto; display: block;',
-					'{{WRAPPER}} .product-name' => 'display: block; width: 100%; margin: 0; padding: 0; opacity: 1; visibility: visible;',
-					'{{WRAPPER}} .product-item-content' => 'display: block; width: 100%;',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'products_count',
-			[
-				'label' => esc_html__( 'Amount of Products to show', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::NUMBER,
-				'min' => 1,
-				'max' => 50,
-				'default' => 4,
-				'tablet_default' => 3,
-				'mobile_default' => 2,
-			]
-		);
-
-		$this->add_responsive_control(
 			'image_width',
 			[
 				'label' => esc_html__( 'Image Width', 'elementor-product-related-widget' ),
@@ -217,26 +212,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .product-image-wrapper' => 'width: {{SIZE}}{{UNIT}};',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'columns',
-			[
-				'label' => esc_html__( 'Columns', 'elementor-product-related-widget' ),
-				'type' => \Elementor\Controls_Manager::SELECT,
-				'default' => '4',
-				'tablet_default' => '3',
-				'mobile_default' => '2',
-				'options' => [
-					'1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6',
-					'7' => '7', '8' => '8', '9' => '9', '10' => '10', '11' => '11', '12' => '12',
-					'13' => '13', '14' => '14', '15' => '15', '16' => '16',
-				],
-				'selectors' => [
-					'{{WRAPPER}} .related-products-grid' => 'grid-template-columns: repeat({{VALUE}}, 1fr);',
+					'{{WRAPPER}} .product-image-wrapper' => 'width: {{SIZE}}{{UNIT}}; margin-left: auto; margin-right: auto;',
 				],
 			]
 		);
@@ -350,7 +326,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-
 		$this->add_responsive_control(
 			'product_name_spacing',
 			[
@@ -363,7 +338,7 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} .product-name' => 'margin-top: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .product-name' => 'margin-top: {{SIZE}}{{UNIT}}; margin-bottom: 0;',
 				],
 				'condition' => [
 					'product_title_position' => 'underneath',
@@ -401,32 +376,18 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			[
 				'label' => esc_html__( 'Columns Gap', 'elementor-product-related-widget' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
-				'range' => [
-					'px' => [
-						'min' => 0,
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .related-products-grid' => 'grid-column-gap: {{SIZE}}{{UNIT}};',
-				],
+				'range' => [ 'px' => [ 'min' => 0, 'max' => 100 ] ],
+				'selectors' => [ '{{WRAPPER}} .related-products-grid' => 'grid-column-gap: {{SIZE}}{{UNIT}};' ],
 			]
 		);
 
 		$this->add_responsive_control(
-			'product_grid_row_gap',
+			'product_grid_rows_gap',
 			[
 				'label' => esc_html__( 'Rows Gap (Vertical Spacing)', 'elementor-product-related-widget' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
-				'range' => [
-					'px' => [
-						'min' => 0,
-						'max' => 100,
-					],
-				],
-				'selectors' => [
-					'{{WRAPPER}} .related-products-grid' => 'grid-row-gap: {{SIZE}}{{UNIT}};',
-				],
+				'range' => [ 'px' => [ 'min' => 0, 'max' => 100 ] ],
+				'selectors' => [ '{{WRAPPER}} .related-products-grid' => 'grid-row-gap: {{SIZE}}{{UNIT}};' ],
 			]
 		);
 
@@ -514,24 +475,15 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		?>
 		<style>
-			.elementor-element-<?php echo $this->get_id(); ?> .related-product-item {
-				display: block;
-			}
-			@media (min-width: 1025px) {
-				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_desktop + 1; ?>) {
-					display: none;
-				}
-			}
-			@media (max-width: 1024px) and (min-width: 768px) {
-				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_tablet + 1; ?>) {
-					display: none;
-				}
-			}
-			@media (max-width: 767px) {
-				.elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_mobile + 1; ?>) {
-					display: none;
-				}
-			}
+			.elementor-element-<?php echo $this->get_id(); ?> .related-product-item { display: block; }
+			@media (min-width: 1025px) { .elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_desktop + 1; ?>) { display: none; } }
+			@media (max-width: 1024px) and (min-width: 768px) { .elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_tablet + 1; ?>) { display: none; } }
+			@media (max-width: 767px) { .elementor-element-<?php echo $this->get_id(); ?> .related-product-item:nth-child(n+<?php echo $total_mobile + 1; ?>) { display: none; } }
+
+			.elementor-element-<?php echo $this->get_id(); ?> .hover-reveal-slide-up .product-hover-overlay { transform: translateY(20px); }
+			.elementor-element-<?php echo $this->get_id(); ?> .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
+			.elementor-element-<?php echo $this->get_id(); ?> .hover-reveal-zoom-in .product-hover-overlay { transform: scale(0.8); }
+			.elementor-element-<?php echo $this->get_id(); ?> .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); opacity: 1; }
 		</style>
 		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
 			<?php if ( 'yes' === $settings['show_section_title'] && ! empty( $settings['section_title'] ) ) : ?>
@@ -571,34 +523,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				<?php endwhile; wp_reset_postdata(); ?>
 			</div>
 		</div>
-
-		<?php $widget_id = $this->get_id(); ?>
-		<style>
-			.elementor-element-<?php echo $widget_id; ?> .related-product-item .product-name a { color: inherit; text-decoration: none; }
-			.elementor-element-<?php echo $widget_id; ?> .product-image-wrapper img { width: 100%; height: auto; }
-
-			.elementor-element-<?php echo $widget_id; ?> .product-hover-overlay {
-				opacity: 0;
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				align-items: center;
-				transition: all ease;
-				pointer-events: none;
-			}
-			.elementor-element-<?php echo $widget_id; ?> .product-image-wrapper:hover .product-hover-overlay {
-				opacity: 1;
-			}
-
-			.elementor-element-<?php echo $widget_id; ?> .hover-reveal-slide-up .product-hover-overlay { transform: translateY(20px); }
-			.elementor-element-<?php echo $widget_id; ?> .hover-reveal-slide-up .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); }
-
-			.elementor-element-<?php echo $widget_id; ?> .hover-reveal-zoom-in .product-hover-overlay { transform: scale(0.8); }
-			.elementor-element-<?php echo $widget_id; ?> .hover-reveal-zoom-in .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); }
-		</style>
 		<?php
 	}
 
@@ -619,10 +543,8 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				var total_desktop = parseInt(settings.products_count) || 4;
 				var total_tablet  = parseInt(settings.products_count_tablet) || total_desktop;
 				var total_mobile  = parseInt(settings.products_count_mobile) || total_tablet;
-
 				var max_posts = Math.max( total_desktop, total_tablet, total_mobile );
 				if ( max_posts === 0 ) max_posts = 4;
-
 				for ( var i = 0; i < max_posts; i++ ) {
 				#>
 				<div class="related-product-item">
@@ -652,47 +574,15 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		</div>
 
 		<style>
-			.elementor-element-{{ id }} .related-product-item {
-				display: block;
-			}
-			@media (min-width: 1025px) {
-				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ total_desktop + 1 }}) {
-					display: none;
-				}
-			}
-			@media (max-width: 1024px) and (min-width: 768px) {
-				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ total_tablet + 1 }}) {
-					display: none;
-				}
-			}
-			@media (max-width: 767px) {
-				.elementor-element-{{ id }} .related-product-item:nth-child(n+{{ total_mobile + 1 }}) {
-					display: none;
-				}
-			}
-			.elementor-element-{{ id }} .product-image-wrapper img { width: 100%; height: auto; }
-
-			.elementor-element-{{ id }} .product-hover-overlay {
-				opacity: 0;
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				align-items: center;
-				transition: all ease;
-				pointer-events: none;
-			}
-			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay {
-				opacity: 1;
-			}
+			.elementor-element-{{ id }} .related-product-item { display: block; }
+			@media (min-width: 1025px) { .elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.products_count) + 1 }}) { display: none; } }
+			@media (max-width: 1024px) and (min-width: 768px) { .elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.products_count_tablet || settings.products_count) + 1 }}) { display: none; } }
+			@media (max-width: 767px) { .elementor-element-{{ id }} .related-product-item:nth-child(n+{{ parseInt(settings.products_count_mobile || (settings.products_count_tablet || settings.products_count)) + 1 }}) { display: none; } }
 
 			.elementor-element-{{ id }} .hover-reveal-slide-up .product-hover-overlay { transform: translateY(20px); }
-			.elementor-element-{{ id }} .hover-reveal-slide-up .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); }
-
+			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
 			.elementor-element-{{ id }} .hover-reveal-zoom-in .product-hover-overlay { transform: scale(0.8); }
-			.elementor-element-{{ id }} .hover-reveal-zoom-in .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); }
+			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); opacity: 1; }
 		</style>
 		<?php
 	}
