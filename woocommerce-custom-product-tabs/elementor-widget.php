@@ -32,7 +32,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'display_layout',
 			[
 				'label' => __( 'Display Layout', 'wcpt' ),
@@ -49,6 +49,8 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 					],
 				],
 				'toggle' => false,
+				'prefix_class' => 'wcpt-layout%s-',
+				'frontend_available' => true,
 			]
 		);
 
@@ -343,7 +345,6 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		}
 
 		$settings = $this->get_settings_for_display();
-		$layout   = $settings['display_layout'];
 
 		// Fetch all active tabs for this product (standard + custom)
 		$all_tabs = apply_filters( 'woocommerce_product_tabs', array() );
@@ -367,11 +368,13 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 			return $pA - $pB;
 		} );
 
-		if ( 'tabs' === $layout ) {
-			$this->render_tabs( $all_tabs );
-		} else {
-			$this->render_fields( $all_tabs );
-		}
+		echo '<div class="wcpt-tabs-layout">';
+		$this->render_tabs( $all_tabs );
+		echo '</div>';
+
+		echo '<div class="wcpt-fields-layout">';
+		$this->render_fields( $all_tabs );
+		echo '</div>';
 	}
 
 	protected function render_tabs( $tabs ) {

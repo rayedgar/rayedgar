@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Custom Product Tabs
  * Description: Add custom tabs to your WooCommerce product pages based on display rules.
- * Version: 1.4.3
+ * Version: 1.4.4
  * Author: Jules
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'WCPT_VERSION', '1.4.3' );
+define( 'WCPT_VERSION', '1.4.4' );
 
 /**
  * Register Custom Post Type for Product Tabs.
@@ -116,6 +116,29 @@ function wcpt_enqueue_styles() {
 		}
 		.woocommerce-product-attributes.shop_attributes .woocommerce-product-attributes-item__value {
 			text-align: <?php echo esc_attr( $global_align ); ?>;
+		}
+
+		/* Responsive Layout Toggles for Elementor Widget */
+		.wcpt-tabs-layout, .wcpt-fields-layout { display: none; }
+
+		/* Desktop Default */
+		.wcpt-layout-tabs .wcpt-tabs-layout { display: block !important; }
+		.wcpt-layout-fields .wcpt-fields-layout { display: block !important; }
+
+		/* Tablet */
+		@media (max-width: 1024px) {
+			.wcpt-layout-tablet-tabs .wcpt-tabs-layout { display: block !important; }
+			.wcpt-layout-tablet-tabs .wcpt-fields-layout { display: none !important; }
+			.wcpt-layout-tablet-fields .wcpt-fields-layout { display: block !important; }
+			.wcpt-layout-tablet-fields .wcpt-tabs-layout { display: none !important; }
+		}
+
+		/* Mobile */
+		@media (max-width: 767px) {
+			.wcpt-layout-mobile-tabs .wcpt-tabs-layout { display: block !important; }
+			.wcpt-layout-mobile-tabs .wcpt-fields-layout { display: none !important; }
+			.wcpt-layout-mobile-fields .wcpt-fields-layout { display: block !important; }
+			.wcpt-layout-mobile-fields .wcpt-tabs-layout { display: none !important; }
 		}
 	</style>
 	<?php
