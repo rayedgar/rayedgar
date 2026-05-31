@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Custom Product Tabs
  * Description: Add custom tabs to your WooCommerce product pages based on display rules.
- * Version: 1.4.0
+ * Version: 1.4.1
  * Author: Jules
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'WCPT_VERSION', '1.4.0' );
+define( 'WCPT_VERSION', '1.4.1' );
 
 /**
  * Register Custom Post Type for Product Tabs.

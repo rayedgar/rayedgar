@@ -96,15 +96,140 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
-			'section_style',
+			'section_style_tabs',
 			[
-				'label' => __( 'Style', 'wcpt' ),
+				'label' => __( 'Tab Titles / Headers', 'wcpt' ),
 				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
 			]
 		);
 
 		$this->add_responsive_control(
-			'text_alignment',
+			'tabs_alignment',
+			[
+				'label' => __( 'Alignment', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => __( 'Left', 'wcpt' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => __( 'Center', 'wcpt' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => __( 'Right', 'wcpt' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .tabs' => 'text-align: {{VALUE}};',
+					'{{WRAPPER}} .wcpt-stacked-field h3' => 'text-align: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'tabs_typography',
+				'selector' => '{{WRAPPER}} .tabs li a, {{WRAPPER}} .wcpt-stacked-field h3',
+			]
+		);
+
+		$this->add_responsive_control(
+			'tabs_padding',
+			[
+				'label' => __( 'Padding', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', '%' ],
+				'selectors' => [
+					'{{WRAPPER}} .tabs li a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{VALUE}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .wcpt-stacked-field h3' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->start_controls_tabs( 'tabs_title_style' );
+
+		$this->start_controls_tab(
+			'tabs_title_normal',
+			[
+				'label' => __( 'Normal', 'wcpt' ),
+			]
+		);
+
+		$this->add_control(
+			'tabs_title_color',
+			[
+				'label' => __( 'Text Color', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .tabs li a' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .wcpt-stacked-field h3' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'tabs_title_bg_color',
+			[
+				'label' => __( 'Background Color', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .tabs li' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .wcpt-stacked-field h3' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'tabs_title_active',
+			[
+				'label' => __( 'Active', 'wcpt' ),
+			]
+		);
+
+		$this->add_control(
+			'tabs_title_color_active',
+			[
+				'label' => __( 'Text Color', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .tabs li.active a' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'tabs_title_bg_color_active',
+			[
+				'label' => __( 'Background Color', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .tabs li.active' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_style_content',
+			[
+				'label' => __( 'Content', 'wcpt' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_responsive_control(
+			'content_alignment',
 			[
 				'label' => __( 'Alignment', 'wcpt' ),
 				'type' => \Elementor\Controls_Manager::CHOOSE,
@@ -125,7 +250,38 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .wcpt-tab-content-wrapper' => 'text-align: {{VALUE}};',
 					'{{WRAPPER}} .woocommerce-product-attributes' => 'text-align: {{VALUE}};',
-					'{{WRAPPER}} .wcpt-stacked-field h3' => 'text-align: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'content_color',
+			[
+				'label' => __( 'Text Color', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .wcpt-tab-content-wrapper' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .woocommerce-product-attributes' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			[
+				'name' => 'content_typography',
+				'selector' => '{{WRAPPER}} .wcpt-tab-content-wrapper, {{WRAPPER}} .woocommerce-product-attributes',
+			]
+		);
+
+		$this->add_responsive_control(
+			'content_padding',
+			[
+				'label' => __( 'Padding', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', '%' ],
+				'selectors' => [
+					'{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-tab-content-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);
@@ -197,6 +353,10 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 	protected function render_fields( $fields ) {
 		foreach ( $fields as $key => $field ) {
 			echo '<div class="wcpt-stacked-field">';
+			// For stacked fields, we don't need the h3 for standard tabs as they usually have their own
+			// or we want them suppressed if they are description/additional_info.
+			// Actually, if we are suppressing the internal H2, we might want to keep our H3.
+			// But the user might want more control.
 			echo '<h3>' . esc_html( $field['title'] ) . '</h3>';
 			$this->render_tab_content( $key, $field );
 			echo '</div>';
@@ -212,7 +372,17 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		if ( isset( $tab['callback'] ) && is_callable( $tab['callback'] ) ) {
 			// Wrap in our style div to ensure widget alignment applies
 			echo '<div class="wcpt-tab-content-wrapper">';
+
+			// Capture output to strip standard headers if they exist
+			ob_start();
 			call_user_func( $tab['callback'], $key, $tab );
+			$content = ob_get_clean();
+
+			// Remove <h2> tags from standard tab callbacks (e.g. "Description" or "Additional Information")
+			// because they are redundant in a tabbed layout or we provide our own in stacked layout.
+			$content = preg_replace( '/<h2[^>]*>.*?<\/h2>/si', '', $content );
+			echo $content;
+
 			echo '</div>';
 		} elseif ( function_exists( 'wcpt_render_tab_content' ) ) {
 			wcpt_render_tab_content( $key, $tab );
