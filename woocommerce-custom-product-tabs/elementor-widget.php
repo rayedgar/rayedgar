@@ -67,6 +67,43 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_style',
+			[
+				'label' => __( 'Style', 'wcpt' ),
+				'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_responsive_control(
+			'text_alignment',
+			[
+				'label' => __( 'Alignment', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::CHOOSE,
+				'options' => [
+					'left' => [
+						'title' => __( 'Left', 'wcpt' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => __( 'Center', 'wcpt' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'right' => [
+						'title' => __( 'Right', 'wcpt' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .wcpt-tab-content-wrapper' => 'text-align: {{VALUE}};',
+					'{{WRAPPER}} .woocommerce-product-attributes' => 'text-align: {{VALUE}};',
+					'{{WRAPPER}} .wcpt-stacked-field h3' => 'text-align: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_section();
 	}
 
 	protected function render() {
@@ -82,18 +119,24 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$settings = $this->get_settings_for_display();
 		$layout   = $settings['display_layout'];
 
-		// Fetch all custom tabs (both tabs and fields)
 		$product_id = $product->get_id();
 		$args = array(
 			'post_type'      => 'wc_product_tab',
 			'post_status'    => 'publish',
 			'posts_per_page' => -1,
-			'meta_key'       => '_wcpt_priority',
-			'orderby'        => 'meta_value_num',
-			'order'          => 'ASC',
 		);
 
 		$custom_tabs = get_posts( $args );
+
+		// Manual sort by priority
+		usort( $custom_tabs, function( $a, $b ) {
+			$pA = get_post_meta( $a->ID, '_wcpt_priority', true );
+			$pB = get_post_meta( $b->ID, '_wcpt_priority', true );
+			$pA = ( '' === $pA ) ? 10 : (int) $pA;
+			$pB = ( '' === $pB ) ? 10 : (int) $pB;
+			return $pA - $pB;
+		} );
+
 		$valid_tabs  = [];
 
 		foreach ( $custom_tabs as $tab_post ) {
@@ -126,6 +169,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 						'padding'      => get_post_meta( $tab_post->ID, '_wcpt_padding', true ),
 						'font_size'    => get_post_meta( $tab_post->ID, '_wcpt_font_size', true ),
 						'margin'       => get_post_meta( $tab_post->ID, '_wcpt_margin', true ),
+						'text_align'   => get_post_meta( $tab_post->ID, '_wcpt_text_align', true ),
 					],
 				];
 			}

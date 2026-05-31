@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Custom Product Tabs
  * Description: Add custom tabs to your WooCommerce product pages based on display rules.
- * Version: 1.3.0
+ * Version: 1.3.3
  * Author: Jules
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'WCPT_VERSION', '1.3.0' );
+define( 'WCPT_VERSION', '1.3.3' );
 
 /**
  * Register Custom Post Type for Product Tabs.
@@ -195,13 +195,15 @@ function wcpt_render_meta_box( $post ) {
 	</p>
 
 	<p id="wcpt_categories_field">
-		<label for="wcpt_categories"><?php _e( 'Categories (IDs, comma separated)', 'wcpt' ); ?></label>
+		<label for="wcpt_categories"><?php _e( 'Categories (IDs or Slugs, comma separated)', 'wcpt' ); ?></label>
 		<input type="text" name="wcpt_categories" id="wcpt_categories" value="<?php echo esc_attr( implode( ',', $categories ) ); ?>" class="widefat">
+		<span class="description"><?php _e( 'Example: <code>clothing,15,shoes</code>', 'wcpt' ); ?></span>
 	</p>
 
 	<p id="wcpt_products_field">
-		<label for="wcpt_products"><?php _e( 'Products (IDs, comma separated)', 'wcpt' ); ?></label>
+		<label for="wcpt_products"><?php _e( 'Products (IDs or SKUs, comma separated)', 'wcpt' ); ?></label>
 		<input type="text" name="wcpt_products" id="wcpt_products" value="<?php echo esc_attr( implode( ',', $products ) ); ?>" class="widefat">
+		<span class="description"><?php _e( 'Example: <code>SKU123,101,PROD-ABC</code>', 'wcpt' ); ?></span>
 	</p>
 
 	<p>
@@ -301,12 +303,14 @@ function wcpt_save_meta_box_data( $post_id ) {
 	}
 
 	if ( isset( $_POST['wcpt_categories'] ) ) {
-		$cats = array_filter( array_map( 'intval', explode( ',', $_POST['wcpt_categories'] ) ) );
+		$cats = array_filter( array_map( 'trim', explode( ',', $_POST['wcpt_categories'] ) ) );
+		$cats = array_map( 'sanitize_text_field', $cats );
 		update_post_meta( $post_id, '_wcpt_categories', $cats );
 	}
 
 	if ( isset( $_POST['wcpt_products'] ) ) {
-		$prods = array_filter( array_map( 'intval', explode( ',', $_POST['wcpt_products'] ) ) );
+		$prods = array_filter( array_map( 'trim', explode( ',', $_POST['wcpt_products'] ) ) );
+		$prods = array_map( 'sanitize_text_field', $prods );
 		update_post_meta( $post_id, '_wcpt_products', $prods );
 	}
 
@@ -371,6 +375,15 @@ function wcpt_product_tabs( $tabs ) {
 
 	$custom_tabs = get_posts( $args );
 
+	// Manual sort by priority to avoid missing posts without priority meta
+	usort( $custom_tabs, function( $a, $b ) {
+		$pA = get_post_meta( $a->ID, '_wcpt_priority', true );
+		$pB = get_post_meta( $b->ID, '_wcpt_priority', true );
+		$pA = ( '' === $pA ) ? 10 : (int) $pA;
+		$pB = ( '' === $pB ) ? 10 : (int) $pB;
+		return $pA - $pB;
+	} );
+
 	foreach ( $custom_tabs as $tab_post ) {
 		$display_as = get_post_meta( $tab_post->ID, '_wcpt_display_as', true );
 		if ( 'field' === $display_as ) {
@@ -385,13 +398,20 @@ function wcpt_product_tabs( $tabs ) {
 			$should_show = true;
 		} elseif ( 'categories' === $display_rule ) {
 			$categories = get_post_meta( $tab_post->ID, '_wcpt_categories', true );
-			if ( is_array( $categories ) && has_term( $categories, 'product_cat', $product_id ) ) {
-				$should_show = true;
+			if ( is_array( $categories ) ) {
+				foreach ( $categories as $cat ) {
+					if ( has_term( $cat, 'product_cat', $product_id ) ) {
+						$should_show = true;
+						break;
+					}
+				}
 			}
 		} elseif ( 'products' === $display_rule ) {
 			$products = get_post_meta( $tab_post->ID, '_wcpt_products', true );
-			if ( is_array( $products ) && in_array( $product_id, $products ) ) {
-				$should_show = true;
+			if ( is_array( $products ) ) {
+				if ( in_array( (string) $product_id, $products ) || in_array( $product->get_sku(), $products ) ) {
+					$should_show = true;
+				}
 			}
 		}
 
@@ -492,12 +512,18 @@ function wcpt_render_stacked_fields() {
 		'post_type'      => 'wc_product_tab',
 		'post_status'    => 'publish',
 		'posts_per_page' => -1,
-		'meta_key'       => '_wcpt_priority',
-		'orderby'        => 'meta_value_num',
-		'order'          => 'ASC',
 	);
 
 	$custom_tabs = get_posts( $args );
+
+	// Manual sort by priority to avoid missing posts without priority meta
+	usort( $custom_tabs, function( $a, $b ) {
+		$pA = get_post_meta( $a->ID, '_wcpt_priority', true );
+		$pB = get_post_meta( $b->ID, '_wcpt_priority', true );
+		$pA = ( '' === $pA ) ? 10 : (int) $pA;
+		$pB = ( '' === $pB ) ? 10 : (int) $pB;
+		return $pA - $pB;
+	} );
 
 	foreach ( $custom_tabs as $tab_post ) {
 		$display_as = get_post_meta( $tab_post->ID, '_wcpt_display_as', true );
@@ -512,13 +538,20 @@ function wcpt_render_stacked_fields() {
 			$should_show = true;
 		} elseif ( 'categories' === $display_rule ) {
 			$categories = get_post_meta( $tab_post->ID, '_wcpt_categories', true );
-			if ( is_array( $categories ) && has_term( $categories, 'product_cat', $product_id ) ) {
-				$should_show = true;
+			if ( is_array( $categories ) ) {
+				foreach ( $categories as $cat ) {
+					if ( has_term( $cat, 'product_cat', $product_id ) ) {
+						$should_show = true;
+						break;
+					}
+				}
 			}
 		} elseif ( 'products' === $display_rule ) {
 			$products = get_post_meta( $tab_post->ID, '_wcpt_products', true );
-			if ( is_array( $products ) && in_array( $product_id, $products ) ) {
-				$should_show = true;
+			if ( is_array( $products ) ) {
+				if ( in_array( (string) $product_id, $products ) || in_array( $product->get_sku(), $products ) ) {
+					$should_show = true;
+				}
 			}
 		}
 

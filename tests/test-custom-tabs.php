@@ -21,6 +21,8 @@ function update_post_meta($id, $key, $value) {
     global $post_meta;
     $post_meta[$id][$key] = $value;
 }
+function get_option($key, $default = false) { return $default; }
+function update_option($key, $value) {}
 function apply_filters($tag, $value) { return $value; }
 function get_posts($args) {
     global $posts;
@@ -47,8 +49,10 @@ function esc_attr($text) {
 
 class MockProduct {
     public $id;
-    public function __construct($id) { $this->id = $id; }
+    public $sku;
+    public function __construct($id, $sku = '') { $this->id = $id; $this->sku = $sku; }
     public function get_id() { return $this->id; }
+    public function get_sku() { return $this->sku; }
 }
 
 // Include the plugin file
@@ -80,11 +84,11 @@ update_post_meta(101, '_wcpt_display_rule', 'all');
 update_post_meta(101, '_wcpt_priority', 10);
 
 update_post_meta(102, '_wcpt_display_rule', 'categories');
-update_post_meta(102, '_wcpt_categories', [5]);
+update_post_meta(102, '_wcpt_categories', ['clothing']);
 update_post_meta(102, '_wcpt_priority', 20);
 
 update_post_meta(103, '_wcpt_display_rule', 'products');
-update_post_meta(103, '_wcpt_products', [1]);
+update_post_meta(103, '_wcpt_products', ['SKU-101']);
 update_post_meta(103, '_wcpt_priority', 30);
 
 // New Stacked Field Tab
@@ -105,11 +109,11 @@ update_post_meta(101, '_wcpt_line_height', '1.8');
 update_post_meta(101, '_wcpt_border_width', 2);
 update_post_meta(101, '_wcpt_border_color', '#ff0000');
 
-// Test Case 1: Product 1 (Category 5)
-echo "Testing Product 1 (Category 5)...\n";
+// Test Case 1: Product 1 (Category 'clothing', SKU-101)
+echo "Testing Product 1 (Category clothing, SKU-101)...\n";
 global $product, $terms;
-$product = new MockProduct(1);
-$terms[1] = [5];
+$product = new MockProduct(1, 'SKU-101');
+$terms[1] = ['clothing'];
 
 $tabs = wcpt_product_tabs([]);
 print_r(array_keys($tabs));
@@ -121,10 +125,10 @@ if (isset($tabs['wcpt_tab_101']) && isset($tabs['wcpt_tab_102']) && isset($tabs[
     exit(1);
 }
 
-// Test Case 2: Product 2 (Category 6)
-echo "Testing Product 2 (Category 6)...\n";
-$product = new MockProduct(2);
-$terms[2] = [6];
+// Test Case 2: Product 2 (Category 'shoes', SKU-102)
+echo "Testing Product 2 (Category shoes, SKU-102)...\n";
+$product = new MockProduct(2, 'SKU-102');
+$terms[2] = ['shoes'];
 
 $tabs = wcpt_product_tabs([]);
 print_r(array_keys($tabs));
