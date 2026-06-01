@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Custom Product Tabs
  * Description: Add custom tabs to your WooCommerce product pages based on display rules.
- * Version: 1.4.4
+ * Version: 1.4.5
  * Author: Jules
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'WCPT_VERSION', '1.4.4' );
+define( 'WCPT_VERSION', '1.4.5' );
 
 /**
  * Register Custom Post Type for Product Tabs.
@@ -139,6 +139,23 @@ function wcpt_enqueue_styles() {
 			.wcpt-layout-mobile-tabs .wcpt-fields-layout { display: none !important; }
 			.wcpt-layout-mobile-fields .wcpt-fields-layout { display: block !important; }
 			.wcpt-layout-mobile-fields .wcpt-tabs-layout { display: none !important; }
+		}
+
+		/* Tab Switching Animations */
+		.wcpt-animation-fade .woocommerce-Tabs-panel.wc-tab[style*="display: block"] {
+			animation: wcptFadeIn 0.4s ease-in-out;
+		}
+		.wcpt-animation-slide .woocommerce-Tabs-panel.wc-tab[style*="display: block"] {
+			animation: wcptSlideUp 0.4s ease-in-out;
+		}
+
+		@keyframes wcptFadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+		@keyframes wcptSlideUp {
+			from { opacity: 0; transform: translateY(10px); }
+			to { opacity: 1; transform: translateY(0); }
 		}
 	</style>
 	<?php

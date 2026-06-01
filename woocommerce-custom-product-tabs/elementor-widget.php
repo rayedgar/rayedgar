@@ -55,6 +55,24 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
+			'tabs_animation',
+			[
+				'label' => __( 'Switching Animation', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => 'none',
+				'options' => [
+					'none' => __( 'None', 'wcpt' ),
+					'fade' => __( 'Fade In', 'wcpt' ),
+					'slide' => __( 'Slide Up', 'wcpt' ),
+				],
+				'prefix_class' => 'wcpt-animation-',
+				'condition' => [
+					'display_layout' => 'tabs',
+				],
+			]
+		);
+
+		$this->add_control(
 			'style_notice',
 			[
 				'type' => \Elementor\Controls_Manager::RAW_HTML,
