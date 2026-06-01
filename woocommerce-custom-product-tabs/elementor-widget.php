@@ -393,6 +393,22 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		echo '<div class="wcpt-fields-layout">';
 		$this->render_fields( $all_tabs );
 		echo '</div>';
+
+		// Animation trigger script
+		if ( 'none' !== $settings['tabs_animation'] ) {
+			?>
+			<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				$('.woocommerce-tabs .tabs li a').on('click', function() {
+					var $panel = $($(this).attr('href'));
+					$panel.removeClass('wcpt-animate');
+					void $panel[0].offsetWidth; // trigger reflow
+					$panel.addClass('wcpt-animate');
+				});
+			});
+			</script>
+			<?php
+		}
 	}
 
 	protected function render_tabs( $tabs ) {

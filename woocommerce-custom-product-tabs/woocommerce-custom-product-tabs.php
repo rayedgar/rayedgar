@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Custom Product Tabs
  * Description: Add custom tabs to your WooCommerce product pages based on display rules.
- * Version: 1.4.5
+ * Version: 1.4.7
  * Author: Jules
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'WCPT_VERSION', '1.4.5' );
+define( 'WCPT_VERSION', '1.4.7' );
 
 /**
  * Register Custom Post Type for Product Tabs.
@@ -81,7 +81,7 @@ function wcpt_enqueue_styles() {
 				display: flex !important;
 				flex-wrap: nowrap !important;
 				justify-content: space-between !important;
-				align-items: baseline !important;
+				align-items: flex-start !important;
 				border-bottom: 1px solid #eee !important;
 				margin-bottom: 0 !important;
 				width: 100% !important;
@@ -92,7 +92,7 @@ function wcpt_enqueue_styles() {
 				padding: 10px 5px !important;
 				background: none !important;
 				border: none !important;
-				white-space: nowrap !important;
+				white-space: normal !important;
 				margin: 0 !important;
 				box-sizing: border-box !important;
 				line-height: 1.5 !important;
@@ -105,8 +105,7 @@ function wcpt_enqueue_styles() {
 			.woocommerce-product-attributes-item__value {
 				text-align: right !important;
 				flex-grow: 1 !important;
-				overflow: hidden !important;
-				text-overflow: ellipsis !important;
+				overflow-wrap: break-word !important;
 				min-width: 0 !important;
 			}
 		}
@@ -116,6 +115,12 @@ function wcpt_enqueue_styles() {
 		}
 		.woocommerce-product-attributes.shop_attributes .woocommerce-product-attributes-item__value {
 			text-align: <?php echo esc_attr( $global_align ); ?>;
+		}
+
+		/* Global Tab Link Wrapping */
+		.woocommerce-tabs ul.tabs li a {
+			white-space: normal !important;
+			word-wrap: break-word !important;
 		}
 
 		/* Responsive Layout Toggles for Elementor Widget */
@@ -142,11 +147,11 @@ function wcpt_enqueue_styles() {
 		}
 
 		/* Tab Switching Animations */
-		.wcpt-animation-fade .woocommerce-Tabs-panel.wc-tab[style*="display: block"] {
-			animation: wcptFadeIn 0.4s ease-in-out;
+		.wcpt-animation-fade .woocommerce-Tabs-panel.wc-tab.wcpt-animate {
+			animation: wcptFadeIn 0.4s ease-in-out forwards;
 		}
-		.wcpt-animation-slide .woocommerce-Tabs-panel.wc-tab[style*="display: block"] {
-			animation: wcptSlideUp 0.4s ease-in-out;
+		.wcpt-animation-slide .woocommerce-Tabs-panel.wc-tab.wcpt-animate {
+			animation: wcptSlideUp 0.4s ease-in-out forwards;
 		}
 
 		@keyframes wcptFadeIn {
