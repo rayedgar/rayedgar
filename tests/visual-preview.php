@@ -94,17 +94,17 @@ namespace {
         .woocommerce-tabs ul.tabs li a {
 			white-space: normal !important;
 			word-wrap: break-word !important;
-			display: inline-block !important; /* FIXED */
-			width: 100% !important; /* FIXED */
+			display: inline-block !important;
+			width: 100% !important;
             box-sizing: border-box;
             background: #3498db;
             color: white;
-            padding: 30px !important; /* Increased padding to test bottom visibility */
+            padding: 15px !important;
             text-decoration: none;
 		}
 
         .woocommerce-tabs ul.tabs {
-            margin-bottom: 20px !important; /* Testing the Spacing control */
+            margin-bottom: 0px !important;
             padding: 0;
             display: flex;
         }
@@ -123,16 +123,23 @@ namespace {
 			box-sizing: border-box !important;
 		}
 
+        /* ONLY the outer panel should have the border in tab mode */
         .elementor-widget-mock-id .woocommerce-Tabs-panel {
             padding: 30px !important;
-            border: 2px solid #2980b9 !important;
+            border: 2px solid red !important; /* RED to easily see if it is duplicated */
             background: #ecf0f1 !important;
+        }
+
+        /* Inner wrapper should NOT have a border here */
+        .elementor-widget-mock-id .woocommerce-Tabs-panel .wcpt-tab-content-wrapper {
+            border: none !important;
+            background: transparent !important;
         }
 
     </style></head><body>";
 
-    echo "<h1>Elementor Widget Preview (Padding and Spacing Fix)</h1>";
-    echo "<p>The tab link (blue) should show large padding on all sides, and there should be a 20px gap below the tabs.</p>";
+    echo "<h1>Elementor Widget Preview (Single Border Fix)</h1>";
+    echo "<p>There should be ONLY ONE red border around the content area.</p>";
 
     echo "<div class='elementor-widget-mock-id'>";
     $widget->settings = ['tabs_animation' => 'none'];

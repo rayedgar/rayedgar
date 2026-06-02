@@ -177,16 +177,6 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
-		$this->add_control(
-			'content_bg_color',
-			[
-				'label' => __( 'Background Color', 'wcpt' ),
-				'type' => \Elementor\Controls_Manager::COLOR,
-				'selectors' => [
-					'{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-tab-content-wrapper' => 'background-color: {{VALUE}} !important;',
-				],
-			]
-		);
 
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
@@ -226,6 +216,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 				],
 			]
 		);
+
 
 		$this->add_group_control(
 			\Elementor\Group_Control_Border::get_type(),
@@ -365,6 +356,17 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'content_bg_color',
+			[
+				'label' => __( 'Background Color', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-stacked-field .wcpt-tab-content-wrapper' => 'background-color: {{VALUE}} !important;',
+				],
+			]
+		);
+
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			[
@@ -380,7 +382,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', 'em', '%' ],
 				'selectors' => [
-					'{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-tab-content-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+					'{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-stacked-field .wcpt-tab-content-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
 				],
 			]
 		);
@@ -390,7 +392,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 			[
 				'name' => 'content_border',
 				'label' => __( 'Border', 'wcpt' ),
-				'selector' => '{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-tab-content-wrapper',
+				'selector' => '{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-stacked-field .wcpt-tab-content-wrapper',
 			]
 		);
 
@@ -401,7 +403,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', '%', 'em' ],
 				'selectors' => [
-					'{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-tab-content-wrapper' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+					'{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-stacked-field .wcpt-tab-content-wrapper' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
 				],
 			]
 		);
