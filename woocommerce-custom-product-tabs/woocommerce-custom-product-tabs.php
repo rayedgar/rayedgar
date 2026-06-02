@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Custom Product Tabs
  * Description: Add custom tabs to your WooCommerce product pages based on display rules.
- * Version: 1.4.7
+ * Version: 1.4.8
  * Author: Jules
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'WCPT_VERSION', '1.4.7' );
+define( 'WCPT_VERSION', '1.4.8' );
 
 /**
  * Register Custom Post Type for Product Tabs.
@@ -121,6 +121,25 @@ function wcpt_enqueue_styles() {
 		.woocommerce-tabs ul.tabs li a {
 			white-space: normal !important;
 			word-wrap: break-word !important;
+			display: inline-block !important;
+			width: 100% !important;
+		}
+
+		/* Fix for unified bordering (removing gaps) */
+		.woocommerce-tabs ul.tabs,
+		.woocommerce-tabs ul.tabs li,
+		.woocommerce-Tabs-panel,
+		.wcpt-tab-content-wrapper,
+		.wcpt-stacked-field h3 {
+			margin-bottom: 0 !important;
+			margin-top: 0 !important;
+			box-sizing: border-box !important;
+		}
+
+		/* Remove bottom border from active tab to join with panel if border-bottom is used */
+		.woocommerce-tabs ul.tabs li.active {
+			z-index: 2;
+			position: relative;
 		}
 
 		/* Responsive Layout Toggles for Elementor Widget */
@@ -148,10 +167,16 @@ function wcpt_enqueue_styles() {
 
 		/* Tab Switching Animations */
 		.wcpt-animation-fade .woocommerce-Tabs-panel.wc-tab.wcpt-animate {
-			animation: wcptFadeIn 0.4s ease-in-out forwards;
+			animation: wcptFadeIn var(--wcpt-animation-speed, 0.4s) ease-in-out forwards;
 		}
 		.wcpt-animation-slide .woocommerce-Tabs-panel.wc-tab.wcpt-animate {
-			animation: wcptSlideUp 0.4s ease-in-out forwards;
+			animation: wcptSlideUp var(--wcpt-animation-speed, 0.4s) ease-in-out forwards;
+		}
+		.wcpt-animation-zoom .woocommerce-Tabs-panel.wc-tab.wcpt-animate {
+			animation: wcptZoomIn var(--wcpt-animation-speed, 0.4s) ease-in-out forwards;
+		}
+		.wcpt-animation-slide-right .woocommerce-Tabs-panel.wc-tab.wcpt-animate {
+			animation: wcptSlideRight var(--wcpt-animation-speed, 0.4s) ease-in-out forwards;
 		}
 
 		@keyframes wcptFadeIn {
@@ -159,8 +184,16 @@ function wcpt_enqueue_styles() {
 			to { opacity: 1; }
 		}
 		@keyframes wcptSlideUp {
-			from { opacity: 0; transform: translateY(10px); }
+			from { opacity: 0; transform: translateY(20px); }
 			to { opacity: 1; transform: translateY(0); }
+		}
+		@keyframes wcptZoomIn {
+			from { opacity: 0; transform: scale(0.95); }
+			to { opacity: 1; transform: scale(1); }
+		}
+		@keyframes wcptSlideRight {
+			from { opacity: 0; transform: translateX(-20px); }
+			to { opacity: 1; transform: translateX(0); }
 		}
 	</style>
 	<?php

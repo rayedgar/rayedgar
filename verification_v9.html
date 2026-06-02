@@ -1,0 +1,54 @@
+<html><head><style>
+        body { font-family: sans-serif; padding: 40px; background: #fafafa; }
+        .tabs { list-style: none; padding: 0; display: flex; }
+        .tabs li { list-style: none; }
+
+        /* Applied Global Fix Styles mimicking the Elementor Selectors */
+        .woocommerce-tabs ul.tabs li a {
+			white-space: normal !important;
+			word-wrap: break-word !important;
+			display: inline-block !important; /* FIXED */
+			width: 100% !important; /* FIXED */
+            box-sizing: border-box;
+            background: #3498db;
+            color: white;
+            padding: 30px !important; /* Increased padding to test bottom visibility */
+            text-decoration: none;
+		}
+
+        .woocommerce-tabs ul.tabs {
+            margin-bottom: 20px !important; /* Testing the Spacing control */
+            padding: 0;
+            display: flex;
+        }
+
+        .woocommerce-tabs ul.tabs li {
+			margin-bottom: 0 !important;
+			margin-top: 0 !important;
+			box-sizing: border-box !important;
+            border: 2px solid #2980b9 !important;
+		}
+
+		.woocommerce-Tabs-panel,
+		.wcpt-tab-content-wrapper {
+			margin-bottom: 0 !important;
+			margin-top: 0 !important;
+			box-sizing: border-box !important;
+		}
+
+        .elementor-widget-mock-id .woocommerce-Tabs-panel {
+            padding: 30px !important;
+            border: 2px solid #2980b9 !important;
+            background: #ecf0f1 !important;
+        }
+
+    </style></head><body><h1>Elementor Widget Preview (Padding and Spacing Fix)</h1><p>The tab link (blue) should show large padding on all sides, and there should be a 20px gap below the tabs.</p><div class='elementor-widget-mock-id'><div class="wcpt-tabs-layout">		<div class="woocommerce-tabs wc-tabs-wrapper">
+			<ul class="tabs wc-tabs" role="tablist">
+									<li class="tab-title-description" role="tab">
+						<a href="#tab-description">Product Description</a>
+					</li>
+							</ul>
+							<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--description panel entry-content wc-tab" id="tab-description" role="tabpanel">
+					<div class="wcpt-tab-content-wrapper"><p>Responsive Layout Test Content.</p></div>				</div>
+					</div>
+		</div><div class="wcpt-fields-layout"><div class="wcpt-stacked-field"><h3>Product Description</h3><div class="wcpt-tab-content-wrapper"><p>Responsive Layout Test Content.</p></div></div></div></div></body></html>

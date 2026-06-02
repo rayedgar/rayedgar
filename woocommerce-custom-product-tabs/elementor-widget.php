@@ -64,10 +64,38 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 					'none' => __( 'None', 'wcpt' ),
 					'fade' => __( 'Fade In', 'wcpt' ),
 					'slide' => __( 'Slide Up', 'wcpt' ),
+					'zoom' => __( 'Zoom In', 'wcpt' ),
+					'slide-right' => __( 'Slide Right', 'wcpt' ),
 				],
 				'prefix_class' => 'wcpt-animation-',
 				'condition' => [
 					'display_layout' => 'tabs',
+				],
+			]
+		);
+
+		$this->add_control(
+			'tabs_animation_speed',
+			[
+				'label' => __( 'Animation Speed (ms)', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::SLIDER,
+				'size_units' => [ 'ms' ],
+				'range' => [
+					'ms' => [
+						'min' => 100,
+						'max' => 2000,
+						'step' => 50,
+					],
+				],
+				'default' => [
+					'unit' => 'ms',
+					'size' => 400,
+				],
+				'selectors' => [
+					'{{WRAPPER}}' => '--wcpt-animation-speed: {{SIZE}}ms;',
+				],
+				'condition' => [
+					'tabs_animation!' => 'none',
 				],
 			]
 		);
@@ -149,6 +177,17 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'content_bg_color',
+			[
+				'label' => __( 'Background Color', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .woocommerce-Tabs-panel, {{WRAPPER}} .wcpt-tab-content-wrapper' => 'background-color: {{VALUE}} !important;',
+				],
+			]
+		);
+
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			[
@@ -164,8 +203,26 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::DIMENSIONS,
 				'size_units' => [ 'px', 'em', '%' ],
 				'selectors' => [
-					'{{WRAPPER}} .woocommerce-tabs ul.tabs li a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important; display: inline-block !important; width: 100% !important;',
 					'{{WRAPPER}} .wcpt-stacked-field h3' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'tabs_spacing',
+			[
+				'label' => __( 'Spacing', 'wcpt' ),
+				'type' => \Elementor\Controls_Manager::SLIDER,
+				'range' => [
+					'px' => [
+						'min' => 0,
+						'max' => 100,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;',
+					'{{WRAPPER}} .wcpt-stacked-field h3' => 'margin-bottom: {{SIZE}}{{UNIT}} !important;',
 				],
 			]
 		);
