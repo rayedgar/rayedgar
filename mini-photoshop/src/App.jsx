@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { cn } from './utils/cn';
 import {
   Square,
   Circle,
@@ -199,7 +200,8 @@ function App() {
 
         {/* Workspace */}
         <main className="flex-1 bg-neutral-900 relative overflow-auto flex items-center justify-center p-8">
-          <div className="bg-white shadow-2xl rounded-sm overflow-hidden border border-neutral-800">
+          <div className="bg-white shadow-2xl rounded-sm overflow-hidden border border-neutral-800 relative"
+               style={{ width: '800px', height: '600px', backgroundImage: 'linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee 100%), linear-gradient(45deg, #eee 25%, white 25%, white 75%, #eee 75%, #eee 100%)', backgroundSize: '20px 20px', backgroundPosition: '0 0, 10px 10px' }}>
             <Canvas
               ref={canvasRef}
               tool={activeTool}
@@ -248,11 +250,12 @@ function ToolButton({ icon, active, onClick, label }) {
     <button
       onClick={onClick}
       title={label}
-      className={`p-2.5 rounded-lg transition-all ${
+      className={cn(
+        "p-2.5 rounded-lg transition-all",
         active
-          ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
-          : 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200'
-      }`}
+          ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+          : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-200"
+      )}
     >
       {icon}
     </button>

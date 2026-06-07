@@ -1,16 +1,57 @@
-# React + Vite
+# Mini Photoshop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight, web-based image editor built with React, Tailwind CSS, and the HTML5 Canvas API.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Drawing Tools**: Pencil/Brush and Eraser.
+- **Shapes**: Rectangle and Circle tools with live preview.
+- **Text Tool**: Add custom text to your images.
+- **Filters**: Instantly apply Grayscale or Invert filters.
+- **File Support**: Open existing images and Export your work as PNG.
+- **Responsive Layout**: Modern, Photoshop-inspired dark theme.
+- **Transparency**: Supports transparent backgrounds and erasers.
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js (v18 or higher recommended)
+- npm or yarn
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Installation
+
+1. Navigate to the project directory:
+   ```bash
+   cd mini-photoshop
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Running the App
+
+Start the development server:
+```bash
+npm run dev
+```
+
+The app will be available at `http://localhost:5173`.
+
+### Building for Production
+
+To create an optimized production build:
+```bash
+npm run build
+```
+
+## Technologies Used
+
+- **React 19**: Frontend library.
+- **Vite**: Next-generation frontend tooling.
+- **Tailwind CSS v4**: Utility-first CSS framework.
+- **Lucide React**: Beautiful & consistent icons.
+- **Canvas API**: For high-performance image manipulation.
+- **clsx & tailwind-merge**: For efficient class management.

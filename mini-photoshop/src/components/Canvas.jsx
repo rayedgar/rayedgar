@@ -22,23 +22,25 @@ const Canvas = forwardRef(({ tool, color, brushSize, width = 800, height = 600 }
     context.lineWidth = brushSize;
     contextRef.current = context;
 
-    // Set background to white
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, width, height);
   }, []);
 
   useEffect(() => {
     if (contextRef.current) {
-      contextRef.current.strokeStyle = tool === 'eraser' ? 'white' : color;
+      contextRef.current.strokeStyle = color;
       contextRef.current.lineWidth = brushSize;
+
+      if (tool === 'eraser') {
+        contextRef.current.globalCompositeOperation = 'destination-out';
+      } else {
+        contextRef.current.globalCompositeOperation = 'source-over';
+      }
     }
   }, [color, brushSize, tool]);
 
   useImperativeHandle(ref, () => ({
     clearCanvas: () => {
       const context = contextRef.current;
-      context.fillStyle = 'white';
-      context.fillRect(0, 0, width, height);
+      context.clearRect(0, 0, width, height);
     },
     download: () => {
       const canvas = canvasRef.current;
@@ -89,6 +91,8 @@ const Canvas = forwardRef(({ tool, color, brushSize, width = 800, height = 600 }
     setStartPos({ x, y });
     setIsDrawing(true);
 
+    if (tool === 'text') return;
+
     if (tool === 'pencil' || tool === 'eraser') {
       contextRef.current.beginPath();
       contextRef.current.moveTo(x, y);
@@ -100,7 +104,7 @@ const Canvas = forwardRef(({ tool, color, brushSize, width = 800, height = 600 }
   };
 
   const draw = (e) => {
-    if (!isDrawing) return;
+    if (!isDrawing || tool === 'text') return;
     const { x, y } = getMousePos(e);
 
     if (tool === 'pencil' || tool === 'eraser') {
