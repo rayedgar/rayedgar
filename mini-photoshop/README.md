@@ -47,6 +47,34 @@ To create an optimized production build:
 npm run build
 ```
 
+## Why doesn't index.html work when opened directly?
+
+This project is a modern Single Page Application (SPA) built with React and Vite. Opening the `index.html` file directly in your browser (using the `file://` protocol) will **not work** because:
+
+1. **Modules**: Modern JavaScript uses `type="module"`, which requires a web server to resolve imports correctly for security reasons (CORS).
+2. **Asset Paths**: The app expects to be served from a root or relative path provided by a server.
+
+### How to correctly run the app:
+
+**Option A: Development (Recommended)**
+```bash
+npm run dev
+```
+Then visit `http://localhost:5173`.
+
+**Option B: Previewing the Production Build**
+If you have already run `npm run build`, you can serve the `dist` folder:
+```bash
+npm run preview
+```
+
+**Option C: Using any Static Server**
+If you want to serve the `dist` folder with another tool:
+```bash
+# Example using 'serve'
+npx serve dist
+```
+
 ## Technologies Used
 
 - **React 19**: Frontend library.
