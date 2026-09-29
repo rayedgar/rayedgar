@@ -120,6 +120,7 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 				'default' => 'taxonomy_filter',
 				'options' => array(
 					'taxonomy_filter' => esc_html__( 'Elementor Taxonomy Filter / Query', 'elementor-category-description' ),
+					'loop_grid'       => esc_html__( 'Loop Grid / Product Category Sync', 'elementor-category-description' ),
 					'current'         => esc_html__( 'Current Query (Archive / Category Page)', 'elementor-category-description' ),
 					'custom'          => esc_html__( 'Select Taxonomy / Category', 'elementor-category-description' ),
 				),
@@ -131,10 +132,10 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 			array(
 				'label'     => esc_html__( 'Taxonomy Filter', 'elementor-category-description' ),
 				'type'      => \Elementor\Controls_Manager::SELECT,
-				'default'   => 'category',
+				'default'   => 'product_cat',
 				'options'   => $this->get_taxonomies_options(),
 				'condition' => array(
-					'source' => array( 'custom', 'taxonomy_filter' ),
+					'source' => array( 'custom', 'taxonomy_filter', 'loop_grid' ),
 				),
 			)
 		);
@@ -303,13 +304,13 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 					$description = $term->description;
 				}
 			}
-		} elseif ( 'taxonomy_filter' === $source ) {
-			// 1. Check Elementor Taxonomy Filter URL query params e-filter-[id]-[taxonomy] or e-filter-...
+		} elseif ( 'taxonomy_filter' === $source || 'loop_grid' === $source ) {
+			// 1. Check Elementor Taxonomy Filter & Loop Grid URL query params e-filter-[id]-[taxonomy], product_cat, category, etc.
 			$selected_term = null;
 
 			if ( ! empty( $_GET ) ) {
 				foreach ( $_GET as $key => $val ) {
-					if ( ( 0 === strpos( $key, 'e-filter-' ) || $key === $taxonomy ) && ! empty( $val ) ) {
+					if ( ( 0 === strpos( $key, 'e-filter-' ) || $key === $taxonomy || $key === 'product_cat' || $key === 'category' ) && ! empty( $val ) ) {
 						$selected_term = sanitize_text_field( $val );
 						break;
 					}
@@ -319,6 +320,9 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 			if ( $selected_term ) {
 				if ( function_exists( 'get_term_by' ) ) {
 					$term_obj = is_numeric( $selected_term ) ? get_term( (int) $selected_term, $taxonomy ) : get_term_by( 'slug', $selected_term, $taxonomy );
+					if ( ! $term_obj && 'product_cat' !== $taxonomy ) {
+						$term_obj = get_term_by( 'slug', $selected_term, 'product_cat' );
+					}
 					if ( $term_obj && ! is_wp_error( $term_obj ) ) {
 						$description = function_exists( 'term_description' ) ? term_description( $term_obj->term_id ) : $term_obj->description;
 					}
@@ -359,7 +363,7 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 	}
 
 	/**
-	 * Get all term descriptions for the current taxonomy to embed as JSON for live JS filter switching.
+	 * Get all term descriptions for the current taxonomy to embed as JSON for live JS filter/loop grid switching.
 	 *
 	 * @param string $taxonomy
 	 * @return array
@@ -368,8 +372,9 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 		$descriptions = array();
 
 		if ( function_exists( 'get_terms' ) ) {
-			$terms = get_terms( array(
-				'taxonomy'   => $taxonomy,
+			$taxonomies = array_unique( array_filter( array( $taxonomy, 'product_cat', 'category', 'post_tag' ) ) );
+			$terms      = get_terms( array(
+				'taxonomy'   => $taxonomies,
 				'hide_empty' => false,
 			) );
 
@@ -380,8 +385,10 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 						if ( function_exists( 'wpautop' ) ) {
 							$desc = wpautop( $desc );
 						}
-						$descriptions[ $term->slug ]    = $desc;
-						$descriptions[ $term->term_id ] = $desc;
+						$descriptions[ $term->slug ]            = $desc;
+						$descriptions[ $term->term_id ]         = $desc;
+						$descriptions[ 'cat-' . $term->term_id ] = $desc;
+						$descriptions[ 'cat-' . $term->slug ]   = $desc;
 					}
 				}
 			}
@@ -450,7 +457,11 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 				var descContainer = document.getElementById('elementor-category-description-<?php echo esc_js( $widget_id ); ?>');
 				if (!descContainer) return;
 
-				var newDesc = termMap[termSlugOrId] || fallbackText || '';
+				if (termSlugOrId) {
+					termSlugOrId = termSlugOrId.toString().trim().replace(/^\./, '').replace(/^cat-/, '');
+				}
+
+				var newDesc = termMap[termSlugOrId] || termMap['cat-' + termSlugOrId] || fallbackText || '';
 				if (newDesc) {
 					descContainer.innerHTML = newDesc;
 					descContainer.style.display = '';
@@ -460,11 +471,17 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 			}
 
 			document.addEventListener('click', function(e) {
-				var filterItem = e.target.closest('[data-filter], .e-filter-item, [data-term-id], [data-term-slug]');
+				var filterItem = e.target.closest('[data-filter], .e-filter-item, [data-term-id], [data-term-slug], .product-category, .elementor-loop-container a');
 				if (filterItem) {
 					var termVal = filterItem.getAttribute('data-filter') || filterItem.getAttribute('data-term-slug') || filterItem.getAttribute('data-term-id');
+					if (!termVal && filterItem.getAttribute('href')) {
+						var href = filterItem.getAttribute('href');
+						var match = href.match(/\/product-category\/([^\/]+)/) || href.match(/\/category\/([^\/]+)/);
+						if (match && match[1]) {
+							termVal = match[1];
+						}
+					}
 					if (termVal) {
-						termVal = termVal.replace(/^\./, ''); // remove leading dot if CSS selector
 						updateDescription(termVal);
 					}
 				}
@@ -485,8 +502,8 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 
 		if ( settings.source === 'custom' && settings.term_id ) {
 			description = 'Category description preview for term ID: ' + settings.term_id;
-		} else if ( settings.source === 'taxonomy_filter' ) {
-			description = 'Live description dynamically synced with Elementor Taxonomy Filter.';
+		} else if ( settings.source === 'taxonomy_filter' || settings.source === 'loop_grid' ) {
+			description = 'Live description dynamically synced with Elementor Taxonomy Filter / Loop Grid.';
 		} else {
 			description = 'Current category / taxonomy description preview.';
 		}

@@ -346,7 +346,7 @@ if ( 'Default description fallback content.' === $desc_fallback ) {
 	exit( 1 );
 }
 
-// Test 6: Taxonomy Filter Query Param Parsing
+// Test 6: Elementor Taxonomy Filter query parameter parsing
 echo "Test 6: Elementor Taxonomy Filter query parameter parsing...\n";
 $_GET['e-filter-12345-category'] = 'apparel';
 $settings_tax_filter = array(
@@ -362,8 +362,25 @@ if ( 'A great selection of clothing and apparel items.' === $desc_filter ) {
 	exit( 1 );
 }
 
-// Test 7: HTML Output Rendering with JS Listener
-echo "Test 7: Testing HTML Output Rendering with JS Listener...\n";
+// Test 7: Loop Grid / Product Category Sync
+echo "Test 7: Loop Grid product_cat query parameter parsing...\n";
+unset($_GET['e-filter-12345-category']);
+$_GET['product_cat'] = 'shoes';
+$settings_loop_grid = array(
+	'source'         => 'loop_grid',
+	'taxonomy'       => 'product_cat',
+	'enable_wpautop' => 'no',
+);
+$desc_loop_grid = $widget->get_description_text( $settings_loop_grid );
+if ( 'High quality shoes and sneakers.' === $desc_loop_grid ) {
+	echo "✓ Test 7 Passed: Loop Grid product_cat URL parameter parsed and rendered successfully.\n\n";
+} else {
+	echo "✗ Test 7 Failed: Failed to parse Loop Grid product_cat parameter.\n";
+	exit( 1 );
+}
+
+// Test 8: HTML Output Rendering with JS Listener
+echo "Test 8: Testing HTML Output Rendering with JS Listener...\n";
 $widget->set_settings( $settings_custom );
 ob_start();
 $render_method = new ReflectionMethod( $widget, 'render' );
@@ -371,10 +388,10 @@ $render_method->setAccessible( true );
 $render_method->invoke( $widget );
 $output = ob_get_clean();
 
-if ( strpos( $output, 'id="elementor-category-description-test_widget_id"' ) !== false && strpos( $output, 'updateDescription' ) !== false ) {
-	echo "✓ Test 7 Passed: Widget rendered valid HTML structure with JS filter script.\n\n";
+if ( strpos( $output, 'id="elementor-category-description-test_widget_id"' ) !== false && strpos( $output, 'updateDescription' ) !== false && strpos( $output, 'product-category' ) !== false ) {
+	echo "✓ Test 8 Passed: Widget rendered valid HTML structure with JS filter script.\n\n";
 } else {
-	echo "✗ Test 7 Failed: Rendered HTML/JS output incorrect.\n";
+	echo "✗ Test 8 Failed: Rendered HTML/JS output incorrect.\n";
 	echo "Output was: $output\n";
 	exit( 1 );
 }
