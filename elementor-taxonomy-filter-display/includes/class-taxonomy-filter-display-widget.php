@@ -25,7 +25,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_keywords() {
-		return array( 'taxonomy', 'filter', 'loop grid', 'active filter', 'category', 'tag' );
+		return array( 'taxonomy', 'filter', 'loop grid', 'active filter', 'category', 'tag', 'product_cat' );
 	}
 
 	protected function register_controls() {
@@ -49,6 +49,10 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 			foreach ( $taxonomies as $taxonomy ) {
 				$taxonomies_options[ $taxonomy->name ] = $taxonomy->label . ' (' . $taxonomy->name . ')';
 			}
+		} else {
+			$taxonomies_options['category']    = esc_html__( 'Categories (category)', 'elementor-taxonomy-filter-display' );
+			$taxonomies_options['post_tag']    = esc_html__( 'Tags (post_tag)', 'elementor-taxonomy-filter-display' );
+			$taxonomies_options['product_cat'] = esc_html__( 'Product Categories (product_cat)', 'elementor-taxonomy-filter-display' );
 		}
 
 		$taxonomies_options['custom'] = esc_html__( 'Custom Query Parameter / Key', 'elementor-taxonomy-filter-display' );
@@ -60,7 +64,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 				'type'        => \Elementor\Controls_Manager::SELECT,
 				'default'     => 'category',
 				'options'     => $taxonomies_options,
-				'description' => esc_html__( 'Select the taxonomy connected to your Elementor Loop Grid filter.', 'elementor-taxonomy-filter-display' ),
+				'description' => esc_html__( 'Select the specific taxonomy filter connected to your Loop Grid.', 'elementor-taxonomy-filter-display' ),
 			)
 		);
 
@@ -107,7 +111,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 				'label'       => esc_html__( 'Default / All Text', 'elementor-taxonomy-filter-display' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'default'     => esc_html__( 'All', 'elementor-taxonomy-filter-display' ),
-				'description' => esc_html__( 'Displayed when no filter is currently active.', 'elementor-taxonomy-filter-display' ),
+				'description' => esc_html__( 'Displayed when all filters are not active / none selected.', 'elementor-taxonomy-filter-display' ),
 			)
 		);
 
@@ -133,7 +137,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
-		// Style Section - Layout & Alignment
+		// Style Section - General & Wrapper
 		$this->start_controls_section(
 			'section_style_general',
 			array(
@@ -168,12 +172,29 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_group_control(
+			\Elementor\Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'wrapper_typography',
+				'label'    => esc_html__( 'General Typography', 'elementor-taxonomy-filter-display' ),
+				'selector' => '{{WRAPPER}} .etfd-active-filter-wrapper',
+			)
+		);
+
 		$this->add_responsive_control(
 			'container_padding',
 			array(
 				'label'      => esc_html__( 'Padding', 'elementor-taxonomy-filter-display' ),
 				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
+				'default'    => array(
+					'top'      => '0',
+					'right'    => '0',
+					'bottom'   => '0',
+					'left'     => '0',
+					'unit'     => 'px',
+					'isLinked' => true,
+				),
 				'selectors'  => array(
 					'{{WRAPPER}} .etfd-active-filter-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
 				),
@@ -205,7 +226,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
-		// Style Section - Label
+		// Style Section - Prefix Label
 		$this->start_controls_section(
 			'section_style_label',
 			array(
@@ -232,7 +253,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 			\Elementor\Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'label_typography',
-				'label'    => esc_html__( 'Typography', 'elementor-taxonomy-filter-display' ),
+				'label'    => esc_html__( 'Label Typography', 'elementor-taxonomy-filter-display' ),
 				'selector' => '{{WRAPPER}} .etfd-filter-label',
 			)
 		);
@@ -281,7 +302,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 			\Elementor\Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'value_typography',
-				'label'    => esc_html__( 'Typography', 'elementor-taxonomy-filter-display' ),
+				'label'    => esc_html__( 'Value Typography', 'elementor-taxonomy-filter-display' ),
 				'selector' => '{{WRAPPER}} .etfd-filter-value',
 			)
 		);
@@ -324,7 +345,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 			}
 		}
 
-		// Fallback if no specific filter matches
+		// Fallback if no specific filter matches or when all filters are inactive
 		return ! empty( $default_text ) ? $default_text : esc_html__( 'All', 'elementor-taxonomy-filter-display' );
 	}
 
