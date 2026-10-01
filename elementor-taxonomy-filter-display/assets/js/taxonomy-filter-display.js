@@ -19,7 +19,7 @@
 				function () {
 					var $clicked = $(this);
 
-					// Small timeout to allow Elementor to update active classes / URL state
+					// Small delay to allow Elementor to toggle active state classes in DOM
 					setTimeout(function () {
 						self.updateFilterDisplay($clicked);
 					}, 100);
@@ -36,12 +36,12 @@
 		},
 
 		/**
-		 * Extract term title from clicked filter element or surrounding container
+		 * Extract term title from element
 		 */
 		extractTitleFromElement: function ($el) {
 			if (!$el || !$el.length) return '';
 
-			// Direct text or title attribute
+			// Direct text
 			var text = $el.text().trim();
 			if (text && text.toLowerCase() !== 'all' && text.toLowerCase() !== 'todos') {
 				return text;
@@ -49,7 +49,7 @@
 
 			// Data attributes
 			var termSlug = $el.attr('data-term-slug') || $el.attr('data-filter') || $el.attr('data-term-title');
-			if (termSlug) {
+			if (termSlug && termSlug !== '__all' && termSlug !== 'all') {
 				return termSlug.replace(/[-_]/g, ' ').replace(/\b\w/g, function (l) {
 					return l.toUpperCase();
 				});
@@ -78,7 +78,7 @@
 				}
 			});
 
-			if (matchedValue) {
+			if (matchedValue && matchedValue !== '__all' && matchedValue !== 'all') {
 				// Convert slug to printable title
 				var parts = matchedValue.split(',');
 				var titles = parts.map(function (item) {
@@ -94,11 +94,10 @@
 		},
 
 		/**
-		 * Update a specific widget instance
+		 * Update widget display on item click / toggle
 		 */
 		updateFilterDisplay: function ($clickedItem) {
 			var self = this;
-			var clickedTitle = self.extractTitleFromElement($clickedItem);
 
 			$('.etfd-active-filter-wrapper').each(function () {
 				var $wrapper = $(this);
@@ -106,14 +105,28 @@
 				var defaultText = $wrapper.attr('data-default-text') || 'All';
 				var $valueSpan = $wrapper.find('.etfd-filter-value');
 
-				// If clicked item has active class or is selected
-				var isAllSelected = $clickedItem.hasClass('e-filter-item-all') || $clickedItem.is('[data-filter="__all"]') || $clickedItem.is('[data-filter=""]');
+				// Check if clicked item is 'All' or if it was deselected (no active class)
+				var isAllBtn = $clickedItem.hasClass('e-filter-item-all') || $clickedItem.is('[data-filter="__all"]') || $clickedItem.is('[data-filter=""]');
+				var isActive = $clickedItem.hasClass('e-active') || $clickedItem.hasClass('active') || $clickedItem.attr('aria-selected') === 'true';
 
-				if (isAllSelected) {
-					$valueSpan.text(defaultText);
+				// If 'All' button selected or clicked item lost active status (deselected)
+				if (isAllBtn || !isActive) {
+					// Search if any other active filter item exists in the container
+					var $otherActive = $('.e-filter-item.e-active, .elementor-taxonomy-filter__item.e-active, [data-filter].active, [aria-selected="true"]').not('.e-filter-item-all');
+
+					if ($otherActive.length) {
+						var activeTitle = self.extractTitleFromElement($otherActive.first());
+						$valueSpan.text(activeTitle || defaultText);
+					} else {
+						// Reset back to All / default text when no active filter remains
+						var urlVal = self.getFilterFromURL(targetTax);
+						$valueSpan.text(urlVal || defaultText);
+					}
 					return;
 				}
 
+				// Active filter selected
+				var clickedTitle = self.extractTitleFromElement($clickedItem);
 				if (clickedTitle) {
 					$valueSpan.text(clickedTitle);
 				} else {
@@ -136,17 +149,17 @@
 				var $valueSpan = $wrapper.find('.etfd-filter-value');
 
 				// Look for active class on page
-				var $activeFilterItem = $('.e-filter-item.e-active, .elementor-taxonomy-filter__item.e-active, [data-filter].active');
+				var $activeFilterItem = $('.e-filter-item.e-active, .elementor-taxonomy-filter__item.e-active, [data-filter].active, [aria-selected="true"]').not('.e-filter-item-all');
 
 				if ($activeFilterItem.length) {
 					var activeTitle = self.extractTitleFromElement($activeFilterItem.first());
-					if (activeTitle && !$activeFilterItem.hasClass('e-filter-item-all')) {
+					if (activeTitle) {
 						$valueSpan.text(activeTitle);
 						return;
 					}
 				}
 
-				// Fallback to URL parameters
+				// Fallback to URL parameters or reset to default text ("All")
 				var urlValue = self.getFilterFromURL(targetTax);
 				$valueSpan.text(urlValue || defaultText);
 			});
