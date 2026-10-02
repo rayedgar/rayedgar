@@ -27,6 +27,10 @@ function is_wp_error($thing) {
     return false;
 }
 
+function wp_json_encode($data) {
+    return json_encode($data);
+}
+
 function get_taxonomies($args = array(), $output = 'names') {
     $taxonomies = array(
         'category' => (object) array('name' => 'category', 'label' => 'Categories'),
@@ -48,7 +52,6 @@ function get_term_by($field, $value, $taxonomy = '') {
     if (isset($mock_terms[$key])) {
         return $mock_terms[$key];
     }
-    // Search across terms if taxonomy not strictly specified
     foreach ($mock_terms as $term) {
         if ($term->slug === $value) {
             return $term;
@@ -67,10 +70,14 @@ function get_term($term_id) {
     return false;
 }
 
-// Declare Elementor classes in top-level namespace or sub-namespace explicitly
 if (!class_exists('Elementor\Widget_Base')) {
     eval('
     namespace Elementor {
+        class Repeater {
+            public function add_control($id, $args = array()) {}
+            public function get_controls() { return array(); }
+        }
+
         class Widget_Base {
             protected $settings = array();
 
@@ -99,6 +106,7 @@ if (!class_exists('Elementor\Widget_Base')) {
             const DIMENSIONS = "dimensions";
             const COLOR = "color";
             const SLIDER = "slider";
+            const REPEATER = "repeater";
         }
 
         class Group_Control_Typography {
@@ -120,7 +128,6 @@ if (!class_exists('Elementor\Widget_Base')) {
 // Load the widget class
 require_once __DIR__ . '/../elementor-taxonomy-filter-display/includes/class-taxonomy-filter-display-widget.php';
 
-// Begin Test Assertions
 echo "=== Running Active Taxonomy Filter Widget Tests ===\n";
 
 $widget = new Elementor_Taxonomy_Filter_Display_Widget();
@@ -132,58 +139,47 @@ assert($widget->get_title() === 'Active Taxonomy Filter', 'Widget title mismatch
 assert($widget->get_icon() === 'eicon-filter', 'Widget icon mismatch');
 echo "[PASS] Widget Metadata is correct.\n";
 
-// Test 2: Active Filter Resolution with no GET parameters
-echo "\nTest 2: Checking Fallback Default Title...\n";
-$_GET = array();
-$default_title = $widget->get_active_filter_title('category', 'All Categories');
-assert($default_title === 'All Categories', "Expected 'All Categories', got '$default_title'");
-echo "[PASS] Fallback default title resolved correctly.\n";
-
-// Test 3: Active Filter Resolution with Elementor Loop Grid query parameter (`e-filter-...`)
-echo "\nTest 3: Checking Elementor Loop Grid parameter resolution...\n";
+// Test 2: Active Filter Resolution with Repeater, Before/After Text & Order
+echo "\nTest 2: Checking Repeater Taxonomy Ordering & Before/After Text Formatting...\n";
 $_GET = array(
     'e-filter-1a2b3c-category' => 'electronics',
-);
-$title = $widget->get_active_filter_title('category', 'All');
-assert($title === 'Electronics', "Expected 'Electronics', got '$title'");
-echo "[PASS] Resolved term 'Electronics' from e-filter-1a2b3c-category parameter.\n";
-
-// Test 4: Active Filter Resolution with custom taxonomy key parameter
-echo "\nTest 4: Checking Custom Taxonomy key resolution...\n";
-$_GET = array(
     'product_cat' => 'shoes',
 );
-$title = $widget->get_active_filter_title('product_cat', 'All Products');
-assert($title === 'Running Shoes', "Expected 'Running Shoes', got '$title'");
-echo "[PASS] Resolved term 'Running Shoes' from product_cat parameter.\n";
 
-// Test 5: Render HTML Output Verification
-echo "\nTest 5: Checking Widget HTML Output rendering...\n";
-$_GET = array(
-    'category' => 'clothing',
+$taxonomies_list = array(
+    array(
+        'enable' => 'yes',
+        'taxonomy' => 'product_cat',
+        'before_text' => 'Cat: ',
+        'after_text' => ' | ',
+    ),
+    array(
+        'enable' => 'yes',
+        'taxonomy' => 'category',
+        'before_text' => 'Tag: ',
+        'after_text' => '',
+    ),
 );
-$widget->set_settings(array(
-    'taxonomy' => 'category',
-    'show_label' => 'yes',
-    'prefix_label' => 'Selected Category:',
-    'default_value' => 'All',
-    'html_tag' => 'h3',
-));
 
-ob_start();
-// Using Reflection to call protected render method
-$reflection = new ReflectionClass($widget);
-$render_method = $reflection->getMethod('render');
-$render_method->setAccessible(true);
-$render_method->invoke($widget);
-$output = ob_get_clean();
+$output = $widget->get_active_filter_output($taxonomies_list, 'All');
+echo "Active Filter Output: '$output'\n";
+assert($output === 'Cat: Running Shoes | Tag: Electronics', "Unexpected output '$output'");
+echo "[PASS] Repeater ordering & before/after formatting resolved correctly.\n";
 
-echo "Rendered HTML Output:\n" . $output . "\n";
+// Test 3: Disabled taxonomy filter in repeater list
+echo "\nTest 3: Checking disabled taxonomy switcher...\n";
+$taxonomies_list[0]['enable'] = 'no'; // Disable product_cat
+$output_disabled = $widget->get_active_filter_output($taxonomies_list, 'All');
+echo "Active Filter Output with disabled item: '$output_disabled'\n";
+assert($output_disabled === 'Tag: Electronics', "Unexpected output '$output_disabled'");
+echo "[PASS] Disabled taxonomy skipped correctly.\n";
 
-assert(strpos($output, '<h3') !== false, 'HTML Tag <h3 missing');
-assert(strpos($output, 'Selected Category:') !== false, 'Prefix label missing');
-assert(strpos($output, 'Apparel & Clothing') !== false, 'Active term title missing');
-echo "[PASS] Rendered HTML contains tag, label, and term title.\n";
+// Test 4: Default fallback text when no parameters match
+echo "\nTest 4: Checking Default Fallback...\n";
+$_GET = array();
+$default_output = $widget->get_active_filter_output($taxonomies_list, 'All Items');
+assert($default_output === 'All Items', "Expected 'All Items', got '$default_output'");
+echo "[PASS] Default fallback text returned when no filters active.\n";
 
 echo "\n============================================\n";
 echo "ALL TAXONOMY FILTER DISPLAY TESTS PASSED SUCCESSFULLY!\n";

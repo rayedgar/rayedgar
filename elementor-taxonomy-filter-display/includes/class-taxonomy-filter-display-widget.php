@@ -30,7 +30,7 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 
 	protected function register_controls() {
 
-		// Content Section
+		// Content Section - Taxonomies Repeater
 		$this->start_controls_section(
 			'section_content',
 			array(
@@ -57,27 +57,80 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 
 		$taxonomies_options['custom'] = esc_html__( 'Custom Query Parameter / Key', 'elementor-taxonomy-filter-display' );
 
-		$this->add_control(
+		// Repeater for Taxonomies listening
+		$repeater = new \Elementor\Repeater();
+
+		$repeater->add_control(
+			'enable',
+			array(
+				'label'        => esc_html__( 'Listen to this Taxonomy', 'elementor-taxonomy-filter-display' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Yes', 'elementor-taxonomy-filter-display' ),
+				'label_off'    => esc_html__( 'No', 'elementor-taxonomy-filter-display' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			)
+		);
+
+		$repeater->add_control(
 			'taxonomy',
 			array(
-				'label'       => esc_html__( 'Taxonomy to Listen To', 'elementor-taxonomy-filter-display' ),
-				'type'        => \Elementor\Controls_Manager::SELECT,
-				'default'     => 'category',
-				'options'     => $taxonomies_options,
-				'description' => esc_html__( 'Select the specific taxonomy filter connected to your Loop Grid.', 'elementor-taxonomy-filter-display' ),
+				'label'   => esc_html__( 'Taxonomy', 'elementor-taxonomy-filter-display' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'default' => 'category',
+				'options' => $taxonomies_options,
+			)
+		);
+
+		$repeater->add_control(
+			'custom_taxonomy_key',
+			array(
+				'label'       => esc_html__( 'Custom Parameter Key', 'elementor-taxonomy-filter-display' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'default'     => '',
+				'placeholder' => 'e.g. product_cat',
+				'condition'   => array(
+					'taxonomy' => 'custom',
+				),
+			)
+		);
+
+		$repeater->add_control(
+			'before_text',
+			array(
+				'label'       => esc_html__( 'Before Text', 'elementor-taxonomy-filter-display' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'default'     => '',
+				'placeholder' => 'e.g. Category: ',
+			)
+		);
+
+		$repeater->add_control(
+			'after_text',
+			array(
+				'label'       => esc_html__( 'After Text', 'elementor-taxonomy-filter-display' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'default'     => '',
+				'placeholder' => 'e.g.  | ',
 			)
 		);
 
 		$this->add_control(
-			'custom_taxonomy_key',
+			'taxonomies_list',
 			array(
-				'label'       => esc_html__( 'Custom Parameter / Taxonomy Key', 'elementor-taxonomy-filter-display' ),
-				'type'        => \Elementor\Controls_Manager::TEXT,
-				'default'     => '',
-				'placeholder' => 'e.g. product_cat or my_custom_tax',
-				'condition'   => array(
-					'taxonomy' => 'custom',
+				'label'       => esc_html__( 'Taxonomies to Listen To (In Order)', 'elementor-taxonomy-filter-display' ),
+				'type'        => \Elementor\Controls_Manager::REPEATER,
+				'fields'      => $repeater->get_controls(),
+				'default'     => array(
+					array(
+						'enable'      => 'yes',
+						'taxonomy'    => 'category',
+						'before_text' => '',
+						'after_text'  => '',
+					),
 				),
+				'title_field' => '{{{ taxonomy }}} <# if(before_text){ #> [{{{ before_text }}}]<# } #>',
+				'description' => esc_html__( 'Reorder items to change the order in which active taxonomy filters are displayed.', 'elementor-taxonomy-filter-display' ),
 			)
 		);
 
@@ -311,73 +364,97 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 	}
 
 	/**
-	 * Helper function to retrieve the active taxonomy filter term name.
+	 * Retrieve formatted active filter string across all enabled taxonomies in specified order.
 	 */
-	public function get_active_filter_title( $taxonomy_key, $default_text ) {
-		$active_title = '';
+	public function get_active_filter_output( $taxonomies_list, $default_text ) {
+		$output_parts = array();
 
-		// Search $_GET parameters for e-filter-* or specific taxonomy parameters
+		if ( ! empty( $taxonomies_list ) && is_array( $taxonomies_list ) ) {
+			foreach ( $taxonomies_list as $item ) {
+				if ( isset( $item['enable'] ) && 'yes' !== $item['enable'] ) {
+					continue;
+				}
+
+				$tax_key = ! empty( $item['taxonomy'] ) ? $item['taxonomy'] : 'category';
+				if ( 'custom' === $tax_key && ! empty( $item['custom_taxonomy_key'] ) ) {
+					$tax_key = trim( $item['custom_taxonomy_key'] );
+				}
+
+				$before = isset( $item['before_text'] ) ? $item['before_text'] : '';
+				$after  = isset( $item['after_text'] ) ? $item['after_text'] : '';
+
+				$val = $this->get_single_taxonomy_value( $tax_key );
+
+				if ( ! empty( $val ) ) {
+					$output_parts[] = $before . $val . $after;
+				}
+			}
+		}
+
+		if ( ! empty( $output_parts ) ) {
+			return implode( '', $output_parts );
+		}
+
+		return ! empty( $default_text ) ? $default_text : esc_html__( 'All', 'elementor-taxonomy-filter-display' );
+	}
+
+	/**
+	 * Helper function to retrieve the active value for a single taxonomy key.
+	 */
+	private function get_single_taxonomy_value( $taxonomy_key ) {
 		foreach ( $_GET as $key => $val ) {
 			if ( empty( $val ) ) {
 				continue;
 			}
 
-			// Sanitize value
 			$val = sanitize_text_field( wp_unslash( $val ) );
 
-			// Case 1: Loop Grid e-filter parameter format (e.g. e-filter-123456-category=term-slug or e-filter-123456-123)
+			// Loop Grid e-filter parameter
 			if ( strpos( $key, 'e-filter-' ) === 0 ) {
-				// Check if this parameter corresponds to targeted taxonomy or any taxonomy
 				if ( 'all' === $taxonomy_key || strpos( $key, '-' . $taxonomy_key ) !== false || strpos( $key, '_' . $taxonomy_key ) !== false ) {
-					$active_title = $this->resolve_term_title( $val, $taxonomy_key );
-					if ( ! empty( $active_title ) ) {
-						return $active_title;
+					$resolved = $this->resolve_term_title( $val, $taxonomy_key );
+					if ( ! empty( $resolved ) ) {
+						return $resolved;
 					}
 				}
 			}
 
-			// Case 2: Exact taxonomy key match in GET parameters
+			// Direct taxonomy key match
 			if ( 'all' !== $taxonomy_key && $key === $taxonomy_key ) {
-				$active_title = $this->resolve_term_title( $val, $taxonomy_key );
-				if ( ! empty( $active_title ) ) {
-					return $active_title;
+				$resolved = $this->resolve_term_title( $val, $taxonomy_key );
+				if ( ! empty( $resolved ) ) {
+					return $resolved;
 				}
 			}
 		}
 
-		// Fallback if no specific filter matches or when all filters are inactive
-		return ! empty( $default_text ) ? $default_text : esc_html__( 'All', 'elementor-taxonomy-filter-display' );
+		return '';
 	}
 
 	/**
 	 * Resolve term title from term slug, ID or comma-separated list.
 	 */
 	private function resolve_term_title( $val, $taxonomy_key ) {
-		// Handle comma separated values if multiple terms selected
 		$items = explode( ',', $val );
 		$titles = array();
 
 		foreach ( $items as $item ) {
 			$item = trim( $item );
-			if ( empty( $item ) ) {
+			if ( empty( $item ) || 'all' === strtolower( $item ) || '__all' === strtolower( $item ) ) {
 				continue;
 			}
 
 			$term = false;
-			// If taxonomy specified and not 'all' or 'custom'
 			$target_tax = ( 'all' !== $taxonomy_key && 'custom' !== $taxonomy_key ) ? $taxonomy_key : '';
 
-			// Try by slug
 			if ( ! empty( $target_tax ) ) {
 				$term = get_term_by( 'slug', $item, $target_tax );
 			}
 
-			// Try by slug without taxonomy specified
 			if ( ! $term ) {
 				$term = get_term_by( 'slug', $item, 'category' ) ?: get_term_by( 'slug', $item, 'product_cat' ) ?: get_term_by( 'slug', $item, 'post_tag' );
 			}
 
-			// Try by ID
 			if ( ! $term && is_numeric( $item ) ) {
 				$term = get_term( (int) $item );
 			}
@@ -385,7 +462,6 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 			if ( $term && ! is_wp_error( $term ) ) {
 				$titles[] = $term->name;
 			} else {
-				// Fallback to capitalised string if term object is not found
 				$titles[] = ucfirst( str_replace( array( '-', '_' ), ' ', $item ) );
 			}
 		}
@@ -396,25 +472,38 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 
-		$taxonomy_target = $settings['taxonomy'];
-		if ( 'custom' === $taxonomy_target && ! empty( $settings['custom_taxonomy_key'] ) ) {
-			$taxonomy_target = trim( $settings['custom_taxonomy_key'] );
+		$taxonomies_list = $settings['taxonomies_list'];
+		$show_label      = 'yes' === $settings['show_label'];
+		$prefix_label    = $settings['prefix_label'];
+		$default_value   = $settings['default_value'];
+		$html_tag        = \Elementor\Utils::validate_html_tag( $settings['html_tag'] );
+
+		$active_value = $this->get_active_filter_output( $taxonomies_list, $default_value );
+
+		// Clean JSON config for client-side JS
+		$tax_config = array();
+		if ( ! empty( $taxonomies_list ) && is_array( $taxonomies_list ) ) {
+			foreach ( $taxonomies_list as $item ) {
+				$tax_key = ! empty( $item['taxonomy'] ) ? $item['taxonomy'] : 'category';
+				if ( 'custom' === $tax_key && ! empty( $item['custom_taxonomy_key'] ) ) {
+					$tax_key = trim( $item['custom_taxonomy_key'] );
+				}
+				$tax_config[] = array(
+					'enable'      => isset( $item['enable'] ) ? $item['enable'] : 'yes',
+					'taxonomy'    => $tax_key,
+					'before_text' => isset( $item['before_text'] ) ? $item['before_text'] : '',
+					'after_text'  => isset( $item['after_text'] ) ? $item['after_text'] : '',
+				);
+			}
 		}
-
-		$show_label    = 'yes' === $settings['show_label'];
-		$prefix_label  = $settings['prefix_label'];
-		$default_value = $settings['default_value'];
-		$html_tag      = \Elementor\Utils::validate_html_tag( $settings['html_tag'] );
-
-		$active_value = $this->get_active_filter_title( $taxonomy_target, $default_value );
 
 		?>
 		<<?php echo esc_attr( $html_tag ); ?>
 			class="etfd-active-filter-wrapper"
-			data-taxonomy="<?php echo esc_attr( $taxonomy_target ); ?>"
 			data-default-text="<?php echo esc_attr( $default_value ); ?>"
 			data-show-label="<?php echo esc_attr( $show_label ? 'yes' : 'no' ); ?>"
-			data-prefix-label="<?php echo esc_attr( $prefix_label ); ?>">
+			data-prefix-label="<?php echo esc_attr( $prefix_label ); ?>"
+			data-taxonomies-config="<?php echo esc_attr( wp_json_encode( $tax_config ) ); ?>">
 
 			<?php if ( $show_label && ! empty( $prefix_label ) ) : ?>
 				<span class="etfd-filter-label"><?php echo esc_html( $prefix_label ); ?></span>
@@ -430,20 +519,32 @@ class Elementor_Taxonomy_Filter_Display_Widget extends \Elementor\Widget_Base {
 		?>
 		<#
 		var html_tag = settings.html_tag || 'div';
-		var taxonomy = settings.taxonomy;
-		if ( 'custom' === taxonomy && settings.custom_taxonomy_key ) {
-			taxonomy = settings.custom_taxonomy_key;
-		}
 		var show_label = 'yes' === settings.show_label;
 		var prefix_label = settings.prefix_label || '';
 		var default_value = settings.default_value || 'All';
+
+		var tax_config = [];
+		if ( settings.taxonomies_list && settings.taxonomies_list.length ) {
+			_.each( settings.taxonomies_list, function( item ) {
+				var tax_key = item.taxonomy || 'category';
+				if ( 'custom' === tax_key && item.custom_taxonomy_key ) {
+					tax_key = item.custom_taxonomy_key;
+				}
+				tax_config.push({
+					enable: item.enable || 'yes',
+					taxonomy: tax_key,
+					before_text: item.before_text || '',
+					after_text: item.after_text || ''
+				});
+			});
+		}
 		#>
 		<{{{ html_tag }}}
 			class="etfd-active-filter-wrapper"
-			data-taxonomy="{{ taxonomy }}"
 			data-default-text="{{ default_value }}"
 			data-show-label="{{ show_label ? 'yes' : 'no' }}"
-			data-prefix-label="{{ prefix_label }}">
+			data-prefix-label="{{ prefix_label }}"
+			data-taxonomies-config="{{ JSON.stringify(tax_config) }}">
 
 			<# if ( show_label && prefix_label ) { #>
 				<span class="etfd-filter-label">{{{ prefix_label }}}</span>

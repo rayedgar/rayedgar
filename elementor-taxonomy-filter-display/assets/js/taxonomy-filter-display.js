@@ -94,6 +94,65 @@
 		},
 
 		/**
+		 * Parse taxonomy configuration list from wrapper element
+		 */
+		getTaxonomiesConfig: function ($wrapper) {
+			var rawConfig = $wrapper.attr('data-taxonomies-config');
+			if (!rawConfig) {
+				return [{
+					enable: 'yes',
+					taxonomy: 'all',
+					before_text: '',
+					after_text: ''
+				}];
+			}
+
+			try {
+				var parsed = JSON.parse(rawConfig);
+				return Array.isArray(parsed) ? parsed : [];
+			} catch (e) {
+				return [];
+			}
+		},
+
+		/**
+		 * Find active element matching specific taxonomy key or any
+		 */
+		findActiveElementForTaxonomy: function (targetTax) {
+			var self = this;
+			var $activeItems = $('.e-filter-item.e-active, .elementor-taxonomy-filter__item.e-active, [data-filter].active, [aria-selected="true"]').not('.e-filter-item-all');
+
+			if (!$activeItems.length) {
+				return '';
+			}
+
+			if (targetTax === 'all') {
+				return self.extractTitleFromElement($activeItems.first());
+			}
+
+			// Try matching specific taxonomy data attributes or filter key
+			var matchedTitle = '';
+			$activeItems.each(function () {
+				var $item = $(this);
+				var filterTax = $item.attr('data-taxonomy') || $item.attr('data-taxonomy-slug') || $item.closest('[data-taxonomy]').attr('data-taxonomy') || '';
+
+				if (!filterTax || filterTax === targetTax) {
+					var title = self.extractTitleFromElement($item);
+					if (title) {
+						matchedTitle = title;
+						return false; // Break loop
+					}
+				}
+			});
+
+			if (matchedTitle) {
+				return matchedTitle;
+			}
+
+			return self.extractTitleFromElement($activeItems.first());
+		},
+
+		/**
 		 * Update widget display on item click / toggle
 		 */
 		updateFilterDisplay: function ($clickedItem) {
@@ -101,37 +160,34 @@
 
 			$('.etfd-active-filter-wrapper').each(function () {
 				var $wrapper = $(this);
-				var targetTax = $wrapper.attr('data-taxonomy') || 'all';
 				var defaultText = $wrapper.attr('data-default-text') || 'All';
 				var $valueSpan = $wrapper.find('.etfd-filter-value');
+				var taxConfigList = self.getTaxonomiesConfig($wrapper);
 
-				// Check if clicked item is 'All' or if it was deselected (no active class)
-				var isAllBtn = $clickedItem.hasClass('e-filter-item-all') || $clickedItem.is('[data-filter="__all"]') || $clickedItem.is('[data-filter=""]');
-				var isActive = $clickedItem.hasClass('e-active') || $clickedItem.hasClass('active') || $clickedItem.attr('aria-selected') === 'true';
+				var outputParts = [];
 
-				// If 'All' button selected or clicked item lost active status (deselected)
-				if (isAllBtn || !isActive) {
-					// Search if any other active filter item exists in the container
-					var $otherActive = $('.e-filter-item.e-active, .elementor-taxonomy-filter__item.e-active, [data-filter].active, [aria-selected="true"]').not('.e-filter-item-all');
+				taxConfigList.forEach(function (item) {
+					if (item.enable && item.enable !== 'yes') return;
 
-					if ($otherActive.length) {
-						var activeTitle = self.extractTitleFromElement($otherActive.first());
-						$valueSpan.text(activeTitle || defaultText);
-					} else {
-						// Reset back to All / default text when no active filter remains
-						var urlVal = self.getFilterFromURL(targetTax);
-						$valueSpan.text(urlVal || defaultText);
+					var targetTax = item.taxonomy || 'all';
+					var before = item.before_text || '';
+					var after = item.after_text || '';
+
+					var val = self.findActiveElementForTaxonomy(targetTax);
+
+					if (!val) {
+						val = self.getFilterFromURL(targetTax);
 					}
-					return;
-				}
 
-				// Active filter selected
-				var clickedTitle = self.extractTitleFromElement($clickedItem);
-				if (clickedTitle) {
-					$valueSpan.text(clickedTitle);
+					if (val) {
+						outputParts.push(before + val + after);
+					}
+				});
+
+				if (outputParts.length) {
+					$valueSpan.text(outputParts.join(''));
 				} else {
-					var urlValue = self.getFilterFromURL(targetTax);
-					$valueSpan.text(urlValue || defaultText);
+					$valueSpan.text(defaultText);
 				}
 			});
 		},
@@ -144,24 +200,35 @@
 
 			$('.etfd-active-filter-wrapper').each(function () {
 				var $wrapper = $(this);
-				var targetTax = $wrapper.attr('data-taxonomy') || 'all';
 				var defaultText = $wrapper.attr('data-default-text') || 'All';
 				var $valueSpan = $wrapper.find('.etfd-filter-value');
+				var taxConfigList = self.getTaxonomiesConfig($wrapper);
 
-				// Look for active class on page
-				var $activeFilterItem = $('.e-filter-item.e-active, .elementor-taxonomy-filter__item.e-active, [data-filter].active, [aria-selected="true"]').not('.e-filter-item-all');
+				var outputParts = [];
 
-				if ($activeFilterItem.length) {
-					var activeTitle = self.extractTitleFromElement($activeFilterItem.first());
-					if (activeTitle) {
-						$valueSpan.text(activeTitle);
-						return;
+				taxConfigList.forEach(function (item) {
+					if (item.enable && item.enable !== 'yes') return;
+
+					var targetTax = item.taxonomy || 'all';
+					var before = item.before_text || '';
+					var after = item.after_text || '';
+
+					var val = self.findActiveElementForTaxonomy(targetTax);
+
+					if (!val) {
+						val = self.getFilterFromURL(targetTax);
 					}
-				}
 
-				// Fallback to URL parameters or reset to default text ("All")
-				var urlValue = self.getFilterFromURL(targetTax);
-				$valueSpan.text(urlValue || defaultText);
+					if (val) {
+						outputParts.push(before + val + after);
+					}
+				});
+
+				if (outputParts.length) {
+					$valueSpan.text(outputParts.join(''));
+				} else {
+					$valueSpan.text(defaultText);
+				}
 			});
 		}
 	};
