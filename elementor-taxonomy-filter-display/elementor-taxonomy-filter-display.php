@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Elementor Active Taxonomy Filter Display
  * Description: An Elementor widget that displays the current chosen taxonomy filter setting connected to the Loop Grid filter.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: Jules
  * Text Domain: elementor-taxonomy-filter-display
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'ETFD_VERSION', '1.1.1' );
+define( 'ETFD_VERSION', '1.1.2' );
 define( 'ETFD_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ETFD_URL', plugin_dir_url( __FILE__ ) );
 

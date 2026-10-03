@@ -6,7 +6,11 @@
 	 */
 	var ETFD_Handler = {
 		init: function () {
-			$(document).ready(this.bindEvents.bind(this));
+			var self = this;
+			$(document).ready(function () {
+				self.bindEvents();
+				self.initMutationObserver();
+			});
 		},
 
 		bindEvents: function () {
@@ -19,12 +23,27 @@
 				function () {
 					var $clicked = $(this);
 
-					// Small delay to allow Elementor to toggle active state classes in DOM
+					// Trigger immediate sync and a follow-up after Elementor DOM updates
+					self.updateFilterDisplay($clicked);
 					setTimeout(function () {
 						self.updateFilterDisplay($clicked);
 					}, 100);
+					setTimeout(function () {
+						self.updateFilterDisplay($clicked);
+					}, 300);
 				}
 			);
+
+			// Listen for Elementor frontend init and AJAX completion events
+			$(document).on('ajaxComplete elementor/popup/show', function () {
+				self.updateAllWidgetDisplays();
+			});
+
+			if (window.elementorFrontend && window.elementorFrontend.hooks) {
+				window.elementorFrontend.hooks.addAction('frontend/element_ready/global', function () {
+					self.updateAllWidgetDisplays();
+				});
+			}
 
 			// Listen for URL popstate (browser back/forward or history state change)
 			$(window).on('popstate hashchange', function () {
@@ -33,6 +52,42 @@
 
 			// Initial sync on page load
 			self.updateAllWidgetDisplays();
+
+			// Periodic light check to ensure dynamic live state stays strictly in sync
+			setInterval(function () {
+				self.updateAllWidgetDisplays();
+			}, 1000);
+		},
+
+		/**
+		 * Use MutationObserver to observe DOM changes on Loop Grid taxonomy filter elements dynamically
+		 */
+		initMutationObserver: function () {
+			var self = this;
+			if (typeof MutationObserver === 'undefined') return;
+
+			var observer = new MutationObserver(function (mutations) {
+				var shouldUpdate = false;
+				mutations.forEach(function (mutation) {
+					if (mutation.type === 'attributes' || mutation.type === 'childList') {
+						shouldUpdate = true;
+					}
+				});
+
+				if (shouldUpdate) {
+					self.updateAllWidgetDisplays();
+				}
+			});
+
+			var targetNodes = document.querySelectorAll('.elementor-taxonomy-filter, .e-loop-taxonomy-filter, .elementor-loop-container, [data-taxonomy]');
+			targetNodes.forEach(function (node) {
+				observer.observe(node, {
+					attributes: true,
+					attributeFilter: ['class', 'aria-selected', 'data-filter', 'data-term-slug'],
+					childList: true,
+					subtree: true
+				});
+			});
 		},
 
 		/**
@@ -116,7 +171,7 @@
 		},
 
 		/**
-		 * Find active element matching specific taxonomy key or any, including 'First Item' option
+		 * Find live active element matching specific taxonomy key or any
 		 */
 		findActiveElementForTaxonomy: function (targetTax) {
 			var self = this;
@@ -128,7 +183,6 @@
 			if (!$activeItems.length) {
 				var $firstFilterItem = $('.e-filter-item:first-child, .elementor-taxonomy-filter__item:first-child, .e-loop-taxonomy-filter__item:first-child').not('.e-filter-item-all').first();
 
-				// Check if taxonomy filter container or item has first-item active attribute/class
 				if ($firstFilterItem.length) {
 					var $filterContainer = $firstFilterItem.closest('.elementor-taxonomy-filter, .e-loop-taxonomy-filter, [data-first-item-active]');
 					var hasFirstItemSetting = $filterContainer.hasClass('e-first-item-active') || $filterContainer.attr('data-first-item-active') === 'true' || $firstFilterItem.hasClass('e-active') || $firstFilterItem.hasClass('active');
