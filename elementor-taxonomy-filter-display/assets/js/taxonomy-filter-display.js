@@ -116,11 +116,28 @@
 		},
 
 		/**
-		 * Find active element matching specific taxonomy key or any
+		 * Find active element matching specific taxonomy key or any, including 'First Item' option
 		 */
 		findActiveElementForTaxonomy: function (targetTax) {
 			var self = this;
-			var $activeItems = $('.e-filter-item.e-active, .elementor-taxonomy-filter__item.e-active, [data-filter].active, [aria-selected="true"]').not('.e-filter-item-all');
+
+			// Target active filter items including standard e-active, aria-selected, and first item active states
+			var $activeItems = $('.e-filter-item.e-active, .elementor-taxonomy-filter__item.e-active, [data-filter].active, [aria-selected="true"], .e-filter-item--active, .e-filter-item-active, .e-filter-item:first-child.e-active').not('.e-filter-item-all');
+
+			// If no explicitly active item, check if taxonomy filter is set to 'First Item' as default active state
+			if (!$activeItems.length) {
+				var $firstFilterItem = $('.e-filter-item:first-child, .elementor-taxonomy-filter__item:first-child, .e-loop-taxonomy-filter__item:first-child').not('.e-filter-item-all').first();
+
+				// Check if taxonomy filter container or item has first-item active attribute/class
+				if ($firstFilterItem.length) {
+					var $filterContainer = $firstFilterItem.closest('.elementor-taxonomy-filter, .e-loop-taxonomy-filter, [data-first-item-active]');
+					var hasFirstItemSetting = $filterContainer.hasClass('e-first-item-active') || $filterContainer.attr('data-first-item-active') === 'true' || $firstFilterItem.hasClass('e-active') || $firstFilterItem.hasClass('active');
+
+					if (hasFirstItemSetting) {
+						$activeItems = $firstFilterItem;
+					}
+				}
+			}
 
 			if (!$activeItems.length) {
 				return '';
@@ -130,7 +147,7 @@
 				return self.extractTitleFromElement($activeItems.first());
 			}
 
-			// Try matching specific taxonomy data attributes or filter key
+			// Match specific taxonomy data attributes or filter key
 			var matchedTitle = '';
 			$activeItems.each(function () {
 				var $item = $(this);
