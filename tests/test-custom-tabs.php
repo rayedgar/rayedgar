@@ -252,6 +252,20 @@ namespace {
 		exit( 1 );
 	}
 
+	// Test 5: Global Attribute Alignment CSS Injection
+	echo "Test 5: Global Attribute Alignment CSS...\n";
+	update_option( 'ptp_attribute_alignment', 'right' );
+	ob_start();
+	ptp_inject_global_styles();
+	$styles = ob_get_clean();
+
+	if ( strpos( $styles, 'text-align: right !important;' ) !== false && strpos( $styles, 'table.woocommerce-product-attributes' ) !== false ) {
+		echo " [PASS] Global attribute right alignment CSS generated successfully.\n";
+	} else {
+		echo " [FAIL] Global attribute alignment CSS generation failed.\n";
+		exit( 1 );
+	}
+
 	// Also run existing plugin tests to ensure no regressions
 	echo "\nRunning existing plugin test runner...\n";
 	passthru( 'php ' . __DIR__ . '/test-plugin.php', $exit_code );

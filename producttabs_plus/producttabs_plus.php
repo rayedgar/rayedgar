@@ -344,8 +344,14 @@ function ptp_inject_global_styles() {
 	$alignment = get_option( 'ptp_attribute_alignment', 'left' );
 	?>
 	<style id="ptp-global-styles">
-		.woocommerce-product-attributes {
-			text-align: <?php echo esc_attr( $alignment ); ?>;
+		.woocommerce-product-attributes,
+		table.woocommerce-product-attributes,
+		.woocommerce-product-attributes th,
+		.woocommerce-product-attributes td,
+		.woocommerce-product-attributes-item__label,
+		.woocommerce-product-attributes-item__value,
+		.woocommerce-product-attributes-item__value p {
+			text-align: <?php echo esc_attr( $alignment ); ?> !important;
 		}
 		.woocommerce-product-attributes-item {
 			align-items: flex-start !important;

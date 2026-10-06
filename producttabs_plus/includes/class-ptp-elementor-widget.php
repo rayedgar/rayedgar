@@ -86,6 +86,37 @@ class PTP_Elementor_Widget extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'specs_alignment',
+			array(
+				'label'     => __( 'Specs / Attributes Text Alignment', 'producttabs_plus' ),
+				'type'      => \Elementor\Controls_Manager::CHOOSE,
+				'options'   => array(
+					'left'   => array(
+						'title' => __( 'Left', 'producttabs_plus' ),
+						'icon'  => 'eicon-text-align-left',
+					),
+					'center' => array(
+						'title' => __( 'Center', 'producttabs_plus' ),
+						'icon'  => 'eicon-text-align-center',
+					),
+					'right'  => array(
+						'title' => __( 'Right', 'producttabs_plus' ),
+						'icon'  => 'eicon-text-align-right',
+					),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .woocommerce-product-attributes' => 'text-align: {{VALUE}} !important;',
+					'{{WRAPPER}} table.woocommerce-product-attributes' => 'text-align: {{VALUE}} !important;',
+					'{{WRAPPER}} .woocommerce-product-attributes th' => 'text-align: {{VALUE}} !important;',
+					'{{WRAPPER}} .woocommerce-product-attributes td' => 'text-align: {{VALUE}} !important;',
+					'{{WRAPPER}} .woocommerce-product-attributes-item__label' => 'text-align: {{VALUE}} !important;',
+					'{{WRAPPER}} .woocommerce-product-attributes-item__value' => 'text-align: {{VALUE}} !important;',
+					'{{WRAPPER}} .woocommerce-product-attributes-item__value p' => 'text-align: {{VALUE}} !important;',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		// Content Section - Layout & Animation Settings
