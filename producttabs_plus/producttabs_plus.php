@@ -3,7 +3,7 @@
  * Plugin Name: ProductTabs Plus
  * Plugin URI: https://example.com/producttabs-plus
  * Description: Custom Product Tabs for WooCommerce with Elementor integration, priority ordering, and targeting rules.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Jules
  * Text Domain: producttabs_plus
  */
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PTP_VERSION', '1.0.1' );
+define( 'PTP_VERSION', '1.0.2' );
 define( 'PTP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PTP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
@@ -350,6 +350,14 @@ function ptp_inject_global_styles() {
 		.woocommerce-product-attributes-item__value,
 		.woocommerce-product-attributes-item__value p {
 			text-align: <?php echo esc_attr( $alignment ); ?> !important;
+		}
+		table.woocommerce-product-attributes,
+		table.woocommerce-product-attributes tr,
+		table.woocommerce-product-attributes th,
+		table.woocommerce-product-attributes td,
+		.woocommerce-product-attributes-item {
+			background: transparent !important;
+			background-color: transparent !important;
 		}
 		table.woocommerce-product-attributes {
 			width: 100% !important;

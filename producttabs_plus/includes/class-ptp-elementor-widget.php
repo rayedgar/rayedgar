@@ -71,8 +71,8 @@ class PTP_Elementor_Widget extends \Elementor\Widget_Base {
 			array(
 				'label'       => __( 'Additional Information Tab Title', 'producttabs_plus' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
-				'default'     => __( 'More Information', 'producttabs_plus' ),
-				'placeholder' => __( 'More Information', 'producttabs_plus' ),
+				'default'     => __( 'Specs', 'producttabs_plus' ),
+				'placeholder' => __( 'Specs', 'producttabs_plus' ),
 			)
 		);
 
@@ -436,7 +436,7 @@ class PTP_Elementor_Widget extends \Elementor\Widget_Base {
 					},
 				),
 				'additional_information' => array(
-					'title'    => ! empty( $settings['title_additional_information'] ) ? $settings['title_additional_information'] : __( 'More Information', 'producttabs_plus' ),
+					'title'    => ! empty( $settings['title_additional_information'] ) ? $settings['title_additional_information'] : __( 'Specs', 'producttabs_plus' ),
 					'callback' => function() {
 						echo '<p>' . esc_html( __( 'Sample additional details, attributes, and specifications.', 'producttabs_plus' ) ) . '</p>';
 					},
@@ -517,7 +517,7 @@ class PTP_Elementor_Widget extends \Elementor\Widget_Base {
 		?>
 		<#
 		var titleDesc = settings.title_description || 'Info';
-		var titleAdd  = settings.title_additional_information || 'More Information';
+		var titleAdd  = settings.title_additional_information || 'Specs';
 		var titleRev  = settings.title_reviews || 'Reviews';
 		#>
 		<div class="ptp-tabs-wrapper woocommerce-tabs" style="min-height: 150px;">
