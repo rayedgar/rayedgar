@@ -1,6 +1,6 @@
 <?php
 /**
- * Elementor Widget Integration for WooCommerce Custom Product Tabs.
+ * Elementor Widget Integration for ProductTabs Plus.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -12,16 +12,16 @@ if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
 }
 
 /**
- * Class WCPT_Elementor_Widget
+ * Class PTP_Elementor_Widget
  */
-class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
+class PTP_Elementor_Widget extends \Elementor\Widget_Base {
 
 	public function get_name() {
-		return 'woocommerce-custom-product-tabs';
+		return 'producttabs-plus';
 	}
 
 	public function get_title() {
-		return __( 'Custom Product Tabs', 'woocommerce-custom-product-tabs' );
+		return __( 'Custom Product Tabs (Plus)', 'producttabs_plus' );
 	}
 
 	public function get_icon() {
@@ -33,7 +33,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_keywords() {
-		return array( 'woocommerce', 'tabs', 'custom tabs', 'product tabs', 'product' );
+		return array( 'woocommerce', 'tabs', 'custom tabs', 'product tabs', 'producttabs_plus' );
 	}
 
 	protected function register_controls() {
@@ -42,7 +42,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'section_tab_overrides',
 			array(
-				'label' => __( 'Tab Title Overrides', 'woocommerce-custom-product-tabs' ),
+				'label' => __( 'Tab Title Overrides', 'producttabs_plus' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 			)
 		);
@@ -51,7 +51,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 			'override_notice',
 			array(
 				'type'            => \Elementor\Controls_Manager::RAW_HTML,
-				'raw'             => __( '<strong>Note:</strong> Customize titles for default WooCommerce tabs or custom tabs registered via WooCommerce Custom Product Tabs manager.', 'woocommerce-custom-product-tabs' ),
+				'raw'             => __( '<strong>Note:</strong> Customize titles for default WooCommerce tabs or custom tabs registered via ProductTabs Plus manager.', 'producttabs_plus' ),
 				'content_classes' => 'elementor-descriptor',
 			)
 		);
@@ -59,30 +59,30 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'title_description',
 			array(
-				'label'       => __( 'Description Tab Title', 'woocommerce-custom-product-tabs' ),
+				'label'       => __( 'Description Tab Title', 'producttabs_plus' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
-				'default'     => __( 'Info', 'woocommerce-custom-product-tabs' ),
-				'placeholder' => __( 'Info', 'woocommerce-custom-product-tabs' ),
+				'default'     => __( 'Info', 'producttabs_plus' ),
+				'placeholder' => __( 'Info', 'producttabs_plus' ),
 			)
 		);
 
 		$this->add_control(
 			'title_additional_information',
 			array(
-				'label'       => __( 'Additional Information Tab Title', 'woocommerce-custom-product-tabs' ),
+				'label'       => __( 'Additional Information Tab Title', 'producttabs_plus' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
-				'default'     => __( 'More Information', 'woocommerce-custom-product-tabs' ),
-				'placeholder' => __( 'More Information', 'woocommerce-custom-product-tabs' ),
+				'default'     => __( 'More Information', 'producttabs_plus' ),
+				'placeholder' => __( 'More Information', 'producttabs_plus' ),
 			)
 		);
 
 		$this->add_control(
 			'title_reviews',
 			array(
-				'label'       => __( 'Reviews Tab Title', 'woocommerce-custom-product-tabs' ),
+				'label'       => __( 'Reviews Tab Title', 'producttabs_plus' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
-				'default'     => __( 'Reviews', 'woocommerce-custom-product-tabs' ),
-				'placeholder' => __( 'Reviews', 'woocommerce-custom-product-tabs' ),
+				'default'     => __( 'Reviews', 'producttabs_plus' ),
+				'placeholder' => __( 'Reviews', 'producttabs_plus' ),
 			)
 		);
 
@@ -92,7 +92,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'section_layout_settings',
 			array(
-				'label' => __( 'Layout & Settings', 'woocommerce-custom-product-tabs' ),
+				'label' => __( 'Layout & Settings', 'producttabs_plus' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 			)
 		);
@@ -100,21 +100,21 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_responsive_control(
 			'display_layout',
 			array(
-				'label'        => __( 'Display Layout', 'woocommerce-custom-product-tabs' ),
+				'label'        => __( 'Display Layout', 'producttabs_plus' ),
 				'type'         => \Elementor\Controls_Manager::SELECT,
 				'default'      => 'tabs',
 				'options'      => array(
-					'tabs'   => __( 'Tabs Header', 'woocommerce-custom-product-tabs' ),
-					'fields' => __( 'Stacked Fields', 'woocommerce-custom-product-tabs' ),
+					'tabs'   => __( 'Tabs Header', 'producttabs_plus' ),
+					'fields' => __( 'Stacked Fields', 'producttabs_plus' ),
 				),
-				'prefix_class' => 'wcpt-layout%s-',
+				'prefix_class' => 'ptp-layout%s-',
 			)
 		);
 
 		$this->add_control(
 			'animation_speed',
 			array(
-				'label'      => __( 'Animation Speed (ms)', 'woocommerce-custom-product-tabs' ),
+				'label'      => __( 'Animation Speed (ms)', 'producttabs_plus' ),
 				'type'       => \Elementor\Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
 				'range'      => array(
@@ -129,7 +129,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 					'size' => 300,
 				),
 				'selectors'  => array(
-					'{{WRAPPER}} .wcpt-tabs-wrapper' => '--wcpt-animation-speed: {{SIZE}}ms;',
+					'{{WRAPPER}} .ptp-tabs-wrapper' => '--ptp-animation-speed: {{SIZE}}ms;',
 				),
 			)
 		);
@@ -140,7 +140,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'section_tab_header_style',
 			array(
-				'label' => __( 'Tab Headers', 'woocommerce-custom-product-tabs' ),
+				'label' => __( 'Tab Headers', 'producttabs_plus' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -148,7 +148,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_responsive_control(
 			'header_spacing',
 			array(
-				'label'      => __( 'Header Spacing (Margin Bottom)', 'woocommerce-custom-product-tabs' ),
+				'label'      => __( 'Header Spacing (Margin Bottom)', 'producttabs_plus' ),
 				'type'       => \Elementor\Controls_Manager::SLIDER,
 				'size_units' => array( 'px', 'em', '%' ),
 				'range'      => array(
@@ -166,7 +166,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_responsive_control(
 			'tab_padding',
 			array(
-				'label'      => __( 'Tab Link Padding', 'woocommerce-custom-product-tabs' ),
+				'label'      => __( 'Tab Link Padding', 'producttabs_plus' ),
 				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
@@ -181,14 +181,14 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_tab(
 			'tab_header_normal',
 			array(
-				'label' => __( 'Normal', 'woocommerce-custom-product-tabs' ),
+				'label' => __( 'Normal', 'producttabs_plus' ),
 			)
 		);
 
 		$this->add_control(
 			'tab_text_color',
 			array(
-				'label'     => __( 'Text Color', 'woocommerce-custom-product-tabs' ),
+				'label'     => __( 'Text Color', 'producttabs_plus' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .woocommerce-tabs ul.tabs li a' => 'color: {{VALUE}} !important;',
@@ -199,7 +199,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'tab_bg_color',
 			array(
-				'label'     => __( 'Background Color', 'woocommerce-custom-product-tabs' ),
+				'label'     => __( 'Background Color', 'producttabs_plus' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .woocommerce-tabs ul.tabs li' => 'background-color: {{VALUE}} !important;',
@@ -214,14 +214,14 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_tab(
 			'tab_header_active',
 			array(
-				'label' => __( 'Active', 'woocommerce-custom-product-tabs' ),
+				'label' => __( 'Active', 'producttabs_plus' ),
 			)
 		);
 
 		$this->add_control(
 			'tab_active_text_color',
 			array(
-				'label'     => __( 'Text Color', 'woocommerce-custom-product-tabs' ),
+				'label'     => __( 'Text Color', 'producttabs_plus' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .woocommerce-tabs ul.tabs li.active a' => 'color: {{VALUE}} !important;',
@@ -232,7 +232,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'tab_active_bg_color',
 			array(
-				'label'     => __( 'Background Color', 'woocommerce-custom-product-tabs' ),
+				'label'     => __( 'Background Color', 'producttabs_plus' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .woocommerce-tabs ul.tabs li.active' => 'background-color: {{VALUE}} !important;',
@@ -251,7 +251,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'section_content_style',
 			array(
-				'label' => __( 'Content Panel', 'woocommerce-custom-product-tabs' ),
+				'label' => __( 'Content Panel', 'producttabs_plus' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -259,11 +259,11 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'content_text_color',
 			array(
-				'label'     => __( 'Text Color', 'woocommerce-custom-product-tabs' ),
+				'label'     => __( 'Text Color', 'producttabs_plus' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .woocommerce-Tabs-panel' => 'color: {{VALUE}};',
-					'{{WRAPPER}} .wcpt-stacked-panel'     => 'color: {{VALUE}};',
+					'{{WRAPPER}} .ptp-stacked-panel'     => 'color: {{VALUE}};',
 				),
 			)
 		);
@@ -271,11 +271,11 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'content_bg_color',
 			array(
-				'label'     => __( 'Background Color', 'woocommerce-custom-product-tabs' ),
+				'label'     => __( 'Background Color', 'producttabs_plus' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} .woocommerce-Tabs-panel' => 'background-color: {{VALUE}};',
-					'{{WRAPPER}} .wcpt-stacked-panel'     => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .ptp-stacked-panel'     => 'background-color: {{VALUE}};',
 				),
 			)
 		);
@@ -283,12 +283,12 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		$this->add_responsive_control(
 			'content_padding',
 			array(
-				'label'      => __( 'Padding', 'woocommerce-custom-product-tabs' ),
+				'label'      => __( 'Padding', 'producttabs_plus' ),
 				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px', 'em', '%' ),
 				'selectors'  => array(
 					'{{WRAPPER}} .woocommerce-Tabs-panel' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					'{{WRAPPER}} .wcpt-stacked-panel'     => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .ptp-stacked-panel'     => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -320,23 +320,23 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		if ( empty( $tabs ) ) {
 			$tabs = array(
 				'description'            => array(
-					'title'    => ! empty( $settings['title_description'] ) ? $settings['title_description'] : __( 'Info', 'woocommerce-custom-product-tabs' ),
+					'title'    => ! empty( $settings['title_description'] ) ? $settings['title_description'] : __( 'Info', 'producttabs_plus' ),
 					'callback' => function() {
-						echo '<p>' . esc_html( __( 'Sample description content for WooCommerce Product Tabs preview.', 'woocommerce-custom-product-tabs' ) ) . '</p>';
+						echo '<p>' . esc_html( __( 'Sample description content for WooCommerce Product Tabs preview.', 'producttabs_plus' ) ) . '</p>';
 					},
 				),
 				'additional_information' => array(
-					'title'    => ! empty( $settings['title_additional_information'] ) ? $settings['title_additional_information'] : __( 'More Information', 'woocommerce-custom-product-tabs' ),
+					'title'    => ! empty( $settings['title_additional_information'] ) ? $settings['title_additional_information'] : __( 'More Information', 'producttabs_plus' ),
 					'callback' => function() {
-						echo '<p>' . esc_html( __( 'Sample additional details, attributes, and specifications.', 'woocommerce-custom-product-tabs' ) ) . '</p>';
+						echo '<p>' . esc_html( __( 'Sample additional details, attributes, and specifications.', 'producttabs_plus' ) ) . '</p>';
 					},
 				),
 			);
 		}
 
 		?>
-		<div class="wcpt-tabs-wrapper woocommerce-tabs wcpt-layout-<?php echo esc_attr( $settings['display_layout'] ); ?>" style="min-height: 150px;">
-			<ul class="tabs wcpt-tabs-nav" role="tablist">
+		<div class="ptp-tabs-wrapper woocommerce-tabs ptp-layout-<?php echo esc_attr( $settings['display_layout'] ); ?>" style="min-height: 150px;">
+			<ul class="tabs ptp-tabs-nav" role="tablist">
 				<?php
 				$i = 0;
 				foreach ( $tabs as $key => $tab ) :
@@ -344,19 +344,19 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 					$active_class = ( 1 === $i ) ? 'active' : '';
 					?>
 					<li class="<?php echo esc_attr( $active_class ); ?> <?php echo esc_attr( $key ); ?>_tab" id="tab-title-<?php echo esc_attr( $key ); ?>" role="tab">
-						<a href="#tab-<?php echo esc_attr( $key ); ?>" class="wcpt-tab-link"><?php echo wp_kses_post( $tab['title'] ); ?></a>
+						<a href="#tab-<?php echo esc_attr( $key ); ?>" class="ptp-tab-link"><?php echo wp_kses_post( $tab['title'] ); ?></a>
 					</li>
 				<?php endforeach; ?>
 			</ul>
 
-			<div class="wcpt-tabs-panels">
+			<div class="ptp-tabs-panels">
 				<?php
 				$j = 0;
 				foreach ( $tabs as $key => $tab ) :
 					$j++;
 					$display_style = ( 1 === $j ) ? 'display: block;' : 'display: none;';
 					?>
-					<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $key ); ?> panel entry-content wcpt-panel wcpt-animate" id="tab-<?php echo esc_attr( $key ); ?>" role="tabpanel" style="<?php echo esc_attr( $display_style ); ?>">
+					<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $key ); ?> panel entry-content ptp-panel ptp-animate" id="tab-<?php echo esc_attr( $key ); ?>" role="tabpanel" style="<?php echo esc_attr( $display_style ); ?>">
 						<?php
 						if ( isset( $tab['callback'] ) && is_callable( $tab['callback'] ) ) {
 							call_user_func( $tab['callback'], $key, $tab );
@@ -371,31 +371,31 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 
 		<script>
 		jQuery(document).ready(function($) {
-			$(document).off('click.wcpt').on('click.wcpt', '.wcpt-tabs-wrapper .wcpt-tabs-nav a', function(e) {
+			$(document).off('click.ptp').on('click.ptp', '.ptp-tabs-wrapper .ptp-tabs-nav a', function(e) {
 				e.preventDefault();
 				var $link = $(this);
 				var $tabLi = $link.parent('li');
 				var targetId = $link.attr('href');
-				var $wrapper = $link.closest('.wcpt-tabs-wrapper');
+				var $wrapper = $link.closest('.ptp-tabs-wrapper');
 
 				$tabLi.addClass('active').siblings().removeClass('active');
 				var $panel = $wrapper.find(targetId);
 
-				$panel.siblings('.wcpt-panel').hide();
-				$panel.removeClass('wcpt-animate');
+				$panel.siblings('.ptp-panel').hide();
+				$panel.removeClass('ptp-animate');
 				// Trigger reflow for restart animation
 				if ($panel[0]) {
 					void $panel[0].offsetWidth;
 				}
-				$panel.addClass('wcpt-animate').show();
+				$panel.addClass('ptp-animate').show();
 			});
 		});
 		</script>
 		<style>
-		.wcpt-animate {
-			animation: wcptFadeIn var(--wcpt-animation-speed, 300ms) ease-in-out;
+		.ptp-animate {
+			animation: ptpFadeIn var(--ptp-animation-speed, 300ms) ease-in-out;
 		}
-		@keyframes wcptFadeIn {
+		@keyframes ptpFadeIn {
 			from { opacity: 0; transform: translateY(4px); }
 			to { opacity: 1; transform: translateY(0); }
 		}
@@ -410,15 +410,15 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 		var titleAdd  = settings.title_additional_information || 'More Information';
 		var titleRev  = settings.title_reviews || 'Reviews';
 		#>
-		<div class="wcpt-tabs-wrapper woocommerce-tabs" style="min-height: 150px;">
-			<ul class="tabs wcpt-tabs-nav">
+		<div class="ptp-tabs-wrapper woocommerce-tabs" style="min-height: 150px;">
+			<ul class="tabs ptp-tabs-nav">
 				<li class="active description_tab"><a href="#tab-description">{{{ titleDesc }}}</a></li>
 				<li class="additional_information_tab"><a href="#tab-additional_information">{{{ titleAdd }}}</a></li>
 				<li class="reviews_tab"><a href="#tab-reviews">{{{ titleRev }}}</a></li>
 			</ul>
-			<div class="wcpt-tabs-panels" style="padding: 15px; border: 1px dashed #ccc; min-height: 80px;">
+			<div class="ptp-tabs-panels" style="padding: 15px; border: 1px dashed #ccc; min-height: 80px;">
 				<div id="tab-description" class="woocommerce-Tabs-panel">
-					<p><?php esc_html_e( 'Description panel preview in Elementor editor.', 'woocommerce-custom-product-tabs' ); ?></p>
+					<p><?php esc_html_e( 'Description panel preview in Elementor editor.', 'producttabs_plus' ); ?></p>
 				</div>
 			</div>
 		</div>
@@ -429,7 +429,7 @@ class WCPT_Elementor_Widget extends \Elementor\Widget_Base {
 /**
  * Register Elementor Widget.
  */
-function wcpt_register_elementor_widget( $widgets_manager ) {
-	$widgets_manager->register( new \WCPT_Elementor_Widget() );
+function ptp_register_elementor_widget( $widgets_manager ) {
+	$widgets_manager->register( new \PTP_Elementor_Widget() );
 }
-add_action( 'elementor/widgets/register', 'wcpt_register_elementor_widget' );
+add_action( 'elementor/widgets/register', 'ptp_register_elementor_widget' );

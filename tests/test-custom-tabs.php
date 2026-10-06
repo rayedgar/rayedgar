@@ -1,6 +1,6 @@
 <?php
 /**
- * Unit tests for WooCommerce Custom Product Tabs plugin.
+ * Unit tests for ProductTabs Plus plugin.
  */
 
 namespace Elementor {
@@ -65,8 +65,8 @@ namespace {
 	function wp_strip_all_tags( $str ) { return strip_tags( (string) $str ); }
 	function wp_kses_post( $str ) { return $str; }
 	function apply_filters( $tag, $value ) { return $value; }
-	function plugin_dir_path( $file ) { return __DIR__ . '/../woocommerce-custom-product-tabs/'; }
-	function plugin_dir_url( $file ) { return 'http://example.com/wp-content/plugins/woocommerce-custom-product-tabs/'; }
+	function plugin_dir_path( $file ) { return __DIR__ . '/../producttabs_plus/'; }
+	function plugin_dir_url( $file ) { return 'http://example.com/wp-content/plugins/producttabs_plus/'; }
 
 	function get_post_meta( $post_id, $key = '', $single = false ) {
 		global $post_meta_db;
@@ -135,10 +135,10 @@ namespace {
 	}
 
 	// Load plugin file
-	require_once __DIR__ . '/../woocommerce-custom-product-tabs/woocommerce-custom-product-tabs.php';
-	wcpt_init_elementor_widget();
+	require_once __DIR__ . '/../producttabs_plus/producttabs_plus.php';
+	ptp_init_elementor_widget();
 
-	echo "Running WooCommerce Custom Product Tabs Unit Tests...\n\n";
+	echo "Running ProductTabs Plus Unit Tests...\n\n";
 
 	// Test 1: Category and Product Targeting Matching
 	echo "Test 1: Rule Matching logic...\n";
@@ -149,17 +149,17 @@ namespace {
 	// Setup custom tab post 1
 	$tab_post1 = (object) array(
 		'ID'          => 1,
-		'post_type'   => 'wcpt_custom_tab',
+		'post_type'   => 'ptp_custom_tab',
 		'post_status' => 'publish',
 		'post_title'  => 'Sizing Guide',
 		'post_content'=> '<p>Size chart details</p>',
 	);
 	$posts_db[1] = $tab_post1;
 
-	update_post_meta( 1, '_wcpt_categories', '12, clothing' );
-	update_post_meta( 1, '_wcpt_priority', '15' );
+	update_post_meta( 1, '_ptp_categories', '12, clothing' );
+	update_post_meta( 1, '_ptp_priority', '15' );
 
-	$matches = wcpt_is_tab_matching_product( 1, 100 );
+	$matches = ptp_is_tab_matching_product( 1, 100 );
 	if ( $matches ) {
 		echo " [PASS] Category rule matched successfully.\n";
 	} else {
@@ -170,17 +170,17 @@ namespace {
 	// Setup custom tab post 2 (targeted to SKU-APPAREL-1 => product 101)
 	$tab_post2 = (object) array(
 		'ID'          => 2,
-		'post_type'   => 'wcpt_custom_tab',
+		'post_type'   => 'ptp_custom_tab',
 		'post_status' => 'publish',
 		'post_title'  => 'Care Instructions',
 		'post_content'=> '<p>Wash cold only.</p>',
 	);
 	$posts_db[2] = $tab_post2;
 
-	update_post_meta( 2, '_wcpt_products', 'SKU-APPAREL-1' );
-	update_post_meta( 2, '_wcpt_priority', '5' );
+	update_post_meta( 2, '_ptp_products', 'SKU-APPAREL-1' );
+	update_post_meta( 2, '_ptp_priority', '5' );
 
-	$matches_sku = wcpt_is_tab_matching_product( 2, 101 );
+	$matches_sku = ptp_is_tab_matching_product( 2, 101 );
 	if ( $matches_sku ) {
 		echo " [PASS] Product SKU rule matched successfully.\n";
 	} else {
@@ -203,10 +203,10 @@ namespace {
 		),
 	);
 
-	$result_tabs = wcpt_add_custom_product_tabs( $initial_tabs );
+	$result_tabs = ptp_add_custom_product_tabs( $initial_tabs );
 
 	$tab_keys = array_keys( $result_tabs );
-	if ( count( $result_tabs ) === 2 && 'wcpt_tab_2' === $tab_keys[0] && 'description' === $tab_keys[1] ) {
+	if ( count( $result_tabs ) === 2 && 'ptp_tab_2' === $tab_keys[0] && 'description' === $tab_keys[1] ) {
 		echo " [PASS] Tab injected and priority sorted (Priority 5 came before Priority 10).\n";
 	} else {
 		echo " [FAIL] Tab injection or priority sorting failed.\n";
@@ -217,7 +217,7 @@ namespace {
 	// Test 3: Plain text product attributes tag stripping
 	echo "Test 3: Plain text product attributes filter...\n";
 
-	update_option( 'wcpt_plain_text_attributes', true );
+	update_option( 'ptp_plain_text_attributes', true );
 	$attributes = array(
 		'material' => array(
 			'name'  => 'Material',
@@ -225,7 +225,7 @@ namespace {
 		),
 	);
 
-	$filtered_attrs = wcpt_filter_product_attributes( $attributes, null );
+	$filtered_attrs = ptp_filter_product_attributes( $attributes, null );
 	if ( '100% Organic Cotton' === $filtered_attrs['material']['value'] ) {
 		echo " [PASS] HTML tags stripped from attribute value successfully.\n";
 	} else {
@@ -237,14 +237,14 @@ namespace {
 	echo "Test 4: Elementor Widget render output...\n";
 
 	ob_start();
-	$widget = new \WCPT_Elementor_Widget();
+	$widget = new \PTP_Elementor_Widget();
 	$reflector = new \ReflectionClass( $widget );
 	$method = $reflector->getMethod( 'render' );
 	$method->setAccessible( true );
 	$method->invoke( $widget );
 	$output = ob_get_clean();
 
-	if ( strpos( $output, 'Custom Info' ) !== false && strpos( $output, 'wcpt-tabs-wrapper' ) !== false ) {
+	if ( strpos( $output, 'Custom Info' ) !== false && strpos( $output, 'ptp-tabs-wrapper' ) !== false ) {
 		echo " [PASS] Elementor Widget rendered custom title overrides and wrapper HTML successfully.\n";
 	} else {
 		echo " [FAIL] Elementor Widget render failed.\n";
@@ -260,5 +260,5 @@ namespace {
 		exit( 1 );
 	}
 
-	echo "\nAll WooCommerce Custom Product Tabs tests passed successfully!\n";
+	echo "\nAll ProductTabs Plus tests passed successfully!\n";
 }
