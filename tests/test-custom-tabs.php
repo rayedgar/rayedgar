@@ -196,17 +196,29 @@ namespace {
 	};
 
 	$initial_tabs = array(
-		'description' => array(
+		'description'            => array(
 			'title'    => 'Description',
 			'priority' => 10,
 			'callback' => 'woocommerce_product_description_tab',
+		),
+		'additional_information' => array(
+			'title'    => 'Additional Information',
+			'priority' => 20,
+			'callback' => 'woocommerce_product_additional_information_tab',
 		),
 	);
 
 	$result_tabs = ptp_add_custom_product_tabs( $initial_tabs );
 
 	$tab_keys = array_keys( $result_tabs );
-	if ( count( $result_tabs ) === 2 && 'ptp_tab_2' === $tab_keys[0] && 'description' === $tab_keys[1] ) {
+	if ( isset( $result_tabs['additional_information'] ) && 'Specs' === $result_tabs['additional_information']['title'] ) {
+		echo " [PASS] Default additional_information tab title renamed to Specs.\n";
+	} else {
+		echo " [FAIL] Default additional_information tab title rename failed.\n";
+		exit( 1 );
+	}
+
+	if ( count( $result_tabs ) === 3 && 'ptp_tab_2' === $tab_keys[0] && 'description' === $tab_keys[1] ) {
 		echo " [PASS] Tab injected and priority sorted (Priority 5 came before Priority 10).\n";
 	} else {
 		echo " [FAIL] Tab injection or priority sorting failed.\n";

@@ -249,6 +249,10 @@ function ptp_is_tab_matching_product( $tab_id, $product_id ) {
 function ptp_add_custom_product_tabs( $tabs ) {
 	global $product, $post;
 
+	if ( isset( $tabs['additional_information'] ) ) {
+		$tabs['additional_information']['title'] = __( 'Specs', 'producttabs_plus' );
+	}
+
 	$product_id = 0;
 	if ( is_object( $product ) && method_exists( $product, 'get_id' ) ) {
 		$product_id = $product->get_id();
@@ -358,6 +362,13 @@ function ptp_inject_global_styles() {
 		.woocommerce-product-attributes-item {
 			background: transparent !important;
 			background-color: transparent !important;
+			border: none !important;
+			border-top: none !important;
+			border-bottom: none !important;
+			border-left: none !important;
+			border-right: none !important;
+			box-shadow: none !important;
+			outline: none !important;
 		}
 		table.woocommerce-product-attributes {
 			width: 100% !important;
