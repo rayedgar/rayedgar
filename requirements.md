@@ -1,5 +1,9 @@
 # User Requirements
 
-- The user explicitly requested: "make sure the specs tab tat contains the attributes info can be aligned, left or right. it does not seem to do anything in this version."
-- Fix text alignment for the Additional Information / Specs tab table elements (`.woocommerce-product-attributes`, `th`, `td`, `.woocommerce-product-attributes-item__label`, `.woocommerce-product-attributes-item__value`, `p`).
-- Add an alignment setting control in the Elementor widget (`PTP_Elementor_Widget`) and improve global CSS injection for `ptp_attribute_alignment`.
+- The user explicitly requested:
+  1. "fix overlapping column in the attribute tab. extend radius in the tab section the tab itself with top, left, bottom, right. Add colour option in tab section"
+  2. "remove the links in the attributes"
+- Stripping HTML links (`<a>` tags or all HTML tags) from WooCommerce product attribute values so attributes display as plain text rather than clickable taxonomy links.
+- Fix attribute table column overlapping (`table-layout: fixed`, `word-break: break-word`, explicit column widths).
+- Add Border Radius dimensions control (top, right, bottom, left) for tab headers.
+- Add Border Color and Hover state text/background/border color controls for tab headers.

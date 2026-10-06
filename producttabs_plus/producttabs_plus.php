@@ -326,11 +326,9 @@ function ptp_render_custom_tab_content( $key, $tab ) {
  * Convert product attributes to plain text if needed.
  */
 function ptp_filter_product_attributes( $product_attributes, $product ) {
-	if ( get_option( 'ptp_plain_text_attributes', false ) ) {
-		foreach ( $product_attributes as $key => $attribute ) {
-			if ( isset( $attribute['value'] ) ) {
-				$product_attributes[ $key ]['value'] = wp_strip_all_tags( $attribute['value'] );
-			}
+	foreach ( $product_attributes as $key => $attribute ) {
+		if ( isset( $attribute['value'] ) ) {
+			$product_attributes[ $key ]['value'] = wp_strip_all_tags( $attribute['value'] );
 		}
 	}
 	return $product_attributes;
@@ -352,6 +350,26 @@ function ptp_inject_global_styles() {
 		.woocommerce-product-attributes-item__value,
 		.woocommerce-product-attributes-item__value p {
 			text-align: <?php echo esc_attr( $alignment ); ?> !important;
+		}
+		table.woocommerce-product-attributes {
+			width: 100% !important;
+			table-layout: fixed !important;
+			border-collapse: collapse !important;
+			box-sizing: border-box !important;
+		}
+		.woocommerce-product-attributes th.woocommerce-product-attributes-item__label {
+			width: 35% !important;
+			word-break: break-word !important;
+			overflow-wrap: break-word !important;
+			box-sizing: border-box !important;
+			padding: 8px 12px !important;
+		}
+		.woocommerce-product-attributes td.woocommerce-product-attributes-item__value {
+			width: 65% !important;
+			word-break: break-word !important;
+			overflow-wrap: break-word !important;
+			box-sizing: border-box !important;
+			padding: 8px 12px !important;
 		}
 		.woocommerce-product-attributes-item {
 			align-items: flex-start !important;

@@ -117,6 +117,19 @@ class PTP_Elementor_Widget extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_responsive_control(
+			'tab_border_radius',
+			array(
+				'label'      => __( 'Tab Border Radius', 'producttabs_plus' ),
+				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li'   => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li a' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}} !important;',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 
 		// Content Section - Layout & Animation Settings
@@ -239,6 +252,61 @@ class PTP_Elementor_Widget extends \Elementor\Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'tab_border_color',
+			array(
+				'label'     => __( 'Border Color', 'producttabs_plus' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li' => 'border-color: {{VALUE}} !important;',
+				),
+			)
+		);
+
+		$this->end_controls_tab();
+
+		// Hover Tab State
+		$this->start_controls_tab(
+			'tab_header_hover',
+			array(
+				'label' => __( 'Hover', 'producttabs_plus' ),
+			)
+		);
+
+		$this->add_control(
+			'tab_hover_text_color',
+			array(
+				'label'     => __( 'Text Color', 'producttabs_plus' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li:hover a' => 'color: {{VALUE}} !important;',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_hover_bg_color',
+			array(
+				'label'     => __( 'Background Color', 'producttabs_plus' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li:hover'   => 'background-color: {{VALUE}} !important;',
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li:hover a' => 'background-color: {{VALUE}} !important;',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_hover_border_color',
+			array(
+				'label'     => __( 'Border Color', 'producttabs_plus' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li:hover' => 'border-color: {{VALUE}} !important;',
+				),
+			)
+		);
+
 		$this->end_controls_tab();
 
 		// Active Tab State
@@ -268,6 +336,17 @@ class PTP_Elementor_Widget extends \Elementor\Widget_Base {
 				'selectors' => array(
 					'{{WRAPPER}} .woocommerce-tabs ul.tabs li.active' => 'background-color: {{VALUE}} !important;',
 					'{{WRAPPER}} .woocommerce-tabs ul.tabs li.active a' => 'background-color: {{VALUE}} !important;',
+				),
+			)
+		);
+
+		$this->add_control(
+			'tab_active_border_color',
+			array(
+				'label'     => __( 'Border Color', 'producttabs_plus' ),
+				'type'      => \Elementor\Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .woocommerce-tabs ul.tabs li.active' => 'border-color: {{VALUE}} !important;',
 				),
 			)
 		);
