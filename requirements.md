@@ -3,6 +3,9 @@
 ## Overview
 Custom Elementor plugin for WooCommerce called **Advanced Related Products Elementor Widget** (or `elementor-product-related-widget`).
 
+## Version
+- Version: **1.0.6**
+
 ## Features & Controls
 1. **Plugin Architecture & Dependency Checks**:
    - Main plugin file: `elementor-product-related-widget/elementor-product-related-widget.php`
@@ -13,11 +16,10 @@ Custom Elementor plugin for WooCommerce called **Advanced Related Products Eleme
 2. **Widget Functionality (`Product_Related_Widget`)**:
    - **Name**: `product_related`
    - **Title**: `Advanced Product Related`
-   - **Product Query & Display Fixes**:
+   - **Product Query & Display**:
      - Queries related products for single product pages.
      - Fallback query for published products when `wc_get_related_products()` returns empty or when used on non-single product pages / Elementor editor mode.
-     - Fallback dummy preview rendering in editor mode if no products exist in the database.
-     - Removed breaking CSS selector (`display: none`) from `products_count` control so all rendered products remain visible.
+     - Fallback dummy preview rendering in editor mode if no products exist in database.
    - **Content Section**:
      - Switcher & Text control for Section Title ("Related Products").
      - Responsive Number control for 'Amount of Products to show'.
@@ -29,12 +31,16 @@ Custom Elementor plugin for WooCommerce called **Advanced Related Products Eleme
      - Responsive Slider control for 'Image Width'.
    - **Style Sections**:
      - Section Title styling (Alignment, Color, Typography, Spacing).
-     - Product Name styling (Color, Typography, Spacing).
+     - **Product Name Hover Text Background**:
+       - Normal and Hover tabs for Product Name styling.
+       - Color control with transparency support for Hover Text Background behind product name (`product_name_bg_hover`).
+       - Smooth CSS transition for text hover background.
+       - Text Padding and Text Border Radius controls for customized hover text background styling.
      - Image & Hover styling (Hover Overlay Background, Columns Gap, Rows Gap, Box Padding, Normal/Hover Border, Box Shadow, Background Color, Border Radius).
 
 3. **Render & Preview Capabilities**:
    - `render()` method queries related/published products with fallbacks.
-   - Outputs CSS Grid layout.
+   - Outputs CSS Grid layout with smooth hover transitions.
    - Live editor template in `content_template()`.
 
 4. **Testing**:

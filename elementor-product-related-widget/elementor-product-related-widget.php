@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Advanced Related Products Elementor Widget
  * Description: Custom Elementor widget to display related products on single product pages.
- * Version: 1.0.5
+ * Version: 1.0.6
  * Author: Jules
  * Text Domain: elementor-product-related-widget
  */

@@ -144,9 +144,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'selectors' => [
 					'{{WRAPPER}} .product-hover-overlay' => 'opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; transition: all 0.3s ease; pointer-events: none; z-index: 10;',
 					'{{WRAPPER}} .product-image-wrapper:hover .product-hover-overlay' => 'opacity: 1;',
-					'{{WRAPPER}} .product-name a' => 'color: inherit; text-decoration: none;',
+					'{{WRAPPER}} .product-name a' => 'color: inherit; text-decoration: none; transition: all 0.3s ease;',
 					'{{WRAPPER}} .product-image-wrapper img' => 'width: 100%; height: auto; display: block;',
-					'{{WRAPPER}} .product-name' => 'display: block; width: 100%; margin: 0; padding: 0; opacity: 1; visibility: visible;',
+					'{{WRAPPER}} .product-name' => 'display: block; width: 100%; margin: 0; padding: 0; opacity: 1; visibility: visible; transition: all 0.3s ease;',
 					'{{WRAPPER}} .product-item-content' => 'display: block; width: 100%;',
 					'{{WRAPPER}} .product-hover-overlay .product-name' => 'margin: 0; padding: 10px;',
 					'{{WRAPPER}} .product-image-wrapper' => 'position: relative; overflow: hidden;',
@@ -306,6 +306,15 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 			]
 		);
 
+		$this->start_controls_tabs( 'product_name_style_tabs' );
+
+		$this->start_controls_tab(
+			'product_name_style_normal',
+			[
+				'label' => esc_html__( 'Normal', 'elementor-product-related-widget' ),
+			]
+		);
+
 		$this->add_control(
 			'product_name_color',
 			[
@@ -313,16 +322,92 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'type' => \Elementor\Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} .product-name' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .product-name a' => 'color: {{VALUE}};',
 					'{{WRAPPER}} .product-hover-overlay .product-name' => 'color: {{VALUE}};',
 				],
 			]
 		);
+
+		$this->add_control(
+			'product_name_bg',
+			[
+				'label' => esc_html__( 'Background Color', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .product-name' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .product-hover-overlay .product-name' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'product_name_style_hover',
+			[
+				'label' => esc_html__( 'Hover', 'elementor-product-related-widget' ),
+			]
+		);
+
+		$this->add_control(
+			'product_name_color_hover',
+			[
+				'label' => esc_html__( 'Hover Text Color', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .related-product-item:hover .product-name' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .related-product-item:hover .product-name a' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .product-name:hover' => 'color: {{VALUE}};',
+					'{{WRAPPER}} .product-name a:hover' => 'color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'product_name_bg_hover',
+			[
+				'label' => esc_html__( 'Hover Text Background Color & Transparency', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::COLOR,
+				'selectors' => [
+					'{{WRAPPER}} .related-product-item:hover .product-name' => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} .product-name:hover' => 'background-color: {{VALUE}};',
+				],
+			]
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
 
 		$this->add_group_control(
 			\Elementor\Group_Control_Typography::get_type(),
 			[
 				'name' => 'product_name_typography',
 				'selector' => '{{WRAPPER}} .product-name, {{WRAPPER}} .product-hover-overlay .product-name',
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_name_padding',
+			[
+				'label' => esc_html__( 'Text Padding', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', 'em', '%' ],
+				'selectors' => [
+					'{{WRAPPER}} .product-name' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'product_name_border_radius',
+			[
+				'label' => esc_html__( 'Text Border Radius', 'elementor-product-related-widget' ),
+				'type' => \Elementor\Controls_Manager::DIMENSIONS,
+				'size_units' => [ 'px', '%' ],
+				'selectors' => [
+					'{{WRAPPER}} .product-name' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
 			]
 		);
 
