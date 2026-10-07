@@ -1,7 +1,7 @@
 # Requirements: Advanced Related Products Elementor Widget
 
 ## Overview
-Re-create / restore the custom Elementor plugin for WooCommerce called **Advanced Related Products Elementor Widget** (or `elementor-product-related-widget`).
+Custom Elementor plugin for WooCommerce called **Advanced Related Products Elementor Widget** (or `elementor-product-related-widget`).
 
 ## Features & Controls
 1. **Plugin Architecture & Dependency Checks**:
@@ -12,7 +12,12 @@ Re-create / restore the custom Elementor plugin for WooCommerce called **Advance
 
 2. **Widget Functionality (`Product_Related_Widget`)**:
    - **Name**: `product_related`
-   - **Title**: `Advanced Product Related` / `Product Related`
+   - **Title**: `Advanced Product Related`
+   - **Product Query & Display Fixes**:
+     - Queries related products for single product pages.
+     - Fallback query for published products when `wc_get_related_products()` returns empty or when used on non-single product pages / Elementor editor mode.
+     - Fallback dummy preview rendering in editor mode if no products exist in the database.
+     - Removed breaking CSS selector (`display: none`) from `products_count` control so all rendered products remain visible.
    - **Content Section**:
      - Switcher & Text control for Section Title ("Related Products").
      - Responsive Number control for 'Amount of Products to show'.
@@ -28,7 +33,7 @@ Re-create / restore the custom Elementor plugin for WooCommerce called **Advance
      - Image & Hover styling (Hover Overlay Background, Columns Gap, Rows Gap, Box Padding, Normal/Hover Border, Box Shadow, Background Color, Border Radius).
 
 3. **Render & Preview Capabilities**:
-   - `render()` method queries related products via `wc_get_related_products()`.
+   - `render()` method queries related/published products with fallbacks.
    - Outputs CSS Grid layout.
    - Live editor template in `content_template()`.
 

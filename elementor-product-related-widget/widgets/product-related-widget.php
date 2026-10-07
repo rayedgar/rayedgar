@@ -67,10 +67,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				'min' => 1,
 				'max' => 50,
 				'default' => 4,
-				'selectors' => [
-					'{{WRAPPER}} .related-product-item' => 'display: none;',
-					'{{WRAPPER}} .related-product-item:nth-child(-n+{{VALUE}})' => 'display: block;',
-				],
 			]
 		);
 
@@ -442,41 +438,54 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		$settings = $this->get_settings_for_display();
 		$is_editor = \Elementor\Plugin::$instance->editor->is_edit_mode();
 
-		if ( ! is_singular( 'product' ) ) {
-			if ( $is_editor ) {
-				echo '<div class="elementor-alert elementor-alert-warning">' . esc_html__( 'Related products are only visible on single product pages.', 'elementor-product-related-widget' ) . '</div>';
-			}
-			return;
-		}
-
-		global $post;
-		$product = wc_get_product( $post->ID );
-		if ( ! $product ) {
-			if ( $is_editor ) echo '<div class="elementor-alert elementor-alert-warning">' . esc_html__( 'Product data not found.', 'elementor-product-related-widget' ) . '</div>';
-			return;
-		}
-
-		$max_posts = (int) $settings['products_count'];
+		$max_posts = (int) ( ! empty( $settings['products_count'] ) ? $settings['products_count'] : 4 );
 		foreach ( $settings as $key => $value ) {
 			if ( strpos( $key, 'products_count_' ) === 0 && ! empty( $value ) ) {
 				$max_posts = max( $max_posts, (int) $value );
 			}
 		}
 
-		$related_ids = wc_get_related_products( $post->ID, $max_posts );
-		if ( empty( $related_ids ) ) {
-			if ( $is_editor ) echo '<div class="elementor-alert elementor-alert-info">' . esc_html__( 'No related products found for this product.', 'elementor-product-related-widget' ) . '</div>';
-			return;
+		global $post;
+		$product_id = ( $post && is_singular( 'product' ) ) ? $post->ID : 0;
+		$related_ids = [];
+
+		if ( $product_id && function_exists( 'wc_get_related_products' ) ) {
+			$related_ids = wc_get_related_products( $product_id, $max_posts );
 		}
 
-		$args = [ 'post_type' => 'product', 'post__in' => $related_ids, 'posts_per_page' => $max_posts, 'orderby' => 'post__in' ];
+		if ( ! empty( $related_ids ) ) {
+			$args = [
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'post__in'       => $related_ids,
+				'posts_per_page' => $max_posts,
+				'orderby'        => 'post__in',
+			];
+		} else {
+			// Fallback: query recent published products if wc_get_related_products returns empty or not on single product
+			$args = [
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'posts_per_page' => $max_posts,
+			];
+			if ( $product_id ) {
+				$args['post__not_in'] = [ $product_id ];
+			}
+		}
+
 		$query = new \WP_Query( $args );
-		if ( ! $query->have_posts() ) return;
+
+		if ( ! $query->have_posts() ) {
+			if ( $is_editor ) {
+				$this->render_dummy_products( $settings, $max_posts );
+			}
+			return;
+		}
 
 		$this->add_render_attribute( 'wrapper', 'class', 'elementor-product-related-wrapper' );
 		$this->add_render_attribute( 'grid', 'class', 'related-products-grid' );
 		$this->add_render_attribute( 'grid', 'style', 'display: grid;' );
-		$this->add_render_attribute( 'wrapper', 'class', 'hover-reveal-' . $settings['hover_reveal_effect'] );
+		$this->add_render_attribute( 'wrapper', 'class', 'hover-reveal-' . ( $settings['hover_reveal_effect'] ?? 'fade' ) );
 
 		?>
 		<style>
@@ -494,18 +503,27 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 				<?php
 				while ( $query->have_posts() ) :
 					$query->the_post();
-					$product_obj = wc_get_product( get_the_ID() );
+					$product_obj = function_exists('wc_get_product') ? wc_get_product( get_the_ID() ) : false;
+					$img_html = '';
+					if ( $product_obj && method_exists( $product_obj, 'get_image' ) ) {
+						$img_html = $product_obj->get_image();
+					} elseif ( function_exists( 'get_the_post_thumbnail' ) ) {
+						$img_html = get_the_post_thumbnail( get_the_ID(), 'woocommerce_thumbnail' );
+					}
+					if ( empty( $img_html ) ) {
+						$img_html = '<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 100px;"><i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i></div>';
+					}
 					?>
 					<div class="related-product-item">
 						<div class="product-item-content">
 							<div class="product-image-wrapper">
 								<a href="<?php the_permalink(); ?>">
-									<?php echo $product_obj->get_image(); ?>
+									<?php echo $img_html; ?>
 								</a>
 								<?php if ( 'overlay' === $settings['product_title_position'] ) : ?>
 									<div class="product-hover-overlay">
 										<h3 class="product-name hover-title">
-											<?php the_title(); ?>
+											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 										</h3>
 									</div>
 								<?php endif; ?>
@@ -521,6 +539,43 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 						</div>
 					</div>
 				<?php endwhile; wp_reset_postdata(); ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	private function render_dummy_products( $settings, $max_posts ) {
+		?>
+		<div class="elementor-product-related-wrapper hover-reveal-<?php echo esc_attr( $settings['hover_reveal_effect'] ?? 'fade' ); ?>">
+			<?php if ( 'yes' === $settings['show_section_title'] && ! empty( $settings['section_title'] ) ) : ?>
+				<h2 class="related-title"><?php echo esc_html( $settings['section_title'] ); ?></h2>
+			<?php endif; ?>
+
+			<div class="related-products-grid" style="display: grid;">
+				<?php for ( $i = 0; $i < $max_posts; $i++ ) : ?>
+					<div class="related-product-item">
+						<div class="product-item-content">
+							<div class="product-image-wrapper">
+								<div class="dummy-image" style="background: #eee; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 100px;">
+									<i class="eicon-image-bold" style="font-size: 48px; color: #ccc;"></i>
+								</div>
+								<?php if ( 'overlay' === $settings['product_title_position'] ) : ?>
+									<div class="product-hover-overlay">
+										<h3 class="product-name hover-title">
+											Product Title <?php echo ( $i + 1 ); ?>
+										</h3>
+									</div>
+								<?php endif; ?>
+							</div>
+
+							<?php if ( 'underneath' === $settings['product_title_position'] ) : ?>
+								<h3 class="product-name">
+									Product Title <?php echo ( $i + 1 ); ?>
+								</h3>
+							<?php endif; ?>
+						</div>
+					</div>
+				<?php endfor; ?>
 			</div>
 		</div>
 		<?php

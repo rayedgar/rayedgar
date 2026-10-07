@@ -2,7 +2,9 @@
 
 namespace {
     // Mock ABSPATH
-    define('ABSPATH', true);
+    if (!defined('ABSPATH')) {
+        define('ABSPATH', true);
+    }
 
     // Mock esc_html__
     if (!function_exists('esc_html__')) {
@@ -14,6 +16,13 @@ namespace {
     // Mock esc_html
     if (!function_exists('esc_html')) {
         function esc_html($text) {
+            return $text;
+        }
+    }
+
+    // Mock esc_attr
+    if (!function_exists('esc_attr')) {
+        function esc_attr($text) {
             return $text;
         }
     }
@@ -159,11 +168,13 @@ namespace {
 
     function wp_reset_postdata() {}
 
+    $GLOBALS['mock_query_posts_count'] = 4;
     class WP_Query {
         public $posts;
         private $index = 0;
         public function __construct($args) {
-            $this->posts = [1, 2, 3, 4];
+            $count = $GLOBALS['mock_query_posts_count'];
+            $this->posts = array_fill(0, $count, 1);
         }
         public function have_posts() {
             return $this->index < count($this->posts);
@@ -197,7 +208,7 @@ namespace {
     // Mock global $post
     $GLOBALS['post'] = (object) ['ID' => 1];
 
-    // Test Case: Underneath Position Visibility
+    // Test Case 1: Underneath Position Visibility
     echo "Test Case: Underneath Position Visibility\n";
     $GLOBALS['test_settings'] = [
         'show_section_title' => 'yes',
@@ -215,7 +226,31 @@ namespace {
         echo " - Visibility test failed.\n";
     }
 
-    // Test Case: Controls Registration
+    // Test Case 2: Fallback Query when wc_get_related_products returns empty
+    echo "Test Case: Fallback Query when related IDs empty\n";
+    $GLOBALS['related_ids'] = [];
+    ob_start();
+    $widget->public_render();
+    $output = ob_get_clean();
+    if (strpos($output, 'related-product-item') !== false) {
+        echo " - Fallback query test passed.\n";
+    } else {
+        echo " - Fallback query test failed.\n";
+    }
+
+    // Test Case 3: Editor Dummy Fallback when no posts exist
+    echo "Test Case: Editor Dummy Fallback when query empty\n";
+    $GLOBALS['mock_query_posts_count'] = 0;
+    ob_start();
+    $widget->public_render();
+    $output = ob_get_clean();
+    if (strpos($output, 'Product Title 1') !== false) {
+        echo " - Dummy preview fallback test passed.\n";
+    } else {
+        echo " - Dummy preview fallback test failed.\n";
+    }
+
+    // Test Case 4: Controls Registration
     echo "Test Case: Controls Registration\n";
     try {
         $widget->public_register_controls();
