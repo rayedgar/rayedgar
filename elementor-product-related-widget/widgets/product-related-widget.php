@@ -116,7 +116,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
-		// Section Title Style
 		$this->start_controls_section( 'section_title_style', [
 			'label' => esc_html__( 'Section Title', 'elementor-product-related-widget' ),
 			'tab' => \Elementor\Controls_Manager::TAB_STYLE,
@@ -151,7 +150,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
-		// Product Name Style
 		$this->start_controls_section( 'product_name_style', [
 			'label' => esc_html__( 'Product Name', 'elementor-product-related-widget' ),
 			'tab' => \Elementor\Controls_Manager::TAB_STYLE,
@@ -229,7 +227,6 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 
 		$this->end_controls_section();
 
-		// Image & Hover Style
 		$this->start_controls_section( 'product_image_style', [
 			'label' => esc_html__( 'Image & Hover', 'elementor-product-related-widget' ),
 			'tab' => \Elementor\Controls_Manager::TAB_STYLE,

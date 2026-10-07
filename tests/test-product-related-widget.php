@@ -1,37 +1,30 @@
 <?php
 
 namespace {
-    // Mock ABSPATH
     if (!defined('ABSPATH')) {
         define('ABSPATH', true);
     }
 
-    // Mock esc_html__
     if (!function_exists('esc_html__')) {
         function esc_html__($text, $domain) {
             return $text;
         }
     }
 
-    // Mock esc_html
     if (!function_exists('esc_html')) {
         function esc_html($text) {
             return $text;
         }
     }
 
-    // Mock esc_attr
     if (!function_exists('esc_attr')) {
         function esc_attr($text) {
             return $text;
         }
     }
 
-    // Mock add_action
     if (!function_exists('add_action')) {
-        function add_action($hook, $callback) {
-            // No-op
-        }
+        function add_action($hook, $callback) {}
     }
 
     if (!function_exists('did_action')) {
@@ -45,7 +38,6 @@ namespace {
     }
 }
 
-// Mock \Elementor\Widget_Base
 namespace Elementor {
     if (!class_exists('Widget_Base')) {
         class Widget_Base {
@@ -132,7 +124,6 @@ namespace Elementor {
     }
 }
 
-// Mock WooCommerce and WP functions
 namespace {
     $GLOBALS['is_singular_product'] = true;
     function is_singular($type) {
@@ -184,10 +175,8 @@ namespace {
         }
     }
 
-    // Initialize Elementor instance
     \Elementor\Plugin::$instance = new \Elementor\Plugin();
 
-    // Include the widget class
     require_once __DIR__ . '/../elementor-product-related-widget/widgets/product-related-widget.php';
 
     if (!class_exists('Testable_Product_Related_Widget')) {
@@ -201,14 +190,11 @@ namespace {
         }
     }
 
-    // Test instantiation
     $widget = new Testable_Product_Related_Widget();
     echo "Widget Name: " . $widget->get_name() . "\n";
 
-    // Mock global $post
     $GLOBALS['post'] = (object) ['ID' => 1];
 
-    // Test Case 1: Underneath Position Visibility
     echo "Test Case: Underneath Position Visibility\n";
     $GLOBALS['test_settings'] = [
         'show_section_title' => 'yes',
@@ -226,7 +212,6 @@ namespace {
         echo " - Visibility test failed.\n";
     }
 
-    // Test Case 2: Fallback Query when wc_get_related_products returns empty
     echo "Test Case: Fallback Query when related IDs empty\n";
     $GLOBALS['related_ids'] = [];
     ob_start();
@@ -238,7 +223,6 @@ namespace {
         echo " - Fallback query test failed.\n";
     }
 
-    // Test Case 3: Editor Dummy Fallback when no posts exist
     echo "Test Case: Editor Dummy Fallback when query empty\n";
     $GLOBALS['mock_query_posts_count'] = 0;
     ob_start();
@@ -250,7 +234,6 @@ namespace {
         echo " - Dummy preview fallback test failed.\n";
     }
 
-    // Test Case 4: Controls Registration
     echo "Test Case: Controls Registration\n";
     try {
         $widget->public_register_controls();
