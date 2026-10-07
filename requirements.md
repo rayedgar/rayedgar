@@ -6,6 +6,10 @@ Custom Elementor plugin for WooCommerce called **Advanced Related Products Eleme
 ## Version
 - Version: **1.0.6**
 
+## Code Optimization & Description Text Removal
+- Empty `Description:` field in plugin header.
+- Streamlined, highly compact, and efficient code in main plugin class and widget class.
+
 ## Features & Controls
 1. **Plugin Architecture & Dependency Checks**:
    - Main plugin file: `elementor-product-related-widget/elementor-product-related-widget.php`
@@ -31,16 +35,11 @@ Custom Elementor plugin for WooCommerce called **Advanced Related Products Eleme
      - Responsive Slider control for 'Image Width'.
    - **Style Sections**:
      - Section Title styling (Alignment, Color, Typography, Spacing).
-     - **Product Name Hover Text Background**:
-       - Normal and Hover tabs for Product Name styling.
-       - Color control with transparency support for Hover Text Background behind product name (`product_name_bg_hover`).
-       - Smooth CSS transition for text hover background.
-       - Text Padding and Text Border Radius controls for customized hover text background styling.
+     - Product Name Hover Text Background (Normal & Hover tabs, color & transparency picker, padding, border-radius).
      - Image & Hover styling (Hover Overlay Background, Columns Gap, Rows Gap, Box Padding, Normal/Hover Border, Box Shadow, Background Color, Border Radius).
 
 3. **Render & Preview Capabilities**:
    - `render()` method queries related/published products with fallbacks.
-   - Outputs CSS Grid layout with smooth hover transitions.
    - Live editor template in `content_template()`.
 
 4. **Testing**:
