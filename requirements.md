@@ -4,7 +4,11 @@
 Custom Elementor plugin for WooCommerce called **Advanced Related Products Elementor Widget** (or `elementor-product-related-widget`).
 
 ## Version
-- Version: **1.0.7** (incremented version number)
+- Version: **1.0.8** (incremented version number)
+
+## Code Minification & Description Removal
+- Completely removed `Description` header line.
+- Minified and optimized code across all plugin files to make code as small and efficient as possible.
 
 ## Features & Controls
 1. **Plugin Architecture & Dependency Checks**:
