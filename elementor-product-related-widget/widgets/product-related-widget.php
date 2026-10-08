@@ -316,9 +316,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		?>
 		<style>
 			.elementor-element-<?php echo $id; ?> .hover-reveal-slide-up .product-hover-overlay { transform: translateY(20px); }
-			.elementor-element-<?php echo $id; ?> .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
+			.elementor-element-<?php echo $id; ?> .hover-reveal-slide-up .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
 			.elementor-element-<?php echo $id; ?> .hover-reveal-zoom-in .product-hover-overlay { transform: scale(0.8); }
-			.elementor-element-<?php echo $id; ?> .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); opacity: 1; }
+			.elementor-element-<?php echo $id; ?> .hover-reveal-zoom-in .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); opacity: 1; }
 		</style>
 		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
 			<?php if ( 'yes' === $s['show_section_title'] && ! empty( $s['section_title'] ) ) : ?>
@@ -393,9 +393,9 @@ class Product_Related_Widget extends \Elementor\Widget_Base {
 		</div>
 		<style>
 			.elementor-element-{{ id }} .hover-reveal-slide-up .product-hover-overlay { transform: translateY(20px); }
-			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
+			.elementor-element-{{ id }} .hover-reveal-slide-up .product-image-wrapper:hover .product-hover-overlay { transform: translateY(0); opacity: 1; }
 			.elementor-element-{{ id }} .hover-reveal-zoom-in .product-hover-overlay { transform: scale(0.8); }
-			.elementor-element-{{ id }} .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); opacity: 1; }
+			.elementor-element-{{ id }} .hover-reveal-zoom-in .product-image-wrapper:hover .product-hover-overlay { transform: scale(1); opacity: 1; }
 		</style>
 		<?php
 	}

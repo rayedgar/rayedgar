@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Advanced Related Products Elementor Widget
  * Description:
- * Version: 1.0.6
+ * Version: 1.0.7
  * Author: Jules
  * Text Domain: elementor-product-related-widget
  */
