@@ -1,489 +1,140 @@
 <?php
-/**
- * Elementor Category Description Widget Class
- */
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
-
-/**
- * Class Elementor_Category_Description_Widget
- */
+if(!defined('ABSPATH'))exit;
 class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
+	public function get_name(){return 'category_description';}
+	public function get_title(){return esc_html__('Category Description','elementor-category-description');}
+	public function get_icon(){return 'eicon-post-content';}
+	public function get_categories(){return array('general');}
 
-	/**
-	 * Get widget name.
-	 *
-	 * @return string Widget name.
-	 */
-	public function get_name() {
-		return 'category_description';
+	protected function get_taxonomies_options(){
+		$o=array();
+		if(function_exists('get_taxonomies')){
+			foreach(get_taxonomies(array('public'=>true),'objects') as $t)$o[$t->name]=$t->label;
+		}else{$o=array('category'=>'Categories','post_tag'=>'Tags','product_cat'=>'Product categories');}
+		return $o;
 	}
 
-	/**
-	 * Get widget title.
-	 *
-	 * @return string Widget title.
-	 */
-	public function get_title() {
-		return esc_html__( 'Category Description', 'elementor-category-description' );
-	}
-
-	/**
-	 * Get widget icon.
-	 *
-	 * @return string Widget icon.
-	 */
-	public function get_icon() {
-		return 'eicon-post-content';
-	}
-
-	/**
-	 * Get widget categories.
-	 *
-	 * @return array Widget categories.
-	 */
-	public function get_categories() {
-		return array( 'general' );
-	}
-
-	/**
-	 * Get list of available taxonomies.
-	 *
-	 * @return array Taxonomies list (id => label).
-	 */
-	protected function get_taxonomies_options() {
-		$options = array();
-
-		if ( function_exists( 'get_taxonomies' ) ) {
-			$taxonomies = get_taxonomies( array( 'public' => true ), 'objects' );
-			foreach ( $taxonomies as $taxonomy ) {
-				$options[ $taxonomy->name ] = $taxonomy->label;
-			}
-		} else {
-			$options['category']    = 'Categories';
-			$options['post_tag']    = 'Tags';
-			$options['product_cat'] = 'Product categories';
-		}
-
-		return $options;
-	}
-
-	/**
-	 * Get list of terms for a taxonomy.
-	 *
-	 * @return array Terms list (id => label).
-	 */
-	protected function get_terms_options() {
-		$options = array(
-			'' => esc_html__( '-- Select Term --', 'elementor-category-description' ),
-		);
-
-		if ( function_exists( 'get_terms' ) ) {
-			$public_taxonomies = function_exists( 'get_taxonomies' ) ? array_keys( get_taxonomies( array( 'public' => true ) ) ) : array( 'category', 'post_tag', 'product_cat' );
-			$terms = get_terms( array(
-				'taxonomy'   => $public_taxonomies,
-				'hide_empty' => false,
-			) );
-
-			if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-				foreach ( $terms as $term ) {
-					$taxonomy_name = function_exists( 'get_taxonomy' ) ? get_taxonomy( $term->taxonomy ) : null;
-					$tax_label     = $taxonomy_name ? $taxonomy_name->labels->singular_name : $term->taxonomy;
-					$options[ $term->term_id ] = sprintf( '%s (%s)', $term->name, $tax_label );
+	protected function get_terms_options(){
+		$o=array(''=>esc_html__('-- Select Term --','elementor-category-description'));
+		if(function_exists('get_terms')){
+			$taxes=function_exists('get_taxonomies')?array_keys(get_taxonomies(array('public'=>true))):array('category','post_tag','product_cat');
+			$terms=get_terms(array('taxonomy'=>$taxes,'hide_empty'=>false));
+			if(!is_wp_error($terms)&&!empty($terms)){
+				foreach($terms as $t){
+					$tx=function_exists('get_taxonomy')?get_taxonomy($t->taxonomy):null;
+					$o[$t->term_id]=sprintf('%s (%s)',$t->name,$tx?$tx->labels->singular_name:$t->taxonomy);
 				}
 			}
 		}
-
-		return $options;
+		return $o;
 	}
 
-	/**
-	 * Register widget controls.
-	 */
-	protected function register_controls() {
-		// Content Section
-		$this->start_controls_section(
-			'section_content',
-			array(
-				'label' => esc_html__( 'Category Description', 'elementor-category-description' ),
-				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
-			)
-		);
-
-		$this->add_control(
-			'source',
-			array(
-				'label'   => esc_html__( 'Source', 'elementor-category-description' ),
-				'type'    => \Elementor\Controls_Manager::SELECT,
-				'default' => 'taxonomy_filter',
-				'options' => array(
-					'taxonomy_filter' => esc_html__( 'Elementor Taxonomy Filter / Query', 'elementor-category-description' ),
-					'loop_grid'       => esc_html__( 'Loop Grid / Product Category Sync', 'elementor-category-description' ),
-					'current'         => esc_html__( 'Current Query (Archive / Category Page)', 'elementor-category-description' ),
-					'custom'          => esc_html__( 'Select Taxonomy / Category', 'elementor-category-description' ),
-				),
-			)
-		);
-
-		$this->add_control(
-			'taxonomy',
-			array(
-				'label'     => esc_html__( 'Taxonomy Filter', 'elementor-category-description' ),
-				'type'      => \Elementor\Controls_Manager::SELECT,
-				'default'   => 'product_cat',
-				'options'   => $this->get_taxonomies_options(),
-				'condition' => array(
-					'source' => array( 'custom', 'taxonomy_filter', 'loop_grid' ),
-				),
-			)
-		);
-
-		$this->add_control(
-			'term_id',
-			array(
-				'label'       => esc_html__( 'Category / Term', 'elementor-category-description' ),
-				'type'        => \Elementor\Controls_Manager::SELECT,
-				'default'     => '',
-				'options'     => $this->get_terms_options(),
-				'description' => esc_html__( 'Select the specific category or term to display description for.', 'elementor-category-description' ),
-				'condition'   => array(
-					'source' => 'custom',
-				),
-			)
-		);
-
-		$this->add_control(
-			'html_tag',
-			array(
-				'label'   => esc_html__( 'HTML Tag', 'elementor-category-description' ),
-				'type'    => \Elementor\Controls_Manager::SELECT,
-				'default' => 'div',
-				'options' => array(
-					'div'  => 'div',
-					'p'    => 'p',
-					'span' => 'span',
-					'h1'   => 'h1',
-					'h2'   => 'h2',
-					'h3'   => 'h3',
-					'h4'   => 'h4',
-				),
-			)
-		);
-
-		$this->add_control(
-			'enable_wpautop',
-			array(
-				'label'        => esc_html__( 'Automatically add paragraphs', 'elementor-category-description' ),
-				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => esc_html__( 'Yes', 'elementor-category-description' ),
-				'label_off'    => esc_html__( 'No', 'elementor-category-description' ),
-				'return_value' => 'yes',
-				'default'      => 'yes',
-			)
-		);
-
-		$this->add_control(
-			'fallback_text',
-			array(
-				'label'       => esc_html__( 'Fallback Text', 'elementor-category-description' ),
-				'type'        => \Elementor\Controls_Manager::TEXTAREA,
-				'default'     => '',
-				'placeholder' => esc_html__( 'Optional text to display if no category description is found.', 'elementor-category-description' ),
-			)
-		);
-
+	protected function register_controls(){
+		$this->start_controls_section('section_content',array('label'=>esc_html__('Category Description','elementor-category-description'),'tab'=>\Elementor\Controls_Manager::TAB_CONTENT));
+		$this->add_control('source',array('label'=>esc_html__('Source','elementor-category-description'),'type'=>\Elementor\Controls_Manager::SELECT,'default'=>'taxonomy_filter','options'=>array('taxonomy_filter'=>esc_html__('Elementor Taxonomy Filter / Query','elementor-category-description'),'loop_grid'=>esc_html__('Loop Grid / Product Category Sync','elementor-category-description'),'current'=>esc_html__('Current Query','elementor-category-description'),'custom'=>esc_html__('Select Taxonomy / Category','elementor-category-description'))));
+		$this->add_control('taxonomy',array('label'=>esc_html__('Taxonomy Filter','elementor-category-description'),'type'=>\Elementor\Controls_Manager::SELECT,'default'=>'product_cat','options'=>$this->get_taxonomies_options(),'condition'=>array('source'=>array('custom','taxonomy_filter','loop_grid'))));
+		$this->add_control('term_id',array('label'=>esc_html__('Category / Term','elementor-category-description'),'type'=>\Elementor\Controls_Manager::SELECT,'default'=>'','options'=>$this->get_terms_options(),'condition'=>array('source'=>'custom')));
+		$this->add_control('html_tag',array('label'=>esc_html__('HTML Tag','elementor-category-description'),'type'=>\Elementor\Controls_Manager::SELECT,'default'=>'div','options'=>array('div'=>'div','p'=>'p','span'=>'span','h1'=>'h1','h2'=>'h2','h3'=>'h3','h4'=>'h4')));
+		$this->add_control('enable_wpautop',array('label'=>esc_html__('Add Paragraphs','elementor-category-description'),'type'=>\Elementor\Controls_Manager::SWITCHER,'return_value'=>'yes','default'=>'yes'));
+		$this->add_control('fallback_text',array('label'=>esc_html__('Fallback Text','elementor-category-description'),'type'=>\Elementor\Controls_Manager::TEXTAREA,'default'=>''));
 		$this->end_controls_section();
 
-		// Style Section
-		$this->start_controls_section(
-			'section_style',
-			array(
-				'label' => esc_html__( 'Description Style', 'elementor-category-description' ),
-				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
-			)
-		);
-
-		$this->add_responsive_control(
-			'align',
-			array(
-				'label'     => esc_html__( 'Alignment', 'elementor-category-description' ),
-				'type'      => \Elementor\Controls_Manager::CHOOSE,
-				'options'   => array(
-					'left'    => array(
-						'title' => esc_html__( 'Left', 'elementor-category-description' ),
-						'icon'  => 'eicon-text-align-left',
-					),
-					'center'  => array(
-						'title' => esc_html__( 'Center', 'elementor-category-description' ),
-						'icon'  => 'eicon-text-align-center',
-					),
-					'right'   => array(
-						'title' => esc_html__( 'Right', 'elementor-category-description' ),
-						'icon'  => 'eicon-text-align-right',
-					),
-					'justify' => array(
-						'title' => esc_html__( 'Justified', 'elementor-category-description' ),
-						'icon'  => 'eicon-text-align-justify',
-					),
-				),
-				'default'   => 'left',
-				'selectors' => array(
-					'{{WRAPPER}} .elementor-category-description' => 'text-align: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'text_color',
-			array(
-				'label'     => esc_html__( 'Text Color', 'elementor-category-description' ),
-				'type'      => \Elementor\Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} .elementor-category-description' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		if ( class_exists( '\Elementor\Group_Control_Typography' ) ) {
-			$this->add_group_control(
-				\Elementor\Group_Control_Typography::get_type(),
-				array(
-					'name'     => 'typography',
-					'selector' => '{{WRAPPER}} .elementor-category-description',
-				)
-			);
-		}
-
-		$this->add_responsive_control(
-			'padding',
-			array(
-				'label'      => esc_html__( 'Padding', 'elementor-category-description' ),
-				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', 'em', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} .elementor-category-description' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'margin',
-			array(
-				'label'      => esc_html__( 'Margin', 'elementor-category-description' ),
-				'type'       => \Elementor\Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', 'em', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} .elementor-category-description' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
+		$this->start_controls_section('section_style',array('label'=>esc_html__('Description Style','elementor-category-description'),'tab'=>\Elementor\Controls_Manager::TAB_STYLE));
+		$this->add_responsive_control('align',array('label'=>esc_html__('Alignment','elementor-category-description'),'type'=>\Elementor\Controls_Manager::CHOOSE,'options'=>array('left'=>array('title'=>'Left','icon'=>'eicon-text-align-left'),'center'=>array('title'=>'Center','icon'=>'eicon-text-align-center'),'right'=>array('title'=>'Right','icon'=>'eicon-text-align-right'),'justify'=>array('title'=>'Justify','icon'=>'eicon-text-align-justify')),'default'=>'left','selectors'=>array('{{WRAPPER}} .elementor-category-description'=>'text-align: {{VALUE}};')));
+		$this->add_control('text_color',array('label'=>esc_html__('Text Color','elementor-category-description'),'type'=>\Elementor\Controls_Manager::COLOR,'selectors'=>array('{{WRAPPER}} .elementor-category-description'=>'color: {{VALUE}};')));
+		if(class_exists('\Elementor\Group_Control_Typography'))$this->add_group_control(\Elementor\Group_Control_Typography::get_type(),array('name'=>'typography','selector'=>'{{WRAPPER}} .elementor-category-description'));
+		$this->add_responsive_control('padding',array('label'=>esc_html__('Padding','elementor-category-description'),'type'=>\Elementor\Controls_Manager::DIMENSIONS,'size_units'=>array('px','em','%'),'selectors'=>array('{{WRAPPER}} .elementor-category-description'=>'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};')));
+		$this->add_responsive_control('margin',array('label'=>esc_html__('Margin','elementor-category-description'),'type'=>\Elementor\Controls_Manager::DIMENSIONS,'size_units'=>array('px','em','%'),'selectors'=>array('{{WRAPPER}} .elementor-category-description'=>'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};')));
 		$this->end_controls_section();
 	}
 
-	/**
-	 * Retrieve description string for requested settings
-	 *
-	 * @param array $settings
-	 * @return string
-	 */
-	public function get_description_text( $settings ) {
-		$description = '';
-		$source      = isset( $settings['source'] ) ? $settings['source'] : 'taxonomy_filter';
-		$taxonomy    = isset( $settings['taxonomy'] ) ? $settings['taxonomy'] : 'category';
+	public function get_description_text($settings){
+		$d='';$src=isset($settings['source'])?$settings['source']:'taxonomy_filter';
+		$tax=isset($settings['taxonomy'])?$settings['taxonomy']:'category';
 
-		if ( 'custom' === $source && ! empty( $settings['term_id'] ) ) {
-			$term_id = (int) $settings['term_id'];
-			if ( function_exists( 'term_description' ) ) {
-				$description = term_description( $term_id );
-			} elseif ( function_exists( 'get_term' ) ) {
-				$term = get_term( $term_id );
-				if ( $term && ! is_wp_error( $term ) ) {
-					$description = $term->description;
+		if('custom'===$src&&!empty($settings['term_id'])){
+			$tid=(int)$settings['term_id'];
+			$d=function_exists('term_description')?term_description($tid):(function_exists('get_term')&&($t=get_term($tid))&&!is_wp_error($t)?$t->description:'');
+		}elseif('taxonomy_filter'===$src||'loop_grid'===$src){
+			$sel=null;
+			if(!empty($_GET)){
+				foreach($_GET as $k=>$v){
+					if((0===strpos($k,'e-filter-')||$k===$tax||$k==='product_cat'||$k==='category')&&!empty($v)){$sel=sanitize_text_field($v);break;}
 				}
 			}
-		} elseif ( 'taxonomy_filter' === $source || 'loop_grid' === $source ) {
-			// 1. Check Elementor Taxonomy Filter & Loop Grid URL query params e-filter-[id]-[taxonomy], product_cat, category, etc.
-			$selected_term = null;
-
-			if ( ! empty( $_GET ) ) {
-				foreach ( $_GET as $key => $val ) {
-					if ( ( 0 === strpos( $key, 'e-filter-' ) || $key === $taxonomy || $key === 'product_cat' || $key === 'category' ) && ! empty( $val ) ) {
-						$selected_term = sanitize_text_field( $val );
-						break;
-					}
-				}
+			if($sel&&function_exists('get_term_by')){
+				$to=is_numeric($sel)?get_term((int)$sel,$tax):get_term_by('slug',$sel,$tax);
+				if(!$to&&'product_cat'!==$tax)$to=get_term_by('slug',$sel,'product_cat');
+				if($to&&!is_wp_error($to))$d=function_exists('term_description')?term_description($to->term_id):$to->description;
 			}
-
-			if ( $selected_term ) {
-				if ( function_exists( 'get_term_by' ) ) {
-					$term_obj = is_numeric( $selected_term ) ? get_term( (int) $selected_term, $taxonomy ) : get_term_by( 'slug', $selected_term, $taxonomy );
-					if ( ! $term_obj && 'product_cat' !== $taxonomy ) {
-						$term_obj = get_term_by( 'slug', $selected_term, 'product_cat' );
-					}
-					if ( $term_obj && ! is_wp_error( $term_obj ) ) {
-						$description = function_exists( 'term_description' ) ? term_description( $term_obj->term_id ) : $term_obj->description;
-					}
-				}
+			if(empty($d)&&function_exists('get_queried_object')){
+				$qo=get_queried_object();
+				if($qo&&isset($qo->term_id))$d=function_exists('term_description')?term_description($qo->term_id):(isset($qo->description)?$qo->description:'');
 			}
-
-			// 2. Fallback to queried object if no taxonomy filter param in URL
-			if ( empty( $description ) && function_exists( 'get_queried_object' ) ) {
-				$queried_object = get_queried_object();
-				if ( $queried_object && isset( $queried_object->term_id ) ) {
-					$description = function_exists( 'term_description' ) ? term_description( $queried_object->term_id ) : ( isset( $queried_object->description ) ? $queried_object->description : '' );
-				}
-			}
-		} else {
-			if ( function_exists( 'get_queried_object' ) ) {
-				$queried_object = get_queried_object();
-				if ( $queried_object && isset( $queried_object->term_id ) ) {
-					if ( function_exists( 'term_description' ) ) {
-						$description = term_description( $queried_object->term_id );
-					} else {
-						$description = isset( $queried_object->description ) ? $queried_object->description : '';
-					}
-				}
-			}
+		}else if(function_exists('get_queried_object')){
+			$qo=get_queried_object();
+			if($qo&&isset($qo->term_id))$d=function_exists('term_description')?term_description($qo->term_id):(isset($qo->description)?$qo->description:'');
 		}
 
-		if ( empty( trim( strip_tags( (string) $description ) ) ) ) {
-			$description = ! empty( $settings['fallback_text'] ) ? $settings['fallback_text'] : '';
-		}
-
-		if ( ! empty( $description ) ) {
-			if ( isset( $settings['enable_wpautop'] ) && 'yes' === $settings['enable_wpautop'] && function_exists( 'wpautop' ) ) {
-				$description = wpautop( $description );
-			}
-		}
-
-		return $description;
+		if(empty(trim(strip_tags((string)$d))))$d=!empty($settings['fallback_text'])?$settings['fallback_text']:'';
+		if(!empty($d)&&isset($settings['enable_wpautop'])&&'yes'===$settings['enable_wpautop']&&function_exists('wpautop'))$d=wpautop($d);
+		return $d;
 	}
 
-	/**
-	 * Get all term descriptions for the current taxonomy to embed as JSON for live JS filter/loop grid switching.
-	 *
-	 * @param string $taxonomy
-	 * @return array
-	 */
-	protected function get_all_term_descriptions( $taxonomy = 'category' ) {
-		$descriptions = array();
-
-		if ( function_exists( 'get_terms' ) ) {
-			$taxonomies = array_unique( array_filter( array( $taxonomy, 'product_cat', 'category', 'post_tag' ) ) );
-			$terms      = get_terms( array(
-				'taxonomy'   => $taxonomies,
-				'hide_empty' => false,
-			) );
-
-			if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-				foreach ( $terms as $term ) {
-					$desc = function_exists( 'term_description' ) ? term_description( $term->term_id ) : $term->description;
-					if ( ! empty( $desc ) ) {
-						if ( function_exists( 'wpautop' ) ) {
-							$desc = wpautop( $desc );
-						}
-						$descriptions[ $term->slug ]            = $desc;
-						$descriptions[ $term->term_id ]         = $desc;
-						$descriptions[ 'cat-' . $term->term_id ] = $desc;
-						$descriptions[ 'cat-' . $term->slug ]   = $desc;
+	protected function get_all_term_descriptions($tax='category'){
+		$m=array();
+		if(function_exists('get_terms')){
+			$terms=get_terms(array('taxonomy'=>array_unique(array_filter(array($tax,'product_cat','category','post_tag'))),'hide_empty'=>false));
+			if(!is_wp_error($terms)&&!empty($terms)){
+				foreach($terms as $t){
+					$desc=function_exists('term_description')?term_description($t->term_id):$t->description;
+					if(!empty($desc)){
+						if(function_exists('wpautop'))$desc=wpautop($desc);
+						$m[$t->slug]=$desc;$m[$t->term_id]=$desc;$m['cat-'.$t->term_id]=$desc;$m['cat-'.$t->slug]=$desc;
 					}
 				}
 			}
 		}
-
-		return $descriptions;
+		return $m;
 	}
 
-	/**
-	 * Render widget output on frontend.
-	 */
-	protected function render() {
-		$settings    = $this->get_settings_for_display();
-		$description = $this->get_description_text( $settings );
+	protected function render(){
+		$s=$this->get_settings_for_display();
+		$d=$this->get_description_text($s);
+		$tags=array('div','p','span','h1','h2','h3','h4');
+		$tag=in_array(isset($s['html_tag'])?$s['html_tag']:'div',$tags,true)?$s['html_tag']:'div';
+		$wid=$this->get_id();
+		$tax=isset($s['taxonomy'])?$s['taxonomy']:'category';
+		$fb=isset($s['fallback_text'])?$s['fallback_text']:'';
 
-		$allowed_tags = array( 'div', 'p', 'span', 'h1', 'h2', 'h3', 'h4' );
-		$tag_setting  = isset( $settings['html_tag'] ) ? $settings['html_tag'] : 'div';
-		$html_tag     = in_array( $tag_setting, $allowed_tags, true ) ? $tag_setting : 'div';
-		$widget_id    = $this->get_id();
-		$taxonomy     = isset( $settings['taxonomy'] ) ? $settings['taxonomy'] : 'category';
-		$fallback     = isset( $settings['fallback_text'] ) ? $settings['fallback_text'] : '';
-
-		$term_descriptions = $this->get_all_term_descriptions( $taxonomy );
-
-		if ( empty( $description ) ) {
-			if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->editor ) && \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
-				echo sprintf(
-					'<%1$s class="elementor-category-description elementor-category-description-empty" style="padding: 10px; border: 1px dashed #ccc; text-align: center; color: #888;">%2$s</%1$s>',
-					esc_attr( $html_tag ),
-					esc_html__( 'Category Description Widget: No description available for the selected category filter.', 'elementor-category-description' )
-				);
-				return;
-			}
+		if(empty($d)&&class_exists('\Elementor\Plugin')&&isset(\Elementor\Plugin::$instance->editor)&&\Elementor\Plugin::$instance->editor->is_edit_mode()){
+			printf('<%1$s class="elementor-category-description" style="padding:10px;border:1px dashed #ccc;text-align:center;color:#888;">%2$s</%1$s>',esc_attr($tag),esc_html__('No category description.','elementor-category-description'));
+			return;
 		}
 
-		if ( function_exists( 'wp_kses_post' ) ) {
-			$clean_description = wp_kses_post( $description );
-		} else {
-			$clean_description = $description;
-		}
+		$cd=function_exists('wp_kses_post')?wp_kses_post($d):$d;
+		printf('<%1$s id="elementor-category-description-%3$s" class="elementor-category-description" data-widget-id="%3$s">%2$s</%1$s>',esc_attr($tag),$cd,esc_attr($wid));
 
-		printf(
-			'<%1$s id="elementor-category-description-%3$s" class="elementor-category-description" data-widget-id="%3$s">%2$s</%1$s>',
-			esc_attr( $html_tag ),
-			$clean_description,
-			esc_attr( $widget_id )
-		);
-
-		// Output safe JSON encoding for inline script block
-		$json_flags = defined( 'JSON_HEX_TAG' ) ? JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT : 0;
-		if ( function_exists( 'wp_json_encode' ) ) {
-			$json_map      = wp_json_encode( $term_descriptions, $json_flags );
-			$fallback_json = wp_json_encode( $fallback, $json_flags );
-		} else {
-			$json_map      = json_encode( $term_descriptions, $json_flags );
-			$fallback_json = json_encode( $fallback, $json_flags );
-		}
-
+		$flags=defined('JSON_HEX_TAG')?JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT:0;
+		$jmap=function_exists('wp_json_encode')?wp_json_encode($this->get_all_term_descriptions($tax),$flags):json_encode($this->get_all_term_descriptions($tax),$flags);
+		$jfb=function_exists('wp_json_encode')?wp_json_encode($fb,$flags):json_encode($fb,$flags);
 		?>
 		<script>
-		(function() {
-			var termMap = <?php echo $json_map ? $json_map : '{}'; ?>;
-			var fallbackText = <?php echo $fallback_json ? $fallback_json : '""'; ?>;
-
-			function updateDescription(termSlugOrId) {
-				var descContainer = document.getElementById('elementor-category-description-<?php echo esc_js( $widget_id ); ?>');
-				if (!descContainer) return;
-
-				if (termSlugOrId) {
-					termSlugOrId = termSlugOrId.toString().trim().replace(/^\./, '').replace(/^cat-/, '');
-				}
-
-				var newDesc = termMap[termSlugOrId] || termMap['cat-' + termSlugOrId] || fallbackText || '';
-				if (newDesc) {
-					descContainer.innerHTML = newDesc;
-					descContainer.style.display = '';
-				} else if (!newDesc) {
-					descContainer.innerHTML = '';
-				}
+		(function(){
+			var tm=<?php echo $jmap?$jmap:'{}';?>;var fb=<?php echo $jfb?$jfb:'""';?>;
+			function update(v){
+				var c=document.getElementById('elementor-category-description-<?php echo esc_js($wid);?>');if(!c)return;
+				if(v)v=v.toString().trim().replace(/^\./,'').replace(/^cat-/,'');
+				var d=tm[v]||tm['cat-'+v]||fb||'';c.innerHTML=d;c.style.display=d?'':'none';
 			}
-
-			document.addEventListener('click', function(e) {
-				var filterItem = e.target.closest('[data-filter], .e-filter-item, [data-term-id], [data-term-slug], .product-category, .elementor-loop-container a');
-				if (filterItem) {
-					var termVal = filterItem.getAttribute('data-filter') || filterItem.getAttribute('data-term-slug') || filterItem.getAttribute('data-term-id');
-					if (!termVal && filterItem.getAttribute('href')) {
-						var href = filterItem.getAttribute('href');
-						var match = href.match(/\/product-category\/([^\/]+)/) || href.match(/\/category\/([^\/]+)/);
-						if (match && match[1]) {
-							termVal = match[1];
-						}
+			document.addEventListener('click',function(e){
+				var i=e.target.closest('[data-filter],.e-filter-item,[data-term-id],[data-term-slug],.product-category,.elementor-loop-container a');
+				if(i){
+					var v=i.getAttribute('data-filter')||i.getAttribute('data-term-slug')||i.getAttribute('data-term-id');
+					if(!v&&i.getAttribute('href')){
+						var m=i.getAttribute('href').match(/\/(product-category|category)\/([^\/]+)/);if(m&&m[2])v=m[2];
 					}
-					if (termVal) {
-						updateDescription(termVal);
-					}
+					if(v)update(v);
 				}
 			});
 		})();
@@ -491,34 +142,10 @@ class Elementor_Category_Description_Widget extends \Elementor\Widget_Base {
 		<?php
 	}
 
-	/**
-	 * Render widget in Elementor Editor live template.
-	 */
-	protected function content_template() {
+	protected function content_template(){
 		?>
-		<#
-		var htmlTag = settings.html_tag || 'div';
-		var description = '';
-
-		if ( settings.source === 'custom' && settings.term_id ) {
-			description = 'Category description preview for term ID: ' + settings.term_id;
-		} else if ( settings.source === 'taxonomy_filter' || settings.source === 'loop_grid' ) {
-			description = 'Live description dynamically synced with Elementor Taxonomy Filter / Loop Grid.';
-		} else {
-			description = 'Current category / taxonomy description preview.';
-		}
-
-		if ( ! description && settings.fallback_text ) {
-			description = settings.fallback_text;
-		}
-
-		if ( ! description ) {
-			description = 'Category Description Widget: Select a category or view on a category archive page.';
-		}
-		#>
-		<{{{ htmlTag }}} class="elementor-category-description">
-			{{{ description }}}
-		</{{{ htmlTag }}}>
+		<# var tag=settings.html_tag||'div'; #>
+		<{{{ tag }}} class="elementor-category-description">Category Description Preview</{{{ tag }}}>
 		<?php
 	}
 }

@@ -388,7 +388,7 @@ $render_method->setAccessible( true );
 $render_method->invoke( $widget );
 $output = ob_get_clean();
 
-if ( strpos( $output, 'id="elementor-category-description-test_widget_id"' ) !== false && strpos( $output, 'updateDescription' ) !== false && strpos( $output, 'product-category' ) !== false ) {
+if ( strpos( $output, 'id="elementor-category-description-test_widget_id"' ) !== false && strpos( $output, 'update(' ) !== false && strpos( $output, 'product-category' ) !== false ) {
 	echo "✓ Test 8 Passed: Widget rendered valid HTML structure with JS filter script.\n\n";
 } else {
 	echo "✗ Test 8 Failed: Rendered HTML/JS output incorrect.\n";
