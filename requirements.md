@@ -1,4 +1,5 @@
 # User Requirements
 
-1. **Tab Title for Additional Information**: Change tab title for the WooCommerce `additional_information` tab to `'Specs'` across all WooCommerce hooks/defaults in `producttabs_plus`.
-2. **Clean Text for Attributes**: Strip any extra highlighted lines, border lines, or column markers from attribute tables (`border: none !important; box-shadow: none !important; outline: none !important; background: transparent !important;`) so product attributes display as pure clean text without distracting cell borders or highlighted lines.
+- The user explicitly requested: "remove all descriptive text and make code as small as possible"
+- Remove non-essential docblocks, code comments, and verbose control descriptions across `producttabs_plus` files.
+- Minify and streamline PHP/CSS code while preserving 100% of the plugin features, Elementor controls, and functionality.
