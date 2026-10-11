@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Advanced Related Products Elementor Widget
- * Version: 1.0.8
+ * Version: 1.0.9
  * Author: Jules
  * Text Domain: elementor-product-related-widget
  */

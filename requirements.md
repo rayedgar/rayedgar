@@ -4,11 +4,18 @@
 Custom Elementor plugin for WooCommerce called **Advanced Related Products Elementor Widget** (or `elementor-product-related-widget`).
 
 ## Version
-- Version: **1.0.8** (incremented version number)
+- Version: **1.0.9** (incremented version number)
 
-## Code Minification & Description Removal
-- Completely removed `Description` header line.
-- Minified and optimized code across all plugin files to make code as small and efficient as possible.
+## New Feature: Stock Status Indicator Dots
+- **Stock Dot Switcher**: Switcher control `show_stock_dot` to toggle stock status dot indicator.
+- **Stock Dot Colors**:
+  - Green dot (`#00d084`) when product is in stock.
+  - Red dot (`#cf2e2e`) when product is sold out / out of stock.
+- **Stock Dot Size**: Responsive Slider control `stock_dot_size` (px) to set the size (width and height) of the stock dot.
+- **Stock Dot Position (X, Y Offset)**:
+  - Responsive Slider control `stock_dot_offset_x` (px, %, em) for horizontal X positioning.
+  - Responsive Slider control `stock_dot_offset_y` (px, %, em) for vertical Y positioning.
+  - CSS position absolute relative to product image container / product item.
 
 ## Features & Controls
 1. **Plugin Architecture & Dependency Checks**:
@@ -33,14 +40,16 @@ Custom Elementor plugin for WooCommerce called **Advanced Related Products Eleme
      - Responsive Select control for 'Hover Reveal Effect' ('Fade', 'Slide Up', 'Zoom In').
      - Responsive Slider control for 'Reveal Speed (ms)'.
      - Responsive Slider control for 'Image Width'.
+     - Stock status indicator dot controls (Show/Hide, Size, In Stock Color, Out of Stock Color, X Offset, Y Offset).
    - **Style Sections**:
-     - Section Title styling (Alignment, Color, Typography, Spacing).
+     - Section Title styling.
      - Product Name Hover Text Background (Normal & Hover tabs, color & transparency picker, padding, border-radius).
      - Image & Hover styling (Hover Overlay Background, Columns Gap, Rows Gap, Box Padding, Normal/Hover Border, Box Shadow, Background Color, Border Radius).
+     - Stock Badge / Dot style section.
 
 3. **Render & Preview Capabilities**:
-   - `render()` method queries related/published products with fallbacks.
-   - Live editor template in `content_template()`.
+   - `render()` checks `$product_obj->is_in_stock()` and outputs `<span class="product-stock-dot in-stock">` or `<span class="product-stock-dot out-of-stock">`.
+   - Live editor template in `content_template()` renders preview dots for both in-stock and out-of-stock items.
 
 4. **Testing**:
-   - Mock PHP test suite in `tests/test-product-related-widget.php`.
+   - Mock PHP test suite in `tests/test-product-related-widget.php` updated to cover stock dot rendering.

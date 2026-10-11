@@ -6,21 +6,15 @@ namespace {
     }
 
     if (!function_exists('esc_html__')) {
-        function esc_html__($text, $domain) {
-            return $text;
-        }
+        function esc_html__($text, $domain) { return $text; }
     }
 
     if (!function_exists('esc_html')) {
-        function esc_html($text) {
-            return $text;
-        }
+        function esc_html($text) { return $text; }
     }
 
     if (!function_exists('esc_attr')) {
-        function esc_attr($text) {
-            return $text;
-        }
+        function esc_attr($text) { return $text; }
     }
 
     if (!function_exists('add_action')) {
@@ -28,9 +22,7 @@ namespace {
     }
 
     if (!function_exists('did_action')) {
-        function did_action($hook) {
-            return true;
-        }
+        function did_action($hook) { return true; }
     }
 
     if (!class_exists('WooCommerce')) {
@@ -58,13 +50,11 @@ namespace Elementor {
                     'product_title_position' => 'underneath',
                     'products_count' => 4,
                     'hover_reveal_effect' => 'fade',
+                    'show_stock_dot' => 'yes',
                 ];
             }
 
-            public function get_render_attribute_string($element) {
-                return '';
-            }
-
+            public function get_render_attribute_string($element) { return ''; }
             public function add_render_attribute($element, $key, $value = null, $overwrite = false) {}
         }
     }
@@ -86,27 +76,15 @@ namespace Elementor {
     }
 
     if (!class_exists('Group_Control_Typography')) {
-        class Group_Control_Typography {
-            public static function get_type() {
-                return 'typography';
-            }
-        }
+        class Group_Control_Typography { public static function get_type() { return 'typography'; } }
     }
 
     if (!class_exists('Group_Control_Border')) {
-        class Group_Control_Border {
-            public static function get_type() {
-                return 'border';
-            }
-        }
+        class Group_Control_Border { public static function get_type() { return 'border'; } }
     }
 
     if (!class_exists('Group_Control_Box_Shadow')) {
-        class Group_Control_Box_Shadow {
-            public static function get_type() {
-                return 'box-shadow';
-            }
-        }
+        class Group_Control_Box_Shadow { public static function get_type() { return 'box-shadow'; } }
     }
 
     if (!class_exists('Plugin')) {
@@ -115,9 +93,7 @@ namespace Elementor {
             public $editor;
             public function __construct() {
                 $this->editor = new class {
-                    public function is_edit_mode() {
-                        return true;
-                    }
+                    public function is_edit_mode() { return true; }
                 };
             }
         }
@@ -136,27 +112,22 @@ namespace {
         return $GLOBALS['related_ids'];
     }
 
+    $GLOBALS['mock_is_in_stock'] = true;
     function wc_get_product($id) {
         if ($id === 999) return false;
         return new class {
             public function get_image() {
                 return '<img src="dummy.jpg" />';
             }
+            public function is_in_stock() {
+                return $GLOBALS['mock_is_in_stock'];
+            }
         };
     }
 
-    function get_the_ID() {
-        return 101;
-    }
-
-    function the_permalink() {
-        echo 'http://example.com/product';
-    }
-
-    function the_title() {
-        echo 'Sample Product';
-    }
-
+    function get_the_ID() { return 101; }
+    function the_permalink() { echo 'http://example.com/product'; }
+    function the_title() { echo 'Sample Product'; }
     function wp_reset_postdata() {}
 
     $GLOBALS['mock_query_posts_count'] = 4;
@@ -202,14 +173,26 @@ namespace {
         'product_title_position' => 'underneath',
         'products_count' => 4,
         'hover_reveal_effect' => 'fade',
+        'show_stock_dot' => 'yes',
     ];
     ob_start();
     $widget->public_render();
     $output = ob_get_clean();
-    if (strpos($output, 'class="product-item-content"') !== false && strpos($output, 'class="product-name"') !== false) {
-        echo " - Visibility test passed.\n";
+    if (strpos($output, 'class="product-item-content"') !== false && strpos($output, 'class="product-name"') !== false && strpos($output, 'product-stock-dot in-stock') !== false) {
+        echo " - Visibility and In-Stock dot test passed.\n";
     } else {
         echo " - Visibility test failed.\n";
+    }
+
+    echo "Test Case: Out of Stock Red Dot Rendering\n";
+    $GLOBALS['mock_is_in_stock'] = false;
+    ob_start();
+    $widget->public_render();
+    $output = ob_get_clean();
+    if (strpos($output, 'product-stock-dot out-of-stock') !== false) {
+        echo " - Out-of-Stock red dot test passed.\n";
+    } else {
+        echo " - Out-of-Stock test failed.\n";
     }
 
     echo "Test Case: Fallback Query when related IDs empty\n";
