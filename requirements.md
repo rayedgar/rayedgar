@@ -4,11 +4,15 @@
 Custom Elementor plugin for WooCommerce called **Advanced Related Products Elementor Widget** (or `elementor-product-related-widget`).
 
 ## Version
-- Version: **1.1.0** (incremented version number)
+- Version: **1.1.1** (incremented version number)
 
-## Touchpad / Touch Single-Click Navigation Fix
-- Added `touch-action: manipulation;` and `cursor: pointer;` to `.related-product-item`, `.product-image-wrapper`, `.product-hover-overlay`, and `.product-name a` to eliminate double-tap / double-click requirements on touchpads and touchscreens.
-- Added click / touchend handler on `.related-product-item` so that a single touch or touchpad click fires the link immediately without requiring a second click.
+## iPad / iOS Single-Tap Navigation Fix
+1. **Media Query Scoping (`@media (hover: hover)`)**:
+   - Wrap all CSS `:hover` rules (e.g. `.product-image-wrapper:hover .product-hover-overlay`) inside `@media (hover: hover) { ... }`.
+   - On iPad/iOS touchscreens where hover is unavailable, WebKit bypasses hover emulation and triggers `click` navigation on the **first tap**.
+2. **Touch Event Listener (`touchend`)**:
+   - Add lightweight JavaScript touch listener on `.related-product-item` and links that tracks touch start/end positions (to distinguish tap from scroll).
+   - On single tap, immediately navigate to product link (`window.location.href`) without requiring a second tap.
 
 ## Features & Controls
 1. **Plugin Architecture & Dependency Checks**:
@@ -41,7 +45,7 @@ Custom Elementor plugin for WooCommerce called **Advanced Related Products Eleme
      - Stock Badge / Dot style section.
 
 3. **Render & Preview Capabilities**:
-   - Single touch / click link firing on touchpad/touchscreen.
+   - Single-tap iPad/touch navigation.
    - `render()` checks `$product_obj->is_in_stock()` and outputs `<span class="product-stock-dot in-stock">` or `<span class="product-stock-dot out-of-stock">`.
    - Live editor template in `content_template()`.
 
