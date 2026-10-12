@@ -17,6 +17,14 @@ namespace {
         function esc_attr($text) { return $text; }
     }
 
+    if (!function_exists('esc_url')) {
+        function esc_url($text) { return $text; }
+    }
+
+    if (!function_exists('get_permalink')) {
+        function get_permalink() { return 'http://example.com/product'; }
+    }
+
     if (!function_exists('add_action')) {
         function add_action($hook, $callback) {}
     }

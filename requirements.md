@@ -4,18 +4,11 @@
 Custom Elementor plugin for WooCommerce called **Advanced Related Products Elementor Widget** (or `elementor-product-related-widget`).
 
 ## Version
-- Version: **1.0.9** (incremented version number)
+- Version: **1.1.0** (incremented version number)
 
-## New Feature: Stock Status Indicator Dots
-- **Stock Dot Switcher**: Switcher control `show_stock_dot` to toggle stock status dot indicator.
-- **Stock Dot Colors**:
-  - Green dot (`#00d084`) when product is in stock.
-  - Red dot (`#cf2e2e`) when product is sold out / out of stock.
-- **Stock Dot Size**: Responsive Slider control `stock_dot_size` (px) to set the size (width and height) of the stock dot.
-- **Stock Dot Position (X, Y Offset)**:
-  - Responsive Slider control `stock_dot_offset_x` (px, %, em) for horizontal X positioning.
-  - Responsive Slider control `stock_dot_offset_y` (px, %, em) for vertical Y positioning.
-  - CSS position absolute relative to product image container / product item.
+## Touchpad / Touch Single-Click Navigation Fix
+- Added `touch-action: manipulation;` and `cursor: pointer;` to `.related-product-item`, `.product-image-wrapper`, `.product-hover-overlay`, and `.product-name a` to eliminate double-tap / double-click requirements on touchpads and touchscreens.
+- Added click / touchend handler on `.related-product-item` so that a single touch or touchpad click fires the link immediately without requiring a second click.
 
 ## Features & Controls
 1. **Plugin Architecture & Dependency Checks**:
@@ -48,8 +41,9 @@ Custom Elementor plugin for WooCommerce called **Advanced Related Products Eleme
      - Stock Badge / Dot style section.
 
 3. **Render & Preview Capabilities**:
+   - Single touch / click link firing on touchpad/touchscreen.
    - `render()` checks `$product_obj->is_in_stock()` and outputs `<span class="product-stock-dot in-stock">` or `<span class="product-stock-dot out-of-stock">`.
-   - Live editor template in `content_template()` renders preview dots for both in-stock and out-of-stock items.
+   - Live editor template in `content_template()`.
 
 4. **Testing**:
-   - Mock PHP test suite in `tests/test-product-related-widget.php` updated to cover stock dot rendering.
+   - Mock PHP test suite in `tests/test-product-related-widget.php`.
